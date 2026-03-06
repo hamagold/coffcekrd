@@ -75,16 +75,18 @@ const MenuScreen = () => {
     ctx.fillText('#' + orderNum, 70, 135);
   };
 
-  const printLabel = () => {
+  const cafeName = getCafeName();
+
+  const doPrint = (orderNum: string) => {
     const w = window.open('', '_blank', 'width=400,height=300');
     if (!w) return;
-    w.document.write(`<html><head><title>PLC Order</title>
+    w.document.write(`<html><head><title>${cafeName} Order</title>
     <style>body{font-family:monospace;text-align:center;padding:20px;} .big{font-size:48px;font-weight:bold;}</style>
     </head><body>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div style="font-size:24px;font-weight:bold;">PLC CAFETERIA</div>
+    <div style="font-size:24px;font-weight:bold;">${cafeName} CAFETERIA</div>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div class="big">#${lastOrderNum}</div>
+    <div class="big">#${orderNum}</div>
     <div>${new Date().toLocaleString()}</div>
     <div>Payment: ${payment.toUpperCase()}</div>
     <div>Type: ${orderType.toUpperCase()}</div>
@@ -93,6 +95,9 @@ const MenuScreen = () => {
     <script>window.print();<\/script>
     </body></html>`);
   };
+
+  const autoPrintLabel = (orderNum: string) => doPrint(orderNum);
+  const printLabel = () => doPrint(lastOrderNum);
 
   const paymentConfig = (() => {
     try {

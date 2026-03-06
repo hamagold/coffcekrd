@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
+import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 
 const MenuScreen = () => {
@@ -153,7 +154,11 @@ const MenuScreen = () => {
               <div className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center text-xs ${menuType === 'robot' ? 'bg-info/30 border border-info' : 'bg-success/30 border border-success'}`}>
                 {menuType === 'robot' ? '🤖' : '👨‍🍳'}
               </div>
-              <span className="text-5xl text-center block mb-2.5">{item.emoji}</span>
+              {menuImages[item.id] ? (
+                <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-32 object-cover rounded-xl mb-2.5" />
+              ) : (
+                <span className="text-5xl text-center block mb-2.5">{item.emoji}</span>
+              )}
               <div className="text-foreground text-[15px] font-bold mb-1">{item.name[language]}</div>
               <div className="text-foreground/40 text-[11px] mb-2.5 leading-relaxed">{item.desc[language]}</div>
               <div className="text-primary text-xl font-black">{item.price.toLocaleString()} <span className="text-xs text-primary/60">IQD</span></div>
@@ -177,7 +182,11 @@ const MenuScreen = () => {
             ) : (
               cart.map(item => (
                 <div key={item.id} className="bg-muted rounded-lg p-3 mb-2 flex items-center gap-2.5 animate-slide-in">
-                  <span className="text-3xl">{item.emoji}</span>
+                  {menuImages[item.id] ? (
+                    <img src={menuImages[item.id]} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-3xl">{item.emoji}</span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="text-foreground text-sm font-semibold truncate">{item.name[language]}</div>
                     <div className="text-primary text-xs">{(item.price * item.qty).toLocaleString()} IQD</div>

@@ -7,6 +7,7 @@ import { StoreProvider } from "@/store/StoreContext";
 import LanguageSelect from "./pages/LanguageSelect";
 import MenuScreen from "./pages/MenuScreen";
 import AdminPanel from "./pages/AdminPanel";
+import OnlineOrder from "./pages/OnlineOrder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<LanguageSelect />} />
             <Route path="/menu" element={<MenuScreen />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/order" element={<OnlineOrder />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

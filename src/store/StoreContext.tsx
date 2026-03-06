@@ -26,7 +26,7 @@ interface StoreContextType {
 
   // Orders
   orders: Order[];
-  placeOrder: (payment: PaymentMethod, orderType: OrderType) => string;
+  placeOrder: (payment: PaymentMethod, orderType: OrderType) => Promise<string>;
   clearOrders: () => void;
 
   // Expenses

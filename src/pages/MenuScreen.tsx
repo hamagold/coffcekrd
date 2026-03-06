@@ -40,9 +40,9 @@ const MenuScreen = () => {
     setActiveCategory(categories[0]?.id || '');
   }, [menuType]);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
-    const num = placeOrder(payment, orderType);
+    const num = await placeOrder(payment, orderType);
     setLastOrderNum(num);
     generateQR(num, cartTotal);
     setShowModal(true);

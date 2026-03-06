@@ -5,6 +5,7 @@ import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
+import { getCafeName } from '@/hooks/useAdminLang';
 import { Coffee, Settings, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat } from 'lucide-react';
 
 const MenuScreen = () => {
@@ -46,6 +47,8 @@ const MenuScreen = () => {
     setLastOrderNum(num);
     generateQR(num, cartTotal);
     setShowModal(true);
+    // Auto-print after short delay
+    setTimeout(() => autoPrintLabel(num), 500);
   };
 
   const generateQR = (orderNum: string, total: number) => {
@@ -72,16 +75,18 @@ const MenuScreen = () => {
     ctx.fillText('#' + orderNum, 70, 135);
   };
 
-  const printLabel = () => {
+  const cafeName = getCafeName();
+
+  const doPrint = (orderNum: string) => {
     const w = window.open('', '_blank', 'width=400,height=300');
     if (!w) return;
-    w.document.write(`<html><head><title>PLC Order</title>
+    w.document.write(`<html><head><title>${cafeName} Order</title>
     <style>body{font-family:monospace;text-align:center;padding:20px;} .big{font-size:48px;font-weight:bold;}</style>
     </head><body>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div style="font-size:24px;font-weight:bold;">PLC CAFETERIA</div>
+    <div style="font-size:24px;font-weight:bold;">${cafeName} CAFETERIA</div>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div class="big">#${lastOrderNum}</div>
+    <div class="big">#${orderNum}</div>
     <div>${new Date().toLocaleString()}</div>
     <div>Payment: ${payment.toUpperCase()}</div>
     <div>Type: ${orderType.toUpperCase()}</div>
@@ -90,6 +95,9 @@ const MenuScreen = () => {
     <script>window.print();<\/script>
     </body></html>`);
   };
+
+  const autoPrintLabel = (orderNum: string) => doPrint(orderNum);
+  const printLabel = () => doPrint(lastOrderNum);
 
   const paymentConfig = (() => {
     try {
@@ -114,7 +122,7 @@ const MenuScreen = () => {
             <Coffee className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <span className="text-foreground text-base font-bold tracking-wide">PLC</span>
+            <span className="text-foreground text-base font-bold tracking-wide">{cafeName}</span>
             <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
           </div>
         </div>

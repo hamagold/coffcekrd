@@ -1,88 +1,179 @@
-import { useState } from 'react';
-import { CreditCard, Smartphone, Zap, Building2, QrCode, Printer } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight } from 'lucide-react';
+import { toast } from 'sonner';
+
+export interface PaymentConfig {
+  fib: boolean;
+  zain: boolean;
+  fastpay: boolean;
+}
+
+export const getPaymentConfig = (): PaymentConfig => {
+  try {
+    const saved = localStorage.getItem('plc_payment_config');
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return { fib: true, zain: true, fastpay: true };
+};
+
+const providers = [
+  {
+    id: 'fib' as const,
+    name: { ku: 'بانکی FIB', ar: 'بنك FIB', en: 'FIB Bank' },
+    icon: Building2,
+    color: 'text-success',
+    bgColor: 'bg-success/10',
+    fields: [
+      { label: { ku: 'کلیلی API', ar: 'مفتاح API', en: 'API KEY' }, type: 'password', placeholder: 'fib_live_xxxx' },
+      { label: { ku: 'ناسنامەی بازرگان', ar: 'معرف التاجر', en: 'MERCHANT ID' }, type: 'text', placeholder: 'FIB-MERCHANT-ID' },
+    ],
+  },
+  {
+    id: 'zain' as const,
+    name: { ku: 'زەین کاش', ar: 'زين كاش', en: 'ZainCash' },
+    icon: Smartphone,
+    color: 'text-destructive',
+    bgColor: 'bg-destructive/10',
+    fields: [
+      { label: { ku: 'تۆکنی بازرگان', ar: 'رمز التاجر', en: 'MERCHANT TOKEN' }, type: 'password', placeholder: 'zain_token_xxxx' },
+      { label: { ku: 'ژمارەی مۆبایل', ar: 'رقم الهاتف', en: 'MSISDN (Phone)' }, type: 'text', placeholder: '07801234567' },
+      { label: { ku: 'کلیلی نهێنی', ar: 'المفتاح السري', en: 'SECRET KEY' }, type: 'password', placeholder: 'secret_xxxx' },
+    ],
+  },
+  {
+    id: 'fastpay' as const,
+    name: { ku: 'فاست پەی', ar: 'فاست باي', en: 'FastPay' },
+    icon: Zap,
+    color: 'text-warning',
+    bgColor: 'bg-warning/10',
+    fields: [
+      { label: { ku: 'کلیلی API', ar: 'مفتاح API', en: 'API KEY' }, type: 'password', placeholder: 'fp_live_xxxx' },
+      { label: { ku: 'ناسنامەی جزدان', ar: 'معرف المحفظة', en: 'WALLET ID' }, type: 'text', placeholder: 'FP-WALLET-XXXXX' },
+      { label: { ku: 'نهێنی Webhook', ar: 'سر Webhook', en: 'WEBHOOK SECRET' }, type: 'password', placeholder: 'whsec_xxxx' },
+    ],
+  },
+];
 
 const AdminPayments = () => {
-  const [providers, setProviders] = useState([
-    { id: 'fib', name: 'FIB Bank', icon: Building2, color: 'success', enabled: true, fields: [{ label: 'API KEY', type: 'password', placeholder: 'fib_live_xxxx' }, { label: 'MERCHANT ID', type: 'text', placeholder: 'FIB-MERCHANT-ID' }] },
-    { id: 'zain', name: 'ZainCash', icon: Smartphone, color: 'destructive', enabled: false, fields: [{ label: 'MERCHANT TOKEN', type: 'password', placeholder: 'zain_token_xxxx' }, { label: 'MSISDN (Phone)', type: 'text', placeholder: '07801234567' }, { label: 'SECRET KEY', type: 'password', placeholder: 'secret_xxxx' }] },
-    { id: 'qi', name: 'QI Card / Qi Bank Iraq', icon: CreditCard, color: 'info', enabled: false, fields: [{ label: 'API KEY', type: 'password', placeholder: 'qi_live_xxxx' }, { label: 'TERMINAL ID', type: 'text', placeholder: 'QI-TERM-00001' }, { label: 'CALLBACK URL', type: 'text', placeholder: 'https://your-domain.com/callback/qi' }] },
-    { id: 'fast', name: 'FastPay', icon: Zap, color: 'warning', enabled: false, fields: [{ label: 'API KEY', type: 'password', placeholder: 'fp_live_xxxx' }, { label: 'WALLET ID', type: 'text', placeholder: 'FP-WALLET-XXXXX' }, { label: 'WEBHOOK SECRET', type: 'password', placeholder: 'whsec_xxxx' }] },
-  ]);
+  const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
+  const [config, setConfig] = useState<PaymentConfig>(getPaymentConfig);
 
-  const toggleProvider = (id: string) => {
-    setProviders(prev => prev.map(p => p.id === id ? { ...p, enabled: !p.enabled } : p));
+  useEffect(() => {
+    const savedLang = localStorage.getItem('plc_admin_lang') as 'ku' | 'ar' | 'en' | null;
+    if (savedLang) setLang(savedLang);
+  }, []);
+
+  const toggleProvider = (id: keyof PaymentConfig) => {
+    setConfig(prev => {
+      const updated = { ...prev, [id]: !prev[id] };
+      localStorage.setItem('plc_payment_config', JSON.stringify(updated));
+      toast.success(
+        lang === 'ku' ? `${id.toUpperCase()} ${updated[id] ? 'چالاک کرا' : 'ناچالاک کرا'}` :
+        lang === 'ar' ? `${id.toUpperCase()} ${updated[id] ? 'تم التفعيل' : 'تم التعطيل'}` :
+        `${id.toUpperCase()} ${updated[id] ? 'enabled' : 'disabled'}`
+      );
+      return updated;
+    });
+  };
+
+  const direction = lang === 'en' ? 'ltr' : 'rtl';
+  const labels = {
+    title: { ku: '💳 ڕێکخستنی پارەدان', ar: '💳 إعدادات الدفع', en: '💳 Payment Settings' },
+    cashTitle: { ku: '💵 پارەدانی کاش', ar: '💵 الدفع النقدي', en: '💵 Cash Payment' },
+    cashDesc: { ku: 'پارەدانی کاش هەمیشە چالاکە و ناتوانرێت ناچالاک بکرێت', ar: 'الدفع النقدي مفعل دائماً ولا يمكن تعطيله', en: 'Cash payment is always enabled and cannot be disabled' },
+    onlineTitle: { ku: '🌐 پارەدانی ئۆنلاین', ar: '🌐 الدفع الإلكتروني', en: '🌐 Online Payments' },
+    onlineDesc: { ku: 'شێوازەکانی پارەدانی ئۆنلاین چالاک/ناچالاک بکە', ar: 'تفعيل/تعطيل طرق الدفع الإلكتروني', en: 'Enable/disable online payment methods' },
+    active: { ku: 'چالاک', ar: 'مفعل', en: 'Active' },
+    inactive: { ku: 'ناچالاک', ar: 'معطل', en: 'Inactive' },
+    alwaysOn: { ku: 'هەمیشە چالاک', ar: 'مفعل دائماً', en: 'Always On' },
+    save: { ku: 'پاشکەوتکردن', ar: 'حفظ', en: 'Save' },
+    showInMenu: { ku: 'نیشاندانی لە مینۆ', ar: 'إظهار في القائمة', en: 'Show in Menu' },
   };
 
   return (
-    <div>
-      <h2 className="text-foreground text-base font-bold mb-5 flex items-center gap-2">
-        <CreditCard className="w-4 h-4 text-muted-foreground" /> Payment Providers & API Keys
+    <div dir={direction}>
+      <h2 className="text-foreground text-lg font-bold mb-6 flex items-center gap-2">
+        {labels.title[lang]}
       </h2>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+
+      {/* Language selector for admin */}
+      <div className="flex gap-2 mb-6">
+        {(['ku', 'ar', 'en'] as const).map(l => (
+          <button key={l} onClick={() => { setLang(l); localStorage.setItem('plc_admin_lang', l); }}
+            className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all border ${lang === l ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-muted-foreground hover:text-foreground'}`}>
+            {l === 'ku' ? 'کوردی' : l === 'ar' ? 'العربية' : 'English'}
+          </button>
+        ))}
+      </div>
+
+      {/* Cash Section */}
+      <div className="bg-card rounded-xl border border-border p-5 mb-5">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+            <span className="text-xl">💵</span>
+          </div>
+          <div className="flex-1">
+            <div className="text-foreground font-bold text-sm">{labels.cashTitle[lang]}</div>
+            <div className="text-muted-foreground text-xs">{labels.cashDesc[lang]}</div>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-success/10 text-success text-[10px] font-bold border border-success/20">
+            {labels.alwaysOn[lang]}
+          </span>
+        </div>
+      </div>
+
+      {/* Online Section */}
+      <div className="mb-4">
+        <h3 className="text-foreground text-base font-bold mb-1 flex items-center gap-2">
+          {labels.onlineTitle[lang]}
+        </h3>
+        <p className="text-muted-foreground text-xs mb-4">{labels.onlineDesc[lang]}</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {providers.map(p => {
           const Icon = p.icon;
+          const enabled = config[p.id];
           return (
-            <div key={p.id} className="bg-card rounded-xl p-5 border border-border">
+            <div key={p.id} className={`bg-card rounded-xl border transition-all ${enabled ? 'border-primary/30' : 'border-border opacity-70'} p-5`}>
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-${p.color}/10`}>
-                  <Icon className={`w-4.5 h-4.5 text-${p.color}`} />
+                <div className={`w-10 h-10 rounded-xl ${p.bgColor} flex items-center justify-center`}>
+                  <Icon className={`w-5 h-5 ${p.color}`} />
                 </div>
-                <div className="flex-1">
-                  <div className="text-foreground font-semibold text-sm">{p.name}</div>
-                  <div className={`text-[10px] font-medium ${p.enabled ? 'text-success' : 'text-muted-foreground'}`}>● {p.enabled ? 'Active' : 'Inactive'}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-foreground font-bold text-sm">{p.name[lang]}</div>
+                  <div className={`text-[10px] font-semibold ${enabled ? 'text-success' : 'text-muted-foreground'}`}>
+                    ● {enabled ? labels.active[lang] : labels.inactive[lang]}
+                  </div>
                 </div>
-                <button
-                  onClick={() => toggleProvider(p.id)}
-                  className={`w-10 h-5 rounded-full relative transition-all border-none cursor-pointer ${p.enabled ? 'bg-success' : 'bg-muted'}`}
-                >
-                  <div className={`absolute w-4 h-4 bg-foreground rounded-full top-[2px] transition-transform ${p.enabled ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
+                <button onClick={() => toggleProvider(p.id)} className="transition-all" title={labels.showInMenu[lang]}>
+                  {enabled
+                    ? <ToggleRight className="w-8 h-8 text-success" />
+                    : <ToggleLeft className="w-8 h-8 text-muted-foreground" />
+                  }
                 </button>
               </div>
+
               {p.fields.map((f, i) => (
                 <div key={i} className="mb-3">
-                  <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">{f.label}</div>
-                  <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type={f.type} placeholder={f.placeholder} />
+                  <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">{f.label[lang]}</div>
+                  <input
+                    className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    type={f.type} placeholder={f.placeholder}
+                    disabled={!enabled}
+                  />
                 </div>
               ))}
-              <button className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">Save & Test</button>
+              <button
+                disabled={!enabled}
+                className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Save className="w-3.5 h-3.5" />
+                {labels.save[lang]}
+              </button>
             </div>
           );
         })}
-      </div>
-
-      <h2 className="text-foreground text-base font-bold mb-4 flex items-center gap-2">
-        <QrCode className="w-4 h-4 text-muted-foreground" /> QR Code Generator
-      </h2>
-      <div className="grid grid-cols-2 gap-5">
-        <div className="bg-card rounded-xl p-5 border border-border">
-          <div className="text-foreground font-semibold text-sm mb-1">Generate Payment QR</div>
-          <div className="text-muted-foreground text-xs mb-4">For digital payments via banking apps</div>
-          <div className="mb-3">
-            <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">Amount (IQD)</div>
-            <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" placeholder="5000" />
-          </div>
-          <div className="mb-3">
-            <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">Order Number</div>
-            <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" placeholder="#001" />
-          </div>
-          <div className="mb-3">
-            <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">Provider</div>
-            <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm">
-              <option>FIB Bank</option><option>ZainCash</option><option>QI Card</option><option>FastPay</option>
-            </select>
-          </div>
-          <button className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">Generate QR Code</button>
-        </div>
-        <div className="bg-card rounded-xl p-5 border border-border text-center">
-          <div className="text-foreground font-semibold text-sm mb-1">QR Preview</div>
-          <div className="w-36 h-36 rounded-xl mx-auto my-4 bg-secondary border border-border flex items-center justify-center">
-            <QrCode className="w-12 h-12 text-muted-foreground/30" />
-          </div>
-          <div className="text-muted-foreground text-xs mb-4">No QR generated yet</div>
-          <button className="w-full p-2.5 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer flex items-center justify-center gap-2 hover:bg-muted transition-all">
-            <Printer className="w-3.5 h-3.5" /> Print QR Label
-          </button>
-        </div>
       </div>
     </div>
   );

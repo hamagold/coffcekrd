@@ -267,22 +267,46 @@ const OnlineOrder = () => {
                 </button>
               </div>
 
-              {/* Payment */}
-              <div className="grid grid-cols-2 gap-1.5 mb-3">
-                {[
-                  { id: 'cash' as PaymentMethod, icon: <Banknote className="w-3.5 h-3.5" />, label: t.cash },
-                  { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-3.5 h-3.5" />, label: t.fibBank },
-                  { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-3.5 h-3.5" />, label: t.zainCash },
-                  { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-3.5 h-3.5" />, label: t.fastPay },
-                ].map(m => (
-                  <button key={m.id} onClick={() => setPayment(m.id)}
-                    className={`flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${
-                      payment === m.id ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'
-                    }`}>
-                    {m.icon} {m.label}
-                  </button>
-                ))}
+              {/* Cash Payment */}
+              <div className="mb-2">
+                <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-1.5 font-medium">
+                  {language === 'ku' ? '💵 کاش' : language === 'ar' ? '💵 نقداً' : '💵 Cash'}
+                </div>
+                <button onClick={() => setPayment('cash')}
+                  className={`w-full flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${
+                    payment === 'cash' ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'
+                  }`}>
+                  <Banknote className="w-3.5 h-3.5" /> {t.cash}
+                </button>
               </div>
+
+              {/* Online Payments */}
+              {(() => {
+                const cfg = (() => { try { const s = localStorage.getItem('plc_payment_config'); if(s) return JSON.parse(s); } catch{} return {fib:true,zain:true,fastpay:true}; })();
+                const online = [
+                  { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-3.5 h-3.5" />, label: t.fibBank, show: cfg.fib },
+                  { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-3.5 h-3.5" />, label: t.zainCash, show: cfg.zain },
+                  { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-3.5 h-3.5" />, label: t.fastPay, show: cfg.fastpay },
+                ].filter(m => m.show !== false);
+                if (online.length === 0) return null;
+                return (
+                  <div className="mb-3">
+                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-1.5 font-medium">
+                      {language === 'ku' ? '🌐 ئۆنلاین' : language === 'ar' ? '🌐 إلكتروني' : '🌐 Online'}
+                    </div>
+                    <div className={`grid gap-1.5 ${online.length === 1 ? 'grid-cols-1' : online.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                      {online.map(m => (
+                        <button key={m.id} onClick={() => setPayment(m.id)}
+                          className={`flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${
+                            payment === m.id ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'
+                          }`}>
+                          {m.icon} {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <button onClick={handleOrder}
                 disabled={cart.length === 0 || !customerName || !customerPhone}
@@ -294,7 +318,7 @@ const OnlineOrder = () => {
         </div>
       </div>
 
-      {/* Success Modal */}
+      {/* Success Modal with QR */}
       {showSuccess && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
           <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full mx-4 text-center animate-modal-in">
@@ -307,6 +331,11 @@ const OnlineOrder = () => {
               <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1">{t.orderNumLabel}</div>
               <div className="text-primary text-4xl font-bold">#{orderNum}</div>
             </div>
+            {/* QR Code */}
+            <div className="mb-4">
+              <canvas ref={qrCanvasRef} width={140} height={140} className="mx-auto bg-foreground rounded-lg" />
+            </div>
+            <div className="text-muted-foreground text-xs mb-4">{t.qrHint}</div>
             <p className="text-muted-foreground text-sm mb-5">
               {language === 'ku' ? 'ئۆردەرەکەت وەرگیرا! پەیوەندیت پێوە دەکرێت.' :
                language === 'ar' ? 'تم استلام طلبك! سنتواصل معك قريباً.' :

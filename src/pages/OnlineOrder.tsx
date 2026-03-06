@@ -94,6 +94,7 @@ const OnlineOrder = () => {
     setOrderNum(num);
     setShowSuccess(true);
     setCart([]);
+    setTimeout(() => generateQR(num), 100);
   };
 
   if (showLangSelect) {

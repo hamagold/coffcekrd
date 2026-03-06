@@ -1,41 +1,40 @@
 import { useState } from 'react';
 import { useStore } from '@/store/StoreContext';
 import { Wallet, Plus, Trash2, Lightbulb, Droplets, HardHat, Package, FileText, X } from 'lucide-react';
+import { Language } from '@/types';
+import { adminT } from '@/data/adminTranslations';
 
-const expenseTypeConfig: Record<string, { icon: typeof Lightbulb; label: string; color: string }> = {
-  electricity: { icon: Lightbulb, label: 'Electricity', color: 'text-destructive' },
-  water: { icon: Droplets, label: 'Water', color: 'text-info' },
-  salary: { icon: HardHat, label: 'Staff Salary', color: 'text-[hsl(var(--purple))]' },
-  supplies: { icon: Package, label: 'Supplies', color: 'text-warning' },
-  other: { icon: FileText, label: 'Other', color: 'text-muted-foreground' },
-};
-
-const AdminExpenses = () => {
+const AdminExpenses = ({ lang }: { lang: Language }) => {
   const { expenses, addExpense, deleteExpense } = useStore();
+  const t = adminT[lang];
+  const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ type: 'electricity', desc: '', amount: '', date: new Date().toISOString().split('T')[0] });
+
+  const expenseTypeConfig: Record<string, { icon: typeof Lightbulb; label: string; color: string }> = {
+    electricity: { icon: Lightbulb, label: t.electricity, color: 'text-destructive' },
+    water: { icon: Droplets, label: t.water, color: 'text-info' },
+    salary: { icon: HardHat, label: t.staffSalary, color: 'text-[hsl(var(--purple))]' },
+    supplies: { icon: Package, label: t.supplies, color: 'text-warning' },
+    other: { icon: FileText, label: t.other, color: 'text-muted-foreground' },
+  };
 
   const totalByType = (type: string) => expenses.filter(e => e.type === type).reduce((s, e) => s + e.amount, 0);
 
   const handleSave = () => {
-    addExpense({
-      type: form.type as any,
-      desc: form.desc || 'Expense',
-      amount: parseInt(form.amount) || 0,
-      date: form.date || new Date().toISOString(),
-    });
+    addExpense({ type: form.type as any, desc: form.desc || t.expenses, amount: parseInt(form.amount) || 0, date: form.date || new Date().toISOString() });
     setShowModal(false);
     setForm({ type: 'electricity', desc: '', amount: '', date: new Date().toISOString().split('T')[0] });
   };
 
   return (
-    <div>
+    <div dir={dir}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-foreground text-base font-bold flex items-center gap-2">
-          <Wallet className="w-4 h-4 text-muted-foreground" /> Daily Expenses
+          <Wallet className="w-4 h-4 text-muted-foreground" /> {t.dailyExpenses}
         </h2>
         <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5 hover:opacity-90 transition-all">
-          <Plus className="w-3.5 h-3.5" /> Add Expense
+          <Plus className="w-3.5 h-3.5" /> {t.addExpense}
         </button>
       </div>
 
@@ -45,9 +44,7 @@ const AdminExpenses = () => {
           const Icon = config.icon;
           return (
             <div key={type} className="bg-card rounded-xl p-5 border border-border">
-              <div className={`w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3`}>
-                <Icon className={`w-5 h-5 ${config.color}`} />
-              </div>
+              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3"><Icon className={`w-5 h-5 ${config.color}`} /></div>
               <div className={`text-2xl font-bold mb-0.5 ${config.color}`}>{totalByType(type).toLocaleString()} IQD</div>
               <div className="text-muted-foreground text-xs">{config.label}</div>
             </div>
@@ -56,18 +53,18 @@ const AdminExpenses = () => {
       </div>
 
       <div className="bg-card rounded-xl border border-border overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-border text-foreground font-semibold text-sm">All Expenses</div>
+        <div className="px-5 py-3.5 border-b border-border text-foreground font-semibold text-sm">{t.allExpenses}</div>
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {['Date', 'Type', 'Description', 'Amount', 'Action'].map(h => (
+              {[t.date, t.type, t.description, t.amount, t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {expenses.length === 0 ? (
-              <tr><td colSpan={5} className="text-center text-muted-foreground py-5 text-sm">No expenses recorded</td></tr>
+              <tr><td colSpan={5} className="text-center text-muted-foreground py-5 text-sm">{t.noExpensesRecorded}</td></tr>
             ) : (
               expenses.slice().reverse().map(e => {
                 const config = expenseTypeConfig[e.type] || expenseTypeConfig.other;
@@ -95,34 +92,30 @@ const AdminExpenses = () => {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
           <div className="bg-card border border-border rounded-xl p-6 min-w-[420px] animate-modal-in">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-foreground text-base font-bold flex items-center gap-2">
-                <Plus className="w-4 h-4 text-primary" /> Add Expense
-              </h3>
-              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-                <X className="w-4 h-4" />
-              </button>
+              <h3 className="text-foreground text-base font-bold flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /> {t.addExpense}</h3>
+              <button onClick={() => setShowModal(false)} className="text-muted-foreground hover:text-foreground transition-colors"><X className="w-4 h-4" /></button>
             </div>
             <div className="mb-3">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">Expense Type</label>
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.expenseType}</label>
               <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
                 {Object.entries(expenseTypeConfig).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
               </select>
             </div>
             <div className="mb-3">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">Description</label>
-              <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={form.desc} onChange={e => setForm(p => ({ ...p, desc: e.target.value }))} placeholder="Monthly electricity bill" />
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.description}</label>
+              <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={form.desc} onChange={e => setForm(p => ({ ...p, desc: e.target.value }))} />
             </div>
             <div className="mb-3">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">Amount (IQD)</label>
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.amountIqd}</label>
               <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))} placeholder="50000" />
             </div>
             <div className="mb-4">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">Date</label>
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.date}</label>
               <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">Cancel</button>
-              <button onClick={handleSave} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">Save Expense</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
+              <button onClick={handleSave} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">{t.saveExpense}</button>
             </div>
           </div>
         </div>

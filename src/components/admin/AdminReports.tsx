@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { useStore } from '@/store/StoreContext';
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, ArrowUpRight, ArrowDownRight, Trophy, Lightbulb, Droplets, HardHat, Package, FileText } from 'lucide-react';
+import { Language } from '@/types';
+import { adminT } from '@/data/adminTranslations';
 
-const AdminReports = () => {
+const AdminReports = ({ lang }: { lang: Language }) => {
   const { orders, expenses } = useStore();
+  const t = adminT[lang];
+  const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const now = new Date();
@@ -34,65 +38,57 @@ const AdminReports = () => {
     itemCounts[i.name.en].total += i.price * i.qty;
   }));
   const topItems = Object.entries(itemCounts).sort((a, b) => b[1].count - a[1].count).slice(0, 5);
-
   const maxBar = Math.max(income, expenseTotal, 1);
 
   const expenseTypeLabels: Record<string, { icon: typeof Lightbulb; label: string }> = {
-    electricity: { icon: Lightbulb, label: 'Electricity' },
-    water: { icon: Droplets, label: 'Water' },
-    salary: { icon: HardHat, label: 'Salary' },
-    supplies: { icon: Package, label: 'Supplies' },
-    other: { icon: FileText, label: 'Other' },
+    electricity: { icon: Lightbulb, label: t.electricity },
+    water: { icon: Droplets, label: t.water },
+    salary: { icon: HardHat, label: t.staffSalary },
+    supplies: { icon: Package, label: t.supplies },
+    other: { icon: FileText, label: t.other },
   };
 
   return (
-    <div>
+    <div dir={dir}>
       <h2 className="text-foreground text-base font-bold mb-4 flex items-center gap-2">
-        <BarChart3 className="w-4 h-4 text-muted-foreground" /> Financial Reports
+        <BarChart3 className="w-4 h-4 text-muted-foreground" /> {t.financialReports}
       </h2>
       <div className="flex gap-2 mb-5">
-        {(['daily', 'weekly', 'monthly'] as const).map(p => (
-          <button key={p} onClick={() => setPeriod(p)} className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-all ${period === p ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
-            {p.charAt(0).toUpperCase() + p.slice(1)}
+        {([{ key: 'daily', label: t.daily }, { key: 'weekly', label: t.weekly }, { key: 'monthly', label: t.monthly }] as const).map(p => (
+          <button key={p.key} onClick={() => setPeriod(p.key as any)} className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-all ${period === p.key ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
+            {p.label}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-card rounded-xl p-4 border border-border">
-          <div className="flex items-center gap-2 mb-2">
-            <ArrowUpRight className="w-4 h-4 text-success" />
-            <span className="text-muted-foreground text-xs">Total Income</span>
-          </div>
+          <div className="flex items-center gap-2 mb-2"><ArrowUpRight className="w-4 h-4 text-success" /><span className="text-muted-foreground text-xs">{t.totalIncome}</span></div>
           <div className="text-success text-xl font-bold">{income.toLocaleString()} IQD</div>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <div className="flex items-center gap-2 mb-2">
-            <ArrowDownRight className="w-4 h-4 text-destructive" />
-            <span className="text-muted-foreground text-xs">Total Expenses</span>
-          </div>
+          <div className="flex items-center gap-2 mb-2"><ArrowDownRight className="w-4 h-4 text-destructive" /><span className="text-muted-foreground text-xs">{t.totalExpenses}</span></div>
           <div className="text-destructive text-xl font-bold">{expenseTotal.toLocaleString()} IQD</div>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
           <div className="flex items-center gap-2 mb-2">
             {profit >= 0 ? <TrendingUp className="w-4 h-4 text-primary" /> : <TrendingDown className="w-4 h-4 text-destructive" />}
-            <span className="text-muted-foreground text-xs">Net Profit / Loss</span>
+            <span className="text-muted-foreground text-xs">{t.netProfitLoss}</span>
           </div>
           <div className={`text-xl font-bold ${profit >= 0 ? 'text-primary' : 'text-destructive'}`}>{profit.toLocaleString()} IQD</div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-5">
-        {/* Chart */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border text-foreground font-semibold text-sm flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-muted-foreground" /> Income vs Expenses
+            <BarChart3 className="w-4 h-4 text-muted-foreground" /> {t.incomeVsExpenses}
           </div>
           <div className="p-5 h-[200px] flex items-end gap-3 px-4">
             {[
-              { label: 'Income', val: income, color: 'bg-success' },
-              { label: 'Expense', val: expenseTotal, color: 'bg-destructive' },
-              { label: 'Profit', val: Math.abs(profit), color: profit >= 0 ? 'bg-primary' : 'bg-destructive' },
+              { label: t.income, val: income, color: 'bg-success' },
+              { label: t.expense, val: expenseTotal, color: 'bg-destructive' },
+              { label: t.profit, val: Math.abs(profit), color: profit >= 0 ? 'bg-primary' : 'bg-destructive' },
             ].map(b => (
               <div key={b.label} className="flex-1 flex flex-col items-center gap-1.5">
                 <span className="text-muted-foreground text-[9px] font-medium">{(b.val / 1000).toFixed(1)}k</span>
@@ -103,14 +99,13 @@ const AdminReports = () => {
           </div>
         </div>
 
-        {/* Top Items */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="px-5 py-3.5 border-b border-border text-foreground font-semibold text-sm flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-muted-foreground" /> Top Selling Items
+            <Trophy className="w-4 h-4 text-muted-foreground" /> {t.topSellingItems}
           </div>
           <div className="p-4">
             {topItems.length === 0 ? (
-              <div className="text-center text-muted-foreground py-5 text-sm">No data yet</div>
+              <div className="text-center text-muted-foreground py-5 text-sm">{t.noData}</div>
             ) : (
               topItems.map(([name, data], i) => (
                 <div key={name} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
@@ -127,22 +122,21 @@ const AdminReports = () => {
         </div>
       </div>
 
-      {/* Expense Details */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="px-5 py-3.5 border-b border-border text-foreground font-semibold text-sm flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-muted-foreground" /> Expense Details
+          <DollarSign className="w-4 h-4 text-muted-foreground" /> {t.expenseDetails}
         </div>
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {['Date', 'Type', 'Description', 'Amount'].map(h => (
+              {[t.date, t.type, t.description, t.amount].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filteredExp.length === 0 ? (
-              <tr><td colSpan={4} className="text-center text-muted-foreground py-5 text-sm">No expenses</td></tr>
+              <tr><td colSpan={4} className="text-center text-muted-foreground py-5 text-sm">{t.noExpenses}</td></tr>
             ) : (
               filteredExp.map(e => {
                 const typeInfo = expenseTypeLabels[e.type] || expenseTypeLabels.other;

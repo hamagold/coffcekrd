@@ -91,12 +91,19 @@ const MenuScreen = () => {
     </body></html>`);
   };
 
-  const paymentMethods: { id: PaymentMethod; icon: React.ReactNode; label: string }[] = [
-    { id: 'cash', icon: <Banknote className="w-4 h-4" />, label: t.cash },
-    { id: 'fib', icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
-    { id: 'zain', icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
-    { id: 'fastpay', icon: <Zap className="w-4 h-4" />, label: t.fastPay },
-  ];
+  const paymentConfig = (() => {
+    try {
+      const saved = localStorage.getItem('plc_payment_config');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return { fib: true, zain: true, fastpay: true };
+  })();
+
+  const onlinePaymentMethods = ([
+    { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
+    { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
+    { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-4 h-4" />, label: t.fastPay },
+  ] as { id: PaymentMethod; icon: React.ReactNode; label: string }[]).filter(m => paymentConfig[m.id] !== false);
 
   return (
     <div className="flex flex-col w-full h-screen bg-background overflow-hidden" dir={direction}>
@@ -253,25 +260,48 @@ const MenuScreen = () => {
               <span className="text-primary text-base font-bold">{cartTotal.toLocaleString()} IQD</span>
             </div>
 
-            <div className="mb-3">
-              <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">{t.payMethod}</div>
-              <div className="grid grid-cols-2 gap-1.5">
-                {paymentMethods.map(m => (
-                  <button
-                    key={m.id}
-                    onClick={() => setPayment(m.id)}
-                    className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
-                      payment === m.id
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'bg-muted border-border text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {m.icon}
-                    {m.label}
-                  </button>
-                ))}
+            {/* Cash Payment */}
+            <div className="mb-2">
+              <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">
+                {language === 'ku' ? '💵 کاش' : language === 'ar' ? '💵 نقداً' : '💵 Cash'}
               </div>
+              <button
+                onClick={() => setPayment('cash')}
+                className={`w-full flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
+                  payment === 'cash'
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Banknote className="w-4 h-4" />
+                {t.cash}
+              </button>
             </div>
+
+            {/* Online Payments */}
+            {onlinePaymentMethods.length > 0 && (
+              <div className="mb-3">
+                <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">
+                  {language === 'ku' ? '🌐 ئۆنلاین' : language === 'ar' ? '🌐 إلكتروني' : '🌐 Online'}
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {onlinePaymentMethods.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => setPayment(m.id)}
+                      className={`flex items-center gap-1.5 p-2 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
+                        payment === m.id
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {m.icon}
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mb-3">
               <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">{t.orderType}</div>

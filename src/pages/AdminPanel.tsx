@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/StoreContext';
+import { useAuth } from '@/hooks/useAuth';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
@@ -8,7 +9,7 @@ import AdminPayments from '@/components/admin/AdminPayments';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound } from 'lucide-react';
 
 const pageTitles: Record<string, [string, string]> = {
   dashboard: ['Dashboard', 'Overview of today'],
@@ -22,13 +23,14 @@ const pageTitles: Record<string, [string, string]> = {
 
 const AdminPanel = () => {
   const navigate = useNavigate();
-  const { currentUser, login, logout } = useStore();
+  const { user, loading, signIn, signOut } = useAuth();
   const [page, setPage] = useState('dashboard');
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
-  const [loginUser, setLoginUser] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     const update = () => {
@@ -41,12 +43,19 @@ const AdminPanel = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = () => {
-    if (login(loginUser, loginPass)) {
-      setLoginError(false);
-    } else {
-      setLoginError(true);
+  const handleLogin = async () => {
+    if (!loginEmail || !loginPass) return;
+    setLoginLoading(true);
+    setLoginError('');
+    const { error } = await signIn(loginEmail, loginPass);
+    if (error) {
+      setLoginError(error.message);
     }
+    setLoginLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
   };
 
   const navItems = [
@@ -59,8 +68,17 @@ const AdminPanel = () => {
     { id: 'expenses', icon: Wallet, label: 'Expenses', section: 'MANAGEMENT', superOnly: true },
   ];
 
+  // Loading screen
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   // Login screen
-  if (!currentUser) {
+  if (!user) {
     return (
       <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,hsl(var(--primary)/0.05)_0%,transparent_70%)]" />
@@ -71,31 +89,54 @@ const AdminPanel = () => {
           <div className="text-foreground text-xl font-bold mb-0.5">PLC Admin</div>
           <div className="text-muted-foreground text-xs mb-6">Sign in to manage your cafeteria</div>
           <div className="mb-3">
-            <input
-              className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
-              type="text" placeholder="Username" value={loginUser}
-              onChange={e => setLoginUser(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                className="w-full p-3 pl-10 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                type="email" placeholder="Email address" value={loginEmail}
+                onChange={e => setLoginEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
           </div>
           <div className="mb-4">
-            <input
-              className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
-              type="password" placeholder="Password" value={loginPass}
-              onChange={e => setLoginPass(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            />
+            <div className="relative">
+              <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                className="w-full p-3 pl-10 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                type="password" placeholder="Password" value={loginPass}
+                onChange={e => setLoginPass(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
           </div>
           <button
             onClick={handleLogin}
-            className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90"
+            disabled={loginLoading}
+            className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
           >
+            {loginLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Sign In
           </button>
-          {loginError && <div className="text-destructive text-sm mt-3 flex items-center gap-1.5 justify-center"><Lock className="w-3.5 h-3.5" /> Invalid credentials</div>}
-          <div className="mt-5 text-muted-foreground text-xs">
-            Super Admin: admin / admin123 &nbsp;|&nbsp; Staff: staff / staff123
+          {loginError && <div className="text-destructive text-sm mt-3 flex items-center gap-1.5 justify-center"><Lock className="w-3.5 h-3.5" /> {loginError}</div>}
+        </div>
+      </div>
+    );
+  }
+
+  // No role assigned
+  if (!user.role) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center">
+        <div className="bg-card border border-border rounded-2xl p-8 w-[380px] text-center">
+          <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-7 h-7 text-destructive" />
           </div>
+          <div className="text-foreground text-xl font-bold mb-2">Access Denied</div>
+          <div className="text-muted-foreground text-sm mb-4">Your account has no admin role assigned. Contact a super admin.</div>
+          <button onClick={handleLogout} className="w-full py-3 bg-destructive/10 text-destructive rounded-lg text-sm font-bold cursor-pointer hover:bg-destructive/20 transition-all">
+            Sign Out
+          </button>
         </div>
       </div>
     );
@@ -131,18 +172,18 @@ const AdminPanel = () => {
         </div>
 
         <div className="mx-3 my-3 bg-secondary border border-border rounded-lg p-2.5 flex items-center gap-2.5">
-          <div className={`w-7 h-7 rounded-md flex items-center justify-center ${currentUser.role === 'super' ? 'bg-primary/10 text-primary' : 'bg-info/10 text-info'}`}>
-            {currentUser.role === 'super' ? <Shield className="w-3.5 h-3.5" /> : <UserIcon className="w-3.5 h-3.5" />}
+          <div className={`w-7 h-7 rounded-md flex items-center justify-center ${user.role === 'super' ? 'bg-primary/10 text-primary' : 'bg-blue-500/10 text-blue-400'}`}>
+            {user.role === 'super' ? <Shield className="w-3.5 h-3.5" /> : <UserIcon className="w-3.5 h-3.5" />}
           </div>
-          <div>
-            <div className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{currentUser.role === 'super' ? 'SUPER ADMIN' : 'STAFF'}</div>
-            <div className="text-foreground text-xs font-medium">{currentUser.name}</div>
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{user.role === 'super' ? 'SUPER ADMIN' : 'STAFF'}</div>
+            <div className="text-foreground text-xs font-medium truncate">{user.name}</div>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 py-1">
           {navItems.map(item => {
-            if (item.superOnly && currentUser.role !== 'super') return null;
+            if (item.superOnly && user.role !== 'super') return null;
             let sectionHeader = null;
             if (item.section !== currentSection) {
               currentSection = item.section;
@@ -172,7 +213,7 @@ const AdminPanel = () => {
           <button onClick={() => navigate('/menu')} className="w-full p-2 bg-secondary border border-border rounded-lg text-muted-foreground cursor-pointer text-xs flex items-center gap-2 hover:text-foreground transition-all">
             <ArrowLeft className="w-3.5 h-3.5" /> Back to POS
           </button>
-          <button onClick={logout} className="w-full p-2 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive cursor-pointer text-xs flex items-center gap-2 hover:bg-destructive/20 transition-all">
+          <button onClick={handleLogout} className="w-full p-2 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive cursor-pointer text-xs flex items-center gap-2 hover:bg-destructive/20 transition-all">
             <LogOut className="w-3.5 h-3.5" /> Logout
           </button>
         </div>

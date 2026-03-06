@@ -18,7 +18,8 @@ serve(async (req) => {
 
     // Verify caller is super admin
     const authHeader = req.headers.get("Authorization")!;
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!);
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
+    const anonClient = createClient(supabaseUrl, anonKey);
     const { data: { user: caller } } = await anonClient.auth.getUser(authHeader.replace("Bearer ", ""));
     
     if (!caller) {
@@ -41,12 +42,18 @@ serve(async (req) => {
       });
       if (error) throw error;
 
+      // Create profile
+      await supabase.from("profiles").upsert({ id: data.user.id, name: name || email });
+      // Assign role
       await supabase.from("user_roles").insert({ user_id: data.user.id, role });
 
       return new Response(JSON.stringify({ user: data.user }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (action === "delete") {
+      // Delete role and profile first, then auth user
+      await supabase.from("user_roles").delete().eq("user_id", userId);
+      await supabase.from("profiles").delete().eq("id", userId);
       const { error } = await supabase.auth.admin.deleteUser(userId);
       if (error) throw error;
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -60,7 +67,7 @@ serve(async (req) => {
       const result = users.map((u: any) => ({
         id: u.id,
         email: u.email,
-        name: profiles?.find((p: any) => p.id === u.id)?.name || u.email,
+        name: profiles?.find((p: any) => p.id === u.id)?.name || u.user_metadata?.name || u.email,
         role: roles?.find((r: any) => r.user_id === u.id)?.role || null,
         created_at: u.created_at,
       }));
@@ -70,6 +77,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
+    console.error("manage-users error:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

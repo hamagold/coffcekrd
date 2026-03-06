@@ -45,11 +45,17 @@ const MenuScreen = () => {
     if (cart.length === 0) return;
     const num = await placeOrder(payment, orderType);
     setLastOrderNum(num);
-    generateQR(num, cartTotal);
     setShowModal(true);
-    // Auto-print after short delay
-    setTimeout(() => autoPrintLabel(num), 500);
   };
+
+  // Draw QR after modal renders and canvas is available
+  useEffect(() => {
+    if (showModal && lastOrderNum && canvasRef.current) {
+      generateQR(lastOrderNum, cartTotal);
+      // Auto-print after short delay
+      setTimeout(() => autoPrintLabel(lastOrderNum), 800);
+    }
+  }, [showModal, lastOrderNum]);
 
   const generateQR = (orderNum: string, total: number) => {
     const canvas = canvasRef.current;
@@ -78,22 +84,47 @@ const MenuScreen = () => {
   const cafeName = getCafeName();
 
   const doPrint = (orderNum: string) => {
-    const w = window.open('', '_blank', 'width=400,height=300');
-    if (!w) return;
-    w.document.write(`<html><head><title>${cafeName} Order</title>
-    <style>body{font-family:monospace;text-align:center;padding:20px;} .big{font-size:48px;font-weight:bold;}</style>
+    // Get QR as data URL
+    const qrDataUrl = canvasRef.current?.toDataURL('image/png') || '';
+    
+    // Use hidden iframe for silent printing (no popup)
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
+    document.body.appendChild(iframe);
+    
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
+    
+    doc.open();
+    doc.write(`<html><head><title>${cafeName}</title>
+    <style>
+      @page { margin: 5mm; size: 80mm auto; }
+      body { font-family: 'Courier New', monospace; text-align: center; padding: 10px; margin: 0; }
+      .line { border-top: 1px dashed #000; margin: 8px 0; }
+      .big { font-size: 42px; font-weight: bold; margin: 8px 0; }
+      .name { font-size: 20px; font-weight: bold; margin: 4px 0; }
+      .info { font-size: 12px; margin: 3px 0; }
+      .qr { margin: 10px auto; }
+    </style>
     </head><body>
-    <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div style="font-size:24px;font-weight:bold;">${cafeName} CAFETERIA</div>
-    <div>━━━━━━━━━━━━━━━━━━━━</div>
+    <div class="line"></div>
+    <div class="name">${cafeName} CAFETERIA</div>
+    <div class="line"></div>
     <div class="big">#${orderNum}</div>
-    <div>${new Date().toLocaleString()}</div>
-    <div>Payment: ${payment.toUpperCase()}</div>
-    <div>Type: ${orderType.toUpperCase()}</div>
-    <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div>THANK YOU / سپاسگوزارین / شكراً</div>
-    <script>window.print();<\/script>
+    <div class="info">${new Date().toLocaleString()}</div>
+    <div class="info">Payment: ${payment.toUpperCase()} | Type: ${orderType.toUpperCase()}</div>
+    ${qrDataUrl ? `<img class="qr" src="${qrDataUrl}" width="120" height="120" />` : ''}
+    <div class="line"></div>
+    <div class="info">THANK YOU / سپاسگوزارین / شكراً</div>
     </body></html>`);
+    doc.close();
+    
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.print();
+        setTimeout(() => document.body.removeChild(iframe), 2000);
+      }, 300);
+    };
   };
 
   const autoPrintLabel = (orderNum: string) => doPrint(orderNum);
@@ -363,8 +394,8 @@ const MenuScreen = () => {
               <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1">{t.orderNumLabel}</div>
               <div className="text-primary text-4xl font-bold">#{lastOrderNum}</div>
             </div>
-            <div className="bg-foreground w-36 h-36 mx-auto mb-5 rounded-lg flex items-center justify-center">
-              <canvas ref={canvasRef} width={140} height={140} />
+            <div className="bg-white w-40 h-40 mx-auto mb-5 rounded-xl flex items-center justify-center shadow-lg border border-border">
+              <canvas ref={canvasRef} width={140} height={140} className="rounded-md" />
             </div>
             <div className="text-muted-foreground text-xs mb-5">{t.qrHint}</div>
             <div className="flex gap-2 justify-center">

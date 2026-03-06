@@ -16,15 +16,26 @@ serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const { email, password, name } = await req.json();
+    const body = await req.json();
 
-    // Check if any users exist
-    const { data: { users } } = await supabase.auth.admin.listUsers();
-    if (users && users.length > 0) {
-      return new Response(JSON.stringify({ error: "Initial setup already completed" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    // Check action
+    if (body.action === "check") {
+      const { data: { users } } = await supabase.auth.admin.listUsers();
+      return new Response(JSON.stringify({ needsSetup: !users || users.length === 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Create first super admin
+    const { email, password, name } = body;
+
+    const { data: { users } } = await supabase.auth.admin.listUsers();
+    if (users && users.length > 0) {
+      return new Response(JSON.stringify({ error: "Initial setup already completed" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
@@ -35,8 +46,12 @@ serve(async (req) => {
 
     await supabase.from("user_roles").insert({ user_id: data.user.id, role: "super" });
 
-    return new Response(JSON.stringify({ success: true, user: data.user }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

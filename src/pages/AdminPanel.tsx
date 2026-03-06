@@ -10,7 +10,8 @@ import AdminReports from '@/components/admin/AdminReports';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
 import SetupAdmin from '@/components/admin/SetupAdmin';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound } from 'lucide-react';
+import StorageSettings from '@/components/settings/StorageSettings';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive } from 'lucide-react';
 
 const pageTitles: Record<string, [string, string]> = {
   dashboard: ['Dashboard', 'Overview of today'],
@@ -20,6 +21,7 @@ const pageTitles: Record<string, [string, string]> = {
   reports: ['Financial Reports', 'Daily, weekly & monthly reports'],
   users: ['User Management', 'Admins & staff accounts'],
   expenses: ['Expenses', 'Track daily costs'],
+  storage: ['Storage Settings', 'Image storage configuration'],
 };
 
 const AdminPanel = () => {
@@ -82,6 +84,7 @@ const AdminPanel = () => {
     { id: 'reports', icon: BarChart3, label: 'Reports', section: 'MANAGEMENT', superOnly: true },
     { id: 'users', icon: Users, label: 'Users', section: 'MANAGEMENT', superOnly: true },
     { id: 'expenses', icon: Wallet, label: 'Expenses', section: 'MANAGEMENT', superOnly: true },
+    { id: 'storage', icon: HardDrive, label: 'Storage', section: 'MANAGEMENT', superOnly: true },
   ];
 
   // Loading screen
@@ -172,6 +175,7 @@ const AdminPanel = () => {
       case 'reports': return <AdminReports />;
       case 'users': return <AdminUsers />;
       case 'expenses': return <AdminExpenses />;
+      case 'storage': return <StorageSettings />;
       default: return <AdminDashboard />;
     }
   };

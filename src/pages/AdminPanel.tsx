@@ -35,14 +35,12 @@ const AdminPanel = () => {
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check if any admin users exist
     const checkSetup = async () => {
       try {
         const { data } = await supabase.functions.invoke('setup-admin', {
-          body: { email: 'check@check.com', password: 'check', name: 'check' },
+          body: { action: 'check' },
         });
-        // If error says "already completed", setup is done
-        setNeedsSetup(!data?.error?.includes('already completed'));
+        setNeedsSetup(data?.needsSetup === true);
       } catch {
         setNeedsSetup(false);
       }

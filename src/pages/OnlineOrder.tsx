@@ -4,10 +4,11 @@ import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
 
 const OnlineOrder = () => {
   const { robotItems, staffItems } = useStore();
-  
+
   const [language, setLanguage] = useState<Language>('en');
   const [showLangSelect, setShowLangSelect] = useState(true);
   const [menuType, setMenuType] = useState<MenuType>('robot');
@@ -49,7 +50,7 @@ const OnlineOrder = () => {
     const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
     localStorage.setItem('plc_order_counter', String(counter));
     const num = String(counter).padStart(3, '0');
-    
+
     const orders = JSON.parse(localStorage.getItem('plc_orders') || '[]');
     orders.push({
       id: num,
@@ -64,7 +65,7 @@ const OnlineOrder = () => {
       online: true,
     });
     localStorage.setItem('plc_orders', JSON.stringify(orders));
-    
+
     setOrderNum(num);
     setShowSuccess(true);
     setCart([]);
@@ -73,24 +74,27 @@ const OnlineOrder = () => {
   if (showLangSelect) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
-        <div className="absolute w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,hsl(var(--gold)/0.1)_0%,transparent_70%)] animate-pulse-gold" />
-        <div className="text-center relative z-10">
-          <div className="w-20 h-20 border-2 border-primary rounded-full flex items-center justify-center mx-auto mb-4 animate-glow-border">
-            <span className="text-2xl font-black text-primary font-display">PLC</span>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,hsl(var(--primary)/0.05)_0%,transparent_70%)]" />
+        <div className="text-center relative z-10 animate-fade-up">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+            <Coffee className="w-7 h-7 text-primary" />
           </div>
-          <h1 className="text-3xl font-black text-primary font-display tracking-[6px] mb-2">PLC</h1>
-          <p className="text-primary/60 tracking-[3px] text-sm mb-2">ONLINE ORDER</p>
-          <p className="text-foreground/50 text-sm mb-8">ئۆردەری ئۆنلاین • طلب أونلاين • Online Order</p>
-          <div className="flex gap-4 justify-center">
+          <h1 className="text-3xl font-bold text-foreground mb-1">PLC</h1>
+          <p className="text-muted-foreground text-xs tracking-widest uppercase mb-1">Online Order</p>
+          <p className="text-muted-foreground text-xs mb-8">ئۆردەری ئۆنلاین • طلب أونلاين • Online Order</p>
+          <div className="flex flex-col gap-3 w-[280px] mx-auto">
             {[
-              { code: 'ku' as Language, flag: '🏔️', name: 'کوردی' },
-              { code: 'ar' as Language, flag: '🌙', name: 'عربي' },
-              { code: 'en' as Language, flag: '🌍', name: 'English' },
+              { code: 'ku' as Language, name: 'کوردی', sub: 'Kurdish' },
+              { code: 'ar' as Language, name: 'العربية', sub: 'Arabic' },
+              { code: 'en' as Language, name: 'English', sub: 'English' },
             ].map(l => (
               <button key={l.code} onClick={() => { setLanguage(l.code); setShowLangSelect(false); }}
-                className="w-28 h-28 bg-gradient-to-br from-secondary to-background border-2 border-primary/30 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all hover:border-primary hover:-translate-y-1 hover:shadow-[0_10px_30px_hsl(var(--gold)/0.2)]">
-                <span className="text-4xl mb-2">{l.flag}</span>
-                <span className="text-primary text-sm font-bold">{l.name}</span>
+                className="group w-full px-5 py-3.5 bg-card border border-border rounded-xl flex items-center justify-between cursor-pointer transition-all hover:border-primary/40 hover:bg-primary/5">
+                <div>
+                  <span className="text-foreground font-semibold block">{l.name}</span>
+                  <span className="text-muted-foreground text-xs">{l.sub}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </button>
             ))}
           </div>
@@ -102,40 +106,42 @@ const OnlineOrder = () => {
   return (
     <div className="min-h-screen bg-background" dir={direction}>
       {/* Header */}
-      <header className="bg-gradient-to-r from-[hsl(0,0%,5%)] via-[hsl(43,30%,8%)] to-[hsl(0,0%,5%)] border-b-2 border-gold-dark px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-card border-b border-border px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 border-2 border-primary rounded-full flex items-center justify-center">
-            <span className="text-sm font-black text-primary font-display">PLC</span>
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Coffee className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <span className="text-primary text-lg font-black font-display tracking-[3px]">PLC</span>
-            <span className="text-primary/40 text-xs block">ONLINE ORDER</span>
+            <span className="text-foreground text-base font-bold">PLC</span>
+            <span className="text-muted-foreground text-[10px] block leading-none">ONLINE ORDER</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowLangSelect(true)} className="bg-primary/10 border border-primary/30 text-primary/70 px-3 py-1 rounded-md text-xs">
-            🌐 {t.changeLang}
+          <button onClick={() => setShowLangSelect(true)} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs hover:text-foreground transition-all">
+            <Globe className="w-3.5 h-3.5" />
+            {t.changeLang}
           </button>
           {cartCount > 0 && (
-            <div className="bg-primary text-background px-3 py-1 rounded-full text-sm font-bold">
-              🛒 {cartCount}
+            <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+              <ShoppingCart className="w-3.5 h-3.5" />
+              {cartCount}
             </div>
           )}
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Menu Type Tabs */}
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Menu Type */}
         <div className="flex gap-3 mb-6">
           <button onClick={() => setMenuType('robot')}
-            className={`flex-1 py-4 rounded-2xl text-center transition-all border-2 ${menuType === 'robot' ? 'border-info bg-info/10' : 'border-foreground/10 bg-secondary'}`}>
-            <div className="text-2xl mb-1">🤖</div>
-            <div className={`text-sm font-bold ${menuType === 'robot' ? 'text-info' : 'text-foreground/50'}`}>{t.tabRobot}</div>
+            className={`flex-1 py-3.5 rounded-xl text-center transition-all border flex items-center justify-center gap-2.5 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-border bg-card'}`}>
+            <Bot className={`w-5 h-5 ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`} />
+            <span className={`text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</span>
           </button>
           <button onClick={() => setMenuType('staff')}
-            className={`flex-1 py-4 rounded-2xl text-center transition-all border-2 ${menuType === 'staff' ? 'border-success bg-success/10' : 'border-foreground/10 bg-secondary'}`}>
-            <div className="text-2xl mb-1">👨‍🍳</div>
-            <div className={`text-sm font-bold ${menuType === 'staff' ? 'text-success' : 'text-foreground/50'}`}>{t.tabStaff}</div>
+            className={`flex-1 py-3.5 rounded-xl text-center transition-all border flex items-center justify-center gap-2.5 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-border bg-card'}`}>
+            <ChefHat className={`w-5 h-5 ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`} />
+            <span className={`text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</span>
           </button>
         </div>
 
@@ -143,121 +149,144 @@ const OnlineOrder = () => {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {categories.map(cat => (
             <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap transition-all text-sm ${activeCategory === cat.id ? 'bg-primary text-background font-bold' : 'bg-secondary text-foreground/60 hover:bg-primary/10'}`}>
-              <span>{cat.icon}</span> {cat.name[language]}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all text-sm border ${
+                activeCategory === cat.id
+                  ? 'bg-primary/10 text-primary border-primary/30 font-semibold'
+                  : 'bg-card border-border text-muted-foreground hover:text-foreground'
+              }`}>
+              {cat.name[language]}
             </button>
           ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Items */}
-          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
             {items.map(item => (
               <button key={item.id} onClick={() => addToCart(item)}
-                className={`bg-gradient-to-br from-muted to-secondary border border-foreground/8 rounded-2xl overflow-hidden cursor-pointer transition-all text-left hover:-translate-y-1 hover:shadow-lg ${menuType === 'robot' ? 'hover:border-info' : 'hover:border-success'}`}>
+                className="group bg-card border border-border rounded-xl overflow-hidden cursor-pointer transition-all text-left hover:border-primary/30 hover:shadow-lg">
                 {menuImages[item.id] ? (
-                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-36 object-cover" />
+                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  <div className="w-full h-36 flex items-center justify-center text-5xl bg-muted">{item.emoji}</div>
+                  <div className="w-full h-32 flex items-center justify-center text-4xl bg-secondary opacity-40">{item.emoji}</div>
                 )}
                 <div className="p-3">
-                  <div className="text-foreground text-sm font-bold mb-0.5">{item.name[language]}</div>
-                  <div className="text-foreground/40 text-[11px] mb-2">{item.desc[language]}</div>
-                  <div className="text-primary text-lg font-black">{item.price.toLocaleString()} <span className="text-xs text-primary/60">IQD</span></div>
+                  <div className="text-foreground text-sm font-semibold mb-0.5">{item.name[language]}</div>
+                  <div className="text-muted-foreground text-[11px] mb-2">{item.desc[language]}</div>
+                  <div className="text-primary text-base font-bold">{item.price.toLocaleString()} <span className="text-xs font-normal text-primary/60">IQD</span></div>
                 </div>
               </button>
             ))}
           </div>
 
           {/* Order Panel */}
-          <div className="bg-secondary rounded-2xl border border-primary/20 overflow-hidden h-fit sticky top-24">
-            <div className="px-5 py-4 bg-gradient-to-r from-[hsl(43,30%,8%)] to-background border-b border-primary/20">
-              <div className="text-primary text-lg font-bold">{t.orderTitle}</div>
-              <div className="text-foreground/50 text-sm">{cartCount} {t.items}</div>
+          <div className="bg-card rounded-xl border border-border overflow-hidden h-fit sticky top-20">
+            <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
+              <div>
+                <div className="text-foreground text-sm font-semibold">{t.orderTitle}</div>
+                <div className="text-muted-foreground text-xs">{cartCount} {t.items}</div>
+              </div>
+              <ShoppingCart className="w-4 h-4 text-primary" />
             </div>
 
-            {/* Cart Items */}
-            <div className="max-h-60 overflow-y-auto p-3">
+            <div className="max-h-52 overflow-y-auto p-3">
               {cart.length === 0 ? (
-                <div className="text-center py-8 text-foreground/20">
-                  <div className="text-4xl mb-2">🛒</div>
-                  <div className="text-sm">{t.emptyCart}</div>
+                <div className="text-center py-8 text-muted-foreground">
+                  <ShoppingCart className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                  <div className="text-xs">{t.emptyCart}</div>
                 </div>
               ) : (
                 cart.map(item => (
-                  <div key={item.id} className="bg-muted rounded-lg p-2.5 mb-2 flex items-center gap-2 animate-slide-in">
+                  <div key={item.id} className="bg-secondary rounded-lg p-2.5 mb-2 flex items-center gap-2 animate-slide-in">
                     {menuImages[item.id] ? (
-                      <img src={menuImages[item.id]} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                      <img src={menuImages[item.id]} alt="" className="w-9 h-9 rounded-md object-cover" />
                     ) : (
-                      <span className="text-2xl">{item.emoji}</span>
+                      <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center text-base">{item.emoji}</div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="text-foreground text-xs font-semibold truncate">{item.name[language]}</div>
+                      <div className="text-foreground text-xs font-medium truncate">{item.name[language]}</div>
                       <div className="text-primary text-xs">{(item.price * item.qty).toLocaleString()} IQD</div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <button onClick={() => changeQty(item.id, -1)} className="w-6 h-6 border border-primary/40 text-primary rounded-full flex items-center justify-center text-sm hover:bg-primary hover:text-background">−</button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => changeQty(item.id, -1)} className="w-6 h-6 border border-border text-foreground rounded-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+                        <Minus className="w-3 h-3" />
+                      </button>
                       <span className="text-foreground text-xs font-bold w-5 text-center">{item.qty}</span>
-                      <button onClick={() => changeQty(item.id, 1)} className="w-6 h-6 border border-primary/40 text-primary rounded-full flex items-center justify-center text-sm hover:bg-primary hover:text-background">+</button>
+                      <button onClick={() => changeQty(item.id, 1)} className="w-6 h-6 border border-border text-foreground rounded-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+                        <Plus className="w-3 h-3" />
+                      </button>
                     </div>
                   </div>
                 ))
               )}
             </div>
 
-            <div className="p-4 border-t border-primary/20">
+            <div className="p-4 border-t border-border">
               {/* Customer Info */}
               <div className="mb-4">
-                <div className="text-foreground/60 text-xs mb-2">📋 {language === 'ku' ? 'زانیاری کڕیار' : language === 'ar' ? 'معلومات العميل' : 'Customer Info'}</div>
-                <input className="w-full p-2.5 bg-muted border border-foreground/10 rounded-lg text-foreground text-sm mb-2 focus:outline-none focus:border-primary"
-                  placeholder={language === 'ku' ? 'ناوی تەواو' : language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
-                  value={customerName} onChange={e => setCustomerName(e.target.value)} />
-                <input className="w-full p-2.5 bg-muted border border-foreground/10 rounded-lg text-foreground text-sm mb-2 focus:outline-none focus:border-primary"
-                  placeholder={language === 'ku' ? 'ژمارەی مۆبایل' : language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
-                  value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} />
+                <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+                  <User className="w-3 h-3" />
+                  {language === 'ku' ? 'زانیاری کڕیار' : language === 'ar' ? 'معلومات العميل' : 'Customer Info'}
+                </div>
+                <div className="relative mb-2">
+                  <input className="w-full pl-9 pr-3 py-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder={language === 'ku' ? 'ناوی تەواو' : language === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                    value={customerName} onChange={e => setCustomerName(e.target.value)} />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                </div>
+                <div className="relative mb-2">
+                  <input className="w-full pl-9 pr-3 py-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder={language === 'ku' ? 'ژمارەی مۆبایل' : language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                    value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                </div>
                 {orderType === 'delivery' && (
-                  <input className="w-full p-2.5 bg-muted border border-foreground/10 rounded-lg text-foreground text-sm focus:outline-none focus:border-primary"
-                    placeholder={language === 'ku' ? 'ناونیشان' : language === 'ar' ? 'العنوان' : 'Delivery Address'}
-                    value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} />
+                  <div className="relative">
+                    <input className="w-full pl-9 pr-3 py-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                      placeholder={language === 'ku' ? 'ناونیشان' : language === 'ar' ? 'العنوان' : 'Address'}
+                      value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  </div>
                 )}
               </div>
 
-              {/* Total */}
-              <div className="flex justify-between mb-3 pt-2 border-t border-foreground/10">
-                <span className="text-foreground font-black">{t.total}</span>
-                <span className="text-primary font-black text-lg">{cartTotal.toLocaleString()} IQD</span>
+              <div className="flex justify-between mb-3 pt-2 border-t border-border">
+                <span className="text-foreground font-bold text-sm">{t.total}</span>
+                <span className="text-primary font-bold text-base">{cartTotal.toLocaleString()} IQD</span>
               </div>
 
               {/* Order Type */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-2 gap-1.5 mb-3">
                 <button onClick={() => setOrderType('dine')}
-                  className={`p-2 border-2 rounded-lg text-center text-xs transition-all ${orderType === 'dine' ? 'border-primary bg-primary/10 text-primary' : 'bg-muted border-foreground/10 text-foreground/60'}`}>
-                  🍽️ {t.dineIn}
+                  className={`flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${orderType === 'dine' ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
+                  <UtensilsCrossed className="w-3.5 h-3.5" /> {t.dineIn}
                 </button>
                 <button onClick={() => setOrderType('delivery')}
-                  className={`p-2 border-2 rounded-lg text-center text-xs transition-all ${orderType === 'delivery' ? 'border-primary bg-primary/10 text-primary' : 'bg-muted border-foreground/10 text-foreground/60'}`}>
-                  🛵 {t.delivery}
+                  className={`flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${orderType === 'delivery' ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
+                  <Truck className="w-3.5 h-3.5" /> {t.delivery}
                 </button>
               </div>
 
               {/* Payment */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                {([
-                  { id: 'cash' as PaymentMethod, icon: '💵', label: t.cash },
-                  { id: 'fib' as PaymentMethod, icon: '🏦', label: t.fibBank },
-                  { id: 'zain' as PaymentMethod, icon: '📱', label: t.zainCash },
-                  { id: 'fastpay' as PaymentMethod, icon: '⚡', label: t.fastPay },
-                ]).map(m => (
+              <div className="grid grid-cols-2 gap-1.5 mb-3">
+                {[
+                  { id: 'cash' as PaymentMethod, icon: <Banknote className="w-3.5 h-3.5" />, label: t.cash },
+                  { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-3.5 h-3.5" />, label: t.fibBank },
+                  { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-3.5 h-3.5" />, label: t.zainCash },
+                  { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-3.5 h-3.5" />, label: t.fastPay },
+                ].map(m => (
                   <button key={m.id} onClick={() => setPayment(m.id)}
-                    className={`p-2 border-2 rounded-lg text-center text-[11px] transition-all ${payment === m.id ? 'border-primary bg-primary/10 text-primary' : 'bg-muted border-foreground/10 text-foreground/60'}`}>
-                    <span className="block text-lg mb-0.5">{m.icon}</span>{m.label}
+                    className={`flex items-center gap-1.5 justify-center p-2 border rounded-lg text-[11px] font-medium transition-all ${
+                      payment === m.id ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'
+                    }`}>
+                    {m.icon} {m.label}
                   </button>
                 ))}
               </div>
 
               <button onClick={handleOrder}
                 disabled={cart.length === 0 || !customerName || !customerPhone}
-                className="w-full py-3.5 bg-gradient-to-r from-gold-dark via-primary to-gold-dark border-none rounded-xl text-background text-base font-black cursor-pointer transition-all hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--gold)/0.4)] disabled:opacity-50 disabled:cursor-not-allowed">
+                className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed">
                 {t.placeOrder}
               </button>
             </div>
@@ -267,22 +296,24 @@ const OnlineOrder = () => {
 
       {/* Success Modal */}
       {showSuccess && (
-        <div className="fixed inset-0 bg-background/85 flex items-center justify-center z-[1000] backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-muted to-secondary border border-primary/30 rounded-3xl p-8 max-w-md w-full mx-4 text-center animate-modal-in">
-            <div className="text-6xl mb-3">🎉</div>
-            <div className="text-primary text-2xl font-bold mb-2">{t.modalTitle}</div>
-            <div className="text-foreground/60 mb-4">{t.modalSub}</div>
-            <div className="bg-muted border-2 border-primary rounded-2xl py-4 px-8 mb-4 inline-block">
-              <div className="text-foreground/50 text-xs tracking-[3px]">{t.orderNumLabel}</div>
-              <div className="text-primary text-4xl font-black font-display">#{orderNum}</div>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
+          <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full mx-4 text-center animate-modal-in">
+            <div className="w-14 h-14 rounded-full bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-5">
+              <Check className="w-7 h-7 text-success" />
             </div>
-            <p className="text-foreground/40 text-sm mb-4">
+            <div className="text-foreground text-xl font-bold mb-1">{t.modalTitle}</div>
+            <div className="text-muted-foreground text-sm mb-5">{t.modalSub}</div>
+            <div className="bg-secondary border border-border rounded-xl py-4 px-8 mb-5 inline-block">
+              <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1">{t.orderNumLabel}</div>
+              <div className="text-primary text-4xl font-bold">#{orderNum}</div>
+            </div>
+            <p className="text-muted-foreground text-sm mb-5">
               {language === 'ku' ? 'ئۆردەرەکەت وەرگیرا! پەیوەندیت پێوە دەکرێت.' :
                language === 'ar' ? 'تم استلام طلبك! سنتواصل معك قريباً.' :
                'Your order has been received! We will contact you shortly.'}
             </p>
             <button onClick={() => { setShowSuccess(false); setCustomerName(''); setCustomerPhone(''); setCustomerAddress(''); }}
-              className="px-8 py-3 rounded-lg bg-primary text-background font-bold cursor-pointer hover:scale-105 transition-all">
+              className="px-8 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm cursor-pointer hover:opacity-90 transition-all">
               {t.modalOk}
             </button>
           </div>

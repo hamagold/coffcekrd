@@ -5,6 +5,7 @@ import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
+import { Coffee, Settings, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -24,8 +25,8 @@ const MenuScreen = () => {
   useEffect(() => {
     const update = () => {
       const now = new Date();
-      setClock(now.toLocaleTimeString('en-GB'));
-      setDateStr(now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+      setClock(now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+      setDateStr(now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
     };
     update();
     const interval = setInterval(update, 1000);
@@ -74,11 +75,11 @@ const MenuScreen = () => {
   const printLabel = () => {
     const w = window.open('', '_blank', 'width=400,height=300');
     if (!w) return;
-    w.document.write(`<html><head><title>PLC Order Label</title>
+    w.document.write(`<html><head><title>PLC Order</title>
     <style>body{font-family:monospace;text-align:center;padding:20px;} .big{font-size:48px;font-weight:bold;}</style>
     </head><body>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
-    <div style="font-size:24px;font-weight:bold;">☕ PLC CAFETERIA</div>
+    <div style="font-size:24px;font-weight:bold;">PLC CAFETERIA</div>
     <div>━━━━━━━━━━━━━━━━━━━━</div>
     <div class="big">#${lastOrderNum}</div>
     <div>${new Date().toLocaleString()}</div>
@@ -90,193 +91,250 @@ const MenuScreen = () => {
     </body></html>`);
   };
 
+  const paymentMethods: { id: PaymentMethod; icon: React.ReactNode; label: string }[] = [
+    { id: 'cash', icon: <Banknote className="w-4 h-4" />, label: t.cash },
+    { id: 'fib', icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
+    { id: 'zain', icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
+    { id: 'fastpay', icon: <Zap className="w-4 h-4" />, label: t.fastPay },
+  ];
+
   return (
     <div className="flex flex-col w-full h-screen bg-background overflow-hidden" dir={direction}>
       {/* Top Bar */}
-      <div className="bg-gradient-to-r from-[hsl(0,0%,5%)] via-[hsl(43,30%,8%)] to-[hsl(0,0%,5%)] border-b-2 border-gold-dark px-8 py-3 flex items-center justify-between shrink-0">
-        <span className="text-primary text-2xl font-black font-display tracking-[4px]">☕ PLC</span>
-        <div className="text-center">
-          <div className="text-foreground text-3xl font-light tracking-wider tabular-nums">{clock}</div>
-          <div className="text-primary/60 text-sm">{dateStr}</div>
+      <div className="bg-card border-b border-border px-6 py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Coffee className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <span className="text-foreground text-base font-bold tracking-wide">PLC</span>
+            <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
+          </div>
         </div>
-        <div className="text-right">
-          <div className="text-primary text-sm">{t.welcome}</div>
-          <button onClick={() => navigate('/')} className="bg-primary/10 border border-primary/30 text-primary/70 px-3 py-1 rounded-md text-xs cursor-pointer mt-1">
-            🌐 {t.changeLang}
+        <div className="flex items-center gap-6">
+          <div className="text-right">
+            <div className="text-foreground text-xl font-semibold tabular-nums">{clock}</div>
+            <div className="text-muted-foreground text-xs">{dateStr}</div>
+          </div>
+          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
+            <Globe className="w-3.5 h-3.5" />
+            {t.changeLang}
           </button>
         </div>
       </div>
 
       {/* Menu Type Tabs */}
-      <div className="flex bg-secondary border-b border-primary/20 shrink-0">
+      <div className="flex bg-card border-b border-border shrink-0">
         <button
           onClick={() => setMenuType('robot')}
-          className={`flex-1 py-5 text-center cursor-pointer transition-all border-b-[3px] ${menuType === 'robot' ? 'border-info bg-info/10' : 'border-transparent'}`}
+          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className="text-3xl mb-1">🤖</div>
-          <div className={`text-base font-bold ${menuType === 'robot' ? 'text-info' : 'text-foreground/50'}`}>{t.tabRobot}</div>
-          <div className="text-xs text-foreground/40">{t.tabRobotSub}</div>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'robot' ? 'bg-info/15 text-info' : 'bg-secondary text-muted-foreground'}`}>
+            <Bot className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <div className={`text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</div>
+            <div className="text-[11px] text-muted-foreground">{t.tabRobotSub}</div>
+          </div>
         </button>
+        <div className="w-px bg-border" />
         <button
           onClick={() => setMenuType('staff')}
-          className={`flex-1 py-5 text-center cursor-pointer transition-all border-b-[3px] ${menuType === 'staff' ? 'border-success bg-success/10' : 'border-transparent'}`}
+          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className="text-3xl mb-1">👨‍🍳</div>
-          <div className={`text-base font-bold ${menuType === 'staff' ? 'text-success' : 'text-foreground/50'}`}>{t.tabStaff}</div>
-          <div className="text-xs text-foreground/40">{t.tabStaffSub}</div>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'staff' ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground'}`}>
+            <ChefHat className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <div className={`text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</div>
+            <div className="text-[11px] text-muted-foreground">{t.tabStaffSub}</div>
+          </div>
         </button>
       </div>
 
       {/* Menu Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Categories Sidebar */}
-        <div className="w-40 bg-muted border-r border-primary/15 overflow-y-auto shrink-0">
+        <div className="w-44 bg-card border-r border-border overflow-y-auto shrink-0 py-2">
           {categories.map(cat => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`w-full py-4 px-3 cursor-pointer border-b border-foreground/5 text-center transition-all ${activeCategory === cat.id ? 'bg-primary/10 border-l-[3px] border-l-primary' : 'hover:bg-primary/5'}`}
+              className={`w-full py-3 px-4 cursor-pointer text-left transition-all flex items-center gap-3 ${
+                activeCategory === cat.id
+                  ? 'bg-primary/8 border-l-2 border-l-primary text-foreground'
+                  : 'border-l-2 border-l-transparent text-muted-foreground hover:bg-secondary hover:text-foreground'
+              }`}
             >
-              <div className="text-2xl">{cat.icon}</div>
-              <div className="text-foreground text-[11px] mt-1">{cat.name[language]}</div>
+              <span className="text-lg">{cat.icon}</span>
+              <span className="text-sm font-medium">{cat.name[language]}</span>
             </button>
           ))}
         </div>
 
         {/* Items Grid */}
-        <div className="flex-1 overflow-y-auto p-5 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 content-start">
+        <div className="flex-1 overflow-y-auto p-5 grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-4 content-start">
           {items.map(item => (
             <button
               key={item.id}
               onClick={() => addToCart(item)}
-              className={`bg-gradient-to-br from-muted to-secondary border border-foreground/8 rounded-2xl p-4 cursor-pointer transition-all relative overflow-hidden text-left hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.4)] ${menuType === 'robot' ? 'hover:border-info' : 'hover:border-success'}`}
+              className="group bg-card border border-border rounded-xl overflow-hidden cursor-pointer transition-all text-left hover:border-primary/30 hover:shadow-[0_8px_30px_hsl(220_14%_4%/0.5)] animate-fade-up"
             >
-              <div className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center text-xs ${menuType === 'robot' ? 'bg-info/30 border border-info' : 'bg-success/30 border border-success'}`}>
-                {menuType === 'robot' ? '🤖' : '👨‍🍳'}
+              <div className="relative overflow-hidden">
+                {menuImages[item.id] ? (
+                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
+                ) : (
+                  <div className="w-full h-36 bg-secondary flex items-center justify-center">
+                    <span className="text-4xl opacity-40">{item.emoji}</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              {menuImages[item.id] ? (
-                <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-32 object-cover rounded-xl mb-2.5" />
-              ) : (
-                <span className="text-5xl text-center block mb-2.5">{item.emoji}</span>
-              )}
-              <div className="text-foreground text-[15px] font-bold mb-1">{item.name[language]}</div>
-              <div className="text-foreground/40 text-[11px] mb-2.5 leading-relaxed">{item.desc[language]}</div>
-              <div className="text-primary text-xl font-black">{item.price.toLocaleString()} <span className="text-xs text-primary/60">IQD</span></div>
+              <div className="p-3.5">
+                <div className="text-foreground text-sm font-semibold mb-0.5">{item.name[language]}</div>
+                <div className="text-muted-foreground text-[11px] mb-2.5">{item.desc[language]}</div>
+                <div className="text-primary text-base font-bold">{item.price.toLocaleString()} <span className="text-xs font-normal text-primary/60">IQD</span></div>
+              </div>
             </button>
           ))}
         </div>
 
         {/* Order Panel */}
-        <div className="w-80 bg-secondary border-l border-primary/20 flex flex-col shrink-0">
-          <div className="px-5 py-4 bg-gradient-to-r from-[hsl(43,30%,8%)] to-background border-b border-primary/20">
-            <div className="text-primary text-lg font-bold">{t.orderTitle}</div>
-            <div className="text-foreground/50 text-sm">{cartItemCount} {t.items}</div>
+        <div className="w-80 bg-card border-l border-border flex flex-col shrink-0">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <div>
+              <div className="text-foreground text-sm font-semibold">{t.orderTitle}</div>
+              <div className="text-muted-foreground text-xs">{cartItemCount} {t.items}</div>
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <ShoppingCart className="w-4 h-4 text-primary" />
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-3">
             {cart.length === 0 ? (
-              <div className="text-center py-10 text-foreground/20">
-                <div className="text-5xl mb-3">🛒</div>
-                <div>{t.emptyCart}</div>
+              <div className="text-center py-12 text-muted-foreground">
+                <ShoppingCart className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <div className="text-sm">{t.emptyCart}</div>
               </div>
             ) : (
               cart.map(item => (
-                <div key={item.id} className="bg-muted rounded-lg p-3 mb-2 flex items-center gap-2.5 animate-slide-in">
+                <div key={item.id} className="bg-secondary rounded-lg p-3 mb-2 flex items-center gap-2.5 animate-slide-in">
                   {menuImages[item.id] ? (
                     <img src={menuImages[item.id]} alt="" className="w-10 h-10 rounded-lg object-cover" />
                   ) : (
-                    <span className="text-3xl">{item.emoji}</span>
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-lg">{item.emoji}</div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="text-foreground text-sm font-semibold truncate">{item.name[language]}</div>
-                    <div className="text-primary text-xs">{(item.price * item.qty).toLocaleString()} IQD</div>
+                    <div className="text-foreground text-xs font-medium truncate">{item.name[language]}</div>
+                    <div className="text-primary text-xs font-semibold">{(item.price * item.qty).toLocaleString()} IQD</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => changeQty(item.id, -1)} className="w-7 h-7 border border-primary/40 bg-transparent text-primary rounded-full flex items-center justify-center text-base hover:bg-primary hover:text-background transition-all">−</button>
-                    <span className="text-foreground text-sm font-bold min-w-[20px] text-center">{item.qty}</span>
-                    <button onClick={() => changeQty(item.id, 1)} className="w-7 h-7 border border-primary/40 bg-transparent text-primary rounded-full flex items-center justify-center text-base hover:bg-primary hover:text-background transition-all">+</button>
+                  <div className="flex items-center gap-1.5">
+                    <button onClick={(e) => { e.stopPropagation(); changeQty(item.id, -1); }} className="w-6 h-6 border border-border bg-muted text-foreground rounded-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="text-foreground text-xs font-bold min-w-[18px] text-center">{item.qty}</span>
+                    <button onClick={(e) => { e.stopPropagation(); changeQty(item.id, 1); }} className="w-6 h-6 border border-border bg-muted text-foreground rounded-md flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
+                      <Plus className="w-3 h-3" />
+                    </button>
                   </div>
                 </div>
               ))
             )}
           </div>
 
-          <div className="p-5 border-t border-primary/20 bg-muted">
-            <div className="flex justify-between mb-1.5">
-              <span className="text-foreground/50 text-sm">{t.subtotal}</span>
-              <span className="text-primary text-sm font-semibold">{cartTotal.toLocaleString()} IQD</span>
+          <div className="p-4 border-t border-border bg-secondary/50">
+            <div className="flex justify-between mb-1">
+              <span className="text-muted-foreground text-xs">{t.subtotal}</span>
+              <span className="text-foreground text-xs font-medium">{cartTotal.toLocaleString()} IQD</span>
             </div>
-            <div className="flex justify-between pt-2 border-t border-foreground/10 mt-1">
-              <span className="text-foreground text-xl font-black">{t.total}</span>
-              <span className="text-primary text-xl font-black">{cartTotal.toLocaleString()} IQD</span>
+            <div className="flex justify-between pt-2 border-t border-border mt-2 mb-4">
+              <span className="text-foreground text-base font-bold">{t.total}</span>
+              <span className="text-primary text-base font-bold">{cartTotal.toLocaleString()} IQD</span>
             </div>
 
-            <div className="mt-4">
-              <div className="text-foreground/60 text-xs mb-2">{t.payMethod}</div>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                {([
-                  { id: 'cash' as PaymentMethod, icon: '💵', label: t.cash },
-                  { id: 'fib' as PaymentMethod, icon: '🏦', label: t.fibBank },
-                  { id: 'zain' as PaymentMethod, icon: '📱', label: t.zainCash },
-                  { id: 'fastpay' as PaymentMethod, icon: '⚡', label: t.fastPay },
-                ]).map(m => (
+            <div className="mb-3">
+              <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">{t.payMethod}</div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {paymentMethods.map(m => (
                   <button
                     key={m.id}
                     onClick={() => setPayment(m.id)}
-                    className={`p-2 border-2 rounded-lg cursor-pointer text-center transition-all text-[11px] ${payment === m.id ? 'border-primary bg-primary/10 text-primary' : 'bg-muted border-foreground/10 text-foreground/60'}`}
+                    className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
+                      payment === m.id
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                    }`}
                   >
-                    <span className="text-lg block mb-0.5">{m.icon}</span>{m.label}
+                    {m.icon}
+                    {m.label}
                   </button>
                 ))}
               </div>
+            </div>
 
-              <div className="text-foreground/60 text-xs mb-2">{t.orderType}</div>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="mb-3">
+              <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">{t.orderType}</div>
+              <div className="grid grid-cols-2 gap-1.5">
                 <button
                   onClick={() => setOrderType('dine')}
-                  className={`p-2 border-2 rounded-lg cursor-pointer text-center text-[11px] transition-all ${orderType === 'dine' ? 'border-[hsl(var(--purple))] bg-[hsl(var(--purple)/0.15)] text-[hsl(var(--purple))]' : 'bg-muted border-foreground/10 text-foreground/60'}`}
+                  className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
+                    orderType === 'dine'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                  }`}
                 >
-                  🍽️ {t.dineIn}
+                  <UtensilsCrossed className="w-3.5 h-3.5" />
+                  {t.dineIn}
                 </button>
                 <button
                   onClick={() => setOrderType('delivery')}
-                  className={`p-2 border-2 rounded-lg cursor-pointer text-center text-[11px] transition-all ${orderType === 'delivery' ? 'border-[hsl(var(--purple))] bg-[hsl(var(--purple)/0.15)] text-[hsl(var(--purple))]' : 'bg-muted border-foreground/10 text-foreground/60'}`}
+                  className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer text-[11px] font-medium transition-all ${
+                    orderType === 'delivery'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                  }`}
                 >
-                  🛵 {t.delivery}
+                  <Truck className="w-3.5 h-3.5" />
+                  {t.delivery}
                 </button>
               </div>
-
-              <button
-                onClick={handlePlaceOrder}
-                className="w-full py-4 bg-gradient-to-r from-gold-dark via-primary to-gold-dark border-none rounded-xl text-background text-lg font-black cursor-pointer transition-all tracking-wider hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--gold)/0.4)]"
-              >
-                {t.placeOrder}
-              </button>
             </div>
+
+            <button
+              onClick={handlePlaceOrder}
+              disabled={cart.length === 0}
+              className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {t.placeOrder}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Order Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-background/85 flex items-center justify-center z-[1000] backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-muted to-secondary border border-primary/30 rounded-3xl p-10 min-w-[400px] max-w-[500px] text-center animate-modal-in">
-            <div className="text-6xl mb-4">🎉</div>
-            <div className="text-primary text-2xl font-bold mb-2">{t.modalTitle}</div>
-            <div className="text-foreground/60 text-base mb-6">{t.modalSub}</div>
-            <div className="bg-muted border-2 border-primary rounded-2xl py-5 px-10 mb-5 inline-block">
-              <div className="text-foreground/50 text-xs tracking-[3px]">{t.orderNumLabel}</div>
-              <div className="text-primary text-5xl font-black font-display">#{lastOrderNum}</div>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
+          <div className="bg-card border border-border rounded-2xl p-8 min-w-[400px] max-w-[480px] text-center animate-modal-in">
+            <div className="w-14 h-14 rounded-full bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-5">
+              <Check className="w-7 h-7 text-success" />
             </div>
-            <div className="bg-foreground w-40 h-40 mx-auto mb-5 rounded-xl flex items-center justify-center">
+            <div className="text-foreground text-xl font-bold mb-1">{t.modalTitle}</div>
+            <div className="text-muted-foreground text-sm mb-6">{t.modalSub}</div>
+            <div className="bg-secondary border border-border rounded-xl py-4 px-8 mb-5 inline-block">
+              <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1">{t.orderNumLabel}</div>
+              <div className="text-primary text-4xl font-bold">#{lastOrderNum}</div>
+            </div>
+            <div className="bg-foreground w-36 h-36 mx-auto mb-5 rounded-lg flex items-center justify-center">
               <canvas ref={canvasRef} width={140} height={140} />
             </div>
-            <div className="text-foreground/40 text-xs mb-5">{t.qrHint}</div>
+            <div className="text-muted-foreground text-xs mb-5">{t.qrHint}</div>
             <div className="flex gap-2 justify-center">
-              <button onClick={() => setShowModal(false)} className="px-8 py-3 rounded-lg bg-primary text-background font-bold text-base cursor-pointer transition-all hover:scale-105">
+              <button onClick={() => setShowModal(false)} className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm cursor-pointer transition-all hover:opacity-90">
                 {t.modalOk}
               </button>
-              <button onClick={printLabel} className="px-8 py-3 rounded-lg bg-muted text-foreground border border-foreground/15 font-bold text-base cursor-pointer transition-all hover:scale-105">
+              <button onClick={printLabel} className="px-6 py-2.5 rounded-lg bg-secondary text-foreground border border-border font-semibold text-sm cursor-pointer transition-all hover:bg-muted flex items-center gap-2">
+                <Printer className="w-4 h-4" />
                 {t.modalPrint}
               </button>
             </div>
@@ -285,13 +343,13 @@ const MenuScreen = () => {
       )}
 
       {/* Admin link */}
-      <a
-        href="/admin"
-        onClick={(e) => { e.preventDefault(); navigate('/admin'); }}
-        className="fixed bottom-5 left-5 bg-background/80 border border-primary/30 px-4 py-2 rounded-lg text-primary/50 text-xs cursor-pointer transition-all hover:border-primary hover:text-primary z-50"
+      <button
+        onClick={() => navigate('/admin')}
+        className="fixed bottom-4 left-4 flex items-center gap-1.5 bg-card border border-border px-3 py-2 rounded-lg text-muted-foreground text-xs cursor-pointer transition-all hover:border-primary/30 hover:text-foreground z-50"
       >
-        ⚙️ Admin
-      </a>
+        <Settings className="w-3.5 h-3.5" />
+        Admin
+      </button>
     </div>
   );
 };

@@ -23,6 +23,7 @@ const App = () => (
             <Route path="/" element={<LanguageSelect />} />
             <Route path="/menu" element={<MenuScreen />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/order" element={<OnlineOrder />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

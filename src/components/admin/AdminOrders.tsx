@@ -32,7 +32,7 @@ const AdminOrders = () => {
     if (error) {
       toast.error('هەڵەی وەرگرتنی ئۆردەرەکان');
     } else {
-      setOrders(data || []);
+      setOrders((data || []).map(d => ({ ...d, items: Array.isArray(d.items) ? d.items : [] })));
     }
     setLoading(false);
   };

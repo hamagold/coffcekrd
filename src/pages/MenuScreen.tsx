@@ -182,7 +182,11 @@ const MenuScreen = () => {
             ) : (
               cart.map(item => (
                 <div key={item.id} className="bg-muted rounded-lg p-3 mb-2 flex items-center gap-2.5 animate-slide-in">
-                  <span className="text-3xl">{item.emoji}</span>
+                  {menuImages[item.id] ? (
+                    <img src={menuImages[item.id]} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-3xl">{item.emoji}</span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="text-foreground text-sm font-semibold truncate">{item.name[language]}</div>
                     <div className="text-primary text-xs">{(item.price * item.qty).toLocaleString()} IQD</div>

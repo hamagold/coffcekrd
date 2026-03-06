@@ -1,17 +1,17 @@
 import { Category, MenuItem } from '@/types';
 
 export const robotCategories: Category[] = [
-  { id: 'hot', icon: '☕', name: { ku: 'گەرم', ar: 'ساخن', en: 'Hot' } },
-  { id: 'cold', icon: '🧊', name: { ku: 'سارد', ar: 'بارد', en: 'Cold' } },
-  { id: 'shake', icon: '🥤', name: { ku: 'شێک', ar: 'شيك', en: 'Shake' } },
-  { id: 'juice', icon: '🍊', name: { ku: 'ئاو میوە', ar: 'عصير', en: 'Juice' } },
+  { id: 'hot', icon: '🔥', name: { ku: 'گەرم', ar: 'ساخن', en: 'Hot' } },
+  { id: 'cold', icon: '❄️', name: { ku: 'سارد', ar: 'بارد', en: 'Cold' } },
+  { id: 'shake', icon: '🧋', name: { ku: 'شێک', ar: 'شيك', en: 'Shake' } },
+  { id: 'juice', icon: '🍹', name: { ku: 'ئاو میوە', ar: 'عصير', en: 'Juice' } },
 ];
 
 export const staffCategories: Category[] = [
-  { id: 'sandwich', icon: '🥪', name: { ku: 'ساندویچ', ar: 'ساندويتش', en: 'Sandwiches' } },
-  { id: 'food', icon: '🍽️', name: { ku: 'خواردن', ar: 'طعام', en: 'Food' } },
-  { id: 'dessert', icon: '🍰', name: { ku: 'شیرینی', ar: 'حلويات', en: 'Desserts' } },
-  { id: 'salad', icon: '🥗', name: { ku: 'سەلاتە', ar: 'سلطة', en: 'Salads' } },
+  { id: 'sandwich', icon: '🌯', name: { ku: 'ساندویچ', ar: 'ساندويتش', en: 'Sandwiches' } },
+  { id: 'food', icon: '🍖', name: { ku: 'خواردن', ar: 'طعام', en: 'Food' } },
+  { id: 'dessert', icon: '🧁', name: { ku: 'شیرینی', ar: 'حلويات', en: 'Desserts' } },
+  { id: 'salad', icon: '🥬', name: { ku: 'سەلاتە', ar: 'سلطة', en: 'Salads' } },
 ];
 
 export const defaultRobotItems: MenuItem[] = [

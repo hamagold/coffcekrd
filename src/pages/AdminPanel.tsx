@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from '@/store/StoreContext';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
@@ -9,6 +9,7 @@ import AdminPayments from '@/components/admin/AdminPayments';
 import AdminReports from '@/components/admin/AdminReports';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
+import SetupAdmin from '@/components/admin/SetupAdmin';
 import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound } from 'lucide-react';
 
 const pageTitles: Record<string, [string, string]> = {

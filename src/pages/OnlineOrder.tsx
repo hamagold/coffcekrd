@@ -4,6 +4,7 @@ import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
 
 const OnlineOrder = () => {
@@ -70,26 +71,26 @@ const OnlineOrder = () => {
     setCart(prev => prev.map(c => c.id === id ? { ...c, qty: c.qty + delta } : c).filter(c => c.qty > 0));
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (cart.length === 0 || !customerName || !customerPhone) return;
     const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
     localStorage.setItem('plc_order_counter', String(counter));
     const num = String(counter).padStart(3, '0');
 
-    const orders = JSON.parse(localStorage.getItem('plc_orders') || '[]');
-    orders.push({
-      id: num,
-      items: cart,
+    // Insert into database
+    await supabase.from('orders').insert({
+      order_number: num,
+      items: cart as any,
       total: cartTotal,
       payment,
-      type: orderType,
-      time: new Date().toISOString(),
+      order_type: orderType,
       lang: language,
       status: 'pending',
-      customer: { name: customerName, phone: customerPhone, address: customerAddress },
-      online: true,
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      customer_address: customerAddress || null,
+      is_online: true,
     });
-    localStorage.setItem('plc_orders', JSON.stringify(orders));
 
     setOrderNum(num);
     setShowSuccess(true);

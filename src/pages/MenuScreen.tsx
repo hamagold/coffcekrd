@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
+import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 
 const MenuScreen = () => {

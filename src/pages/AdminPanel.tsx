@@ -87,12 +87,17 @@ const AdminPanel = () => {
   ];
 
   // Loading screen
-  if (loading) {
+  if (loading || needsSetup === null) {
     return (
       <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
+  }
+
+  // Initial setup
+  if (needsSetup && !user) {
+    return <SetupAdmin onComplete={() => setNeedsSetup(false)} />;
   }
 
   // Login screen

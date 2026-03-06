@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Plus, Trash2, Shield, User as UserIcon, X, Loader2, Mail, KeyRound } from 'lucide-react';
+import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 
@@ -23,22 +24,51 @@ const AdminUsers = ({ lang }: { lang: Language }) => {
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data } = await supabase.functions.invoke('manage-users', { body: { action: 'list' } });
-    if (data?.users) setUsers(data.users);
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-users', { body: { action: 'list' } });
+      if (error) {
+        console.error('Fetch users error:', error);
+        toast.error(lang === 'ku' ? 'هەڵەی وەرگرتنی بەکارهێنەرەکان' : lang === 'ar' ? 'خطأ في جلب المستخدمين' : 'Error fetching users');
+      } else if (data?.error) {
+        console.error('Fetch users data error:', data.error);
+        toast.error(data.error);
+      } else if (data?.users) {
+        setUsers(data.users);
+      }
+    } catch (e) {
+      console.error('Fetch users exception:', e);
+      toast.error(lang === 'ku' ? 'هەڵەی نەخوازراو' : lang === 'ar' ? 'خطأ غير متوقع' : 'Unexpected error');
+    }
     setLoading(false);
   };
 
   useEffect(() => { fetchUsers(); }, []);
 
   const handleAdd = async () => {
+    if (!newUser.email || !newUser.password) {
+      toast.error(lang === 'ku' ? 'ئیمەیڵ و وشەی نهێنی پێویستە' : lang === 'ar' ? 'البريد وكلمة المرور مطلوبان' : 'Email and password required');
+      return;
+    }
     setActionLoading(true);
-    const { data, error } = await supabase.functions.invoke('manage-users', {
-      body: { action: 'create', email: newUser.email, password: newUser.password, name: newUser.fullname, role: newUser.role },
-    });
-    if (!error && !data?.error) {
-      setShowModal(false);
-      setNewUser({ email: '', fullname: '', password: '', role: 'staff' });
-      fetchUsers();
+    try {
+      const { data, error } = await supabase.functions.invoke('manage-users', {
+        body: { action: 'create', email: newUser.email, password: newUser.password, name: newUser.fullname, role: newUser.role },
+      });
+      if (error) {
+        console.error('Add user error:', error);
+        toast.error(lang === 'ku' ? 'هەڵەی زیادکردنی بەکارهێنەر' : lang === 'ar' ? 'خطأ في إضافة المستخدم' : 'Error adding user');
+      } else if (data?.error) {
+        console.error('Add user data error:', data.error);
+        toast.error(data.error);
+      } else {
+        toast.success(lang === 'ku' ? 'بەکارهێنەر زیادکرا' : lang === 'ar' ? 'تمت إضافة المستخدم' : 'User added');
+        setShowModal(false);
+        setNewUser({ email: '', fullname: '', password: '', role: 'staff' });
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error('Add user exception:', e);
+      toast.error(String(e));
     }
     setActionLoading(false);
   };

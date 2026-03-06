@@ -122,7 +122,7 @@ const MenuScreen = () => {
             <Coffee className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <span className="text-foreground text-base font-bold tracking-wide">PLC</span>
+            <span className="text-foreground text-base font-bold tracking-wide">{cafeName}</span>
             <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
           </div>
         </div>

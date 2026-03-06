@@ -99,11 +99,11 @@ const MenuScreen = () => {
     return { fib: true, zain: true, fastpay: true };
   })();
 
-  const onlinePaymentMethods: { id: PaymentMethod; icon: React.ReactNode; label: string }[] = [
-    { id: 'fib', icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
-    { id: 'zain', icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
-    { id: 'fastpay', icon: <Zap className="w-4 h-4" />, label: t.fastPay },
-  ].filter(m => paymentConfig[m.id.replace('fib','fib').replace('zain','zain').replace('fastpay','fastpay')] !== false);
+  const onlinePaymentMethods = ([
+    { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
+    { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
+    { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-4 h-4" />, label: t.fastPay },
+  ] as { id: PaymentMethod; icon: React.ReactNode; label: string }[]).filter(m => paymentConfig[m.id] !== false);
 
   return (
     <div className="flex flex-col w-full h-screen bg-background overflow-hidden" dir={direction}>

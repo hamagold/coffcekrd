@@ -154,7 +154,11 @@ const MenuScreen = () => {
               <div className={`absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center text-xs ${menuType === 'robot' ? 'bg-info/30 border border-info' : 'bg-success/30 border border-success'}`}>
                 {menuType === 'robot' ? '🤖' : '👨‍🍳'}
               </div>
-              <span className="text-5xl text-center block mb-2.5">{item.emoji}</span>
+              {menuImages[item.id] ? (
+                <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-32 object-cover rounded-xl mb-2.5" />
+              ) : (
+                <span className="text-5xl text-center block mb-2.5">{item.emoji}</span>
+              )}
               <div className="text-foreground text-[15px] font-bold mb-1">{item.name[language]}</div>
               <div className="text-foreground/40 text-[11px] mb-2.5 leading-relaxed">{item.desc[language]}</div>
               <div className="text-primary text-xl font-black">{item.price.toLocaleString()} <span className="text-xs text-primary/60">IQD</span></div>

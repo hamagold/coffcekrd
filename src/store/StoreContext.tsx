@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser } from '@/types';
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StoreContextType {
   // Language
@@ -25,7 +26,7 @@ interface StoreContextType {
 
   // Orders
   orders: Order[];
-  placeOrder: (payment: PaymentMethod, orderType: OrderType) => string;
+  placeOrder: (payment: PaymentMethod, orderType: OrderType) => Promise<string>;
   clearOrders: () => void;
 
   // Expenses
@@ -119,10 +120,24 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const cartTotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const cartItemCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
-  const placeOrder = useCallback((payment: PaymentMethod, orderType: OrderType): string => {
+  const placeOrder = useCallback(async (payment: PaymentMethod, orderType: OrderType): Promise<string> => {
     const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
     localStorage.setItem('plc_order_counter', String(counter));
     const orderNum = String(counter).padStart(3, '0');
+
+    // Insert into database
+    await supabase.from('orders').insert({
+      order_number: orderNum,
+      items: cart as any,
+      total: cart.reduce((s, i) => s + i.price * i.qty, 0),
+      payment,
+      order_type: orderType,
+      lang: language,
+      status: 'done',
+      is_online: false,
+    });
+
+    // Also keep local for backward compat
     const order: Order = {
       id: orderNum,
       items: [...cart],

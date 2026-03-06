@@ -47,6 +47,8 @@ const MenuScreen = () => {
     setLastOrderNum(num);
     generateQR(num, cartTotal);
     setShowModal(true);
+    // Auto-print after short delay
+    setTimeout(() => autoPrintLabel(num), 500);
   };
 
   const generateQR = (orderNum: string, total: number) => {

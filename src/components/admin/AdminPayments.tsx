@@ -110,6 +110,22 @@ const AdminPayments = () => {
     });
   };
 
+  const updateFieldValue = (providerId: string, fieldIndex: number, value: string) => {
+    setFieldValues(prev => ({
+      ...prev,
+      [providerId]: { ...prev[providerId], [fieldIndex]: value }
+    }));
+  };
+
+  const saveProviderKeys = (providerId: string) => {
+    localStorage.setItem(`plc_payment_keys_${providerId}`, JSON.stringify(fieldValues[providerId] || {}));
+    toast.success(
+      lang === 'ku' ? `${providerId.toUpperCase()} پاشکەوت کرا ✓` :
+      lang === 'ar' ? `تم حفظ ${providerId.toUpperCase()} ✓` :
+      `${providerId.toUpperCase()} saved ✓`
+    );
+  };
+
   const direction = lang === 'en' ? 'ltr' : 'rtl';
   const labels = {
     title: { ku: '💳 ڕێکخستنی پارەدان', ar: '💳 إعدادات الدفع', en: '💳 Payment Settings' },

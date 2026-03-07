@@ -225,6 +225,7 @@ const AdminPayments = () => {
               {p.fields.length > 0 && (
                 <button
                   disabled={!enabled}
+                  onClick={() => saveProviderKeys(p.id)}
                   className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Save className="w-3.5 h-3.5" />

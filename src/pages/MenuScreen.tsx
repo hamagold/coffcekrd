@@ -6,6 +6,7 @@ import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
+import { isPaymentConfigured } from '@/components/admin/AdminPayments';
 import { getCafeName } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins } from 'lucide-react';
 
@@ -47,6 +48,16 @@ const MenuScreen = () => {
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
+    // Block if online payment selected but not configured
+    if (payment !== 'cash' && !isPaymentConfigured(payment)) {
+      const { toast } = await import('sonner');
+      toast.error(
+        language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
+        language === 'ar' ? `⚠️ ${payment.toUpperCase()} غير مُعد - تواصل مع المسؤول` :
+        `⚠️ ${payment.toUpperCase()} is not configured - contact admin`
+      );
+      return;
+    }
     const num = await placeOrder(payment, orderType);
     setLastOrderNum(num);
     setShowModal(true);

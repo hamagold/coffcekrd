@@ -17,6 +17,19 @@ export const getPaymentConfig = (): PaymentConfig => {
   return { plc: true, fib: true, zain: true, fastpay: true };
 };
 
+// Check if a payment provider has API keys configured
+export const isPaymentConfigured = (providerId: string): boolean => {
+  if (providerId === 'cash' || providerId === 'plc') return true;
+  try {
+    const saved = localStorage.getItem(`plc_payment_keys_${providerId}`);
+    if (!saved) return false;
+    const keys = JSON.parse(saved);
+    // Check that at least one key field has a value
+    return Object.values(keys).some((v: any) => v && String(v).trim().length > 0);
+  } catch {}
+  return false;
+};
+
 const providers = [
   {
     id: 'plc' as const,
@@ -67,6 +80,17 @@ const providers = [
 const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
   const [config, setConfig] = useState<PaymentConfig>(getPaymentConfig);
+  const [fieldValues, setFieldValues] = useState<Record<string, Record<number, string>>>(() => {
+    const vals: Record<string, Record<number, string>> = {};
+    providers.forEach(p => {
+      try {
+        const saved = localStorage.getItem(`plc_payment_keys_${p.id}`);
+        if (saved) vals[p.id] = JSON.parse(saved);
+        else vals[p.id] = {};
+      } catch { vals[p.id] = {}; }
+    });
+    return vals;
+  });
 
   useEffect(() => {
     const savedLang = localStorage.getItem('plc_admin_lang') as 'ku' | 'ar' | 'en' | null;
@@ -84,6 +108,22 @@ const AdminPayments = () => {
       );
       return updated;
     });
+  };
+
+  const updateFieldValue = (providerId: string, fieldIndex: number, value: string) => {
+    setFieldValues(prev => ({
+      ...prev,
+      [providerId]: { ...prev[providerId], [fieldIndex]: value }
+    }));
+  };
+
+  const saveProviderKeys = (providerId: string) => {
+    localStorage.setItem(`plc_payment_keys_${providerId}`, JSON.stringify(fieldValues[providerId] || {}));
+    toast.success(
+      lang === 'ku' ? `${providerId.toUpperCase()} پاشکەوت کرا ✓` :
+      lang === 'ar' ? `تم حفظ ${providerId.toUpperCase()} ✓` :
+      `${providerId.toUpperCase()} saved ✓`
+    );
   };
 
   const direction = lang === 'en' ? 'ltr' : 'rtl';
@@ -177,12 +217,15 @@ const AdminPayments = () => {
                     className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
                     type={f.type} placeholder={f.placeholder}
                     disabled={!enabled}
+                    value={fieldValues[p.id]?.[i] || ''}
+                    onChange={e => updateFieldValue(p.id, i, e.target.value)}
                   />
                 </div>
               ))}
               {p.fields.length > 0 && (
                 <button
                   disabled={!enabled}
+                  onClick={() => saveProviderKeys(p.id)}
                   className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <Save className="w-3.5 h-3.5" />

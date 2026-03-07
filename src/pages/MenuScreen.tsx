@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { getCafeName } from '@/hooks/useAdminLang';
-import { Coffee, Settings, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
   const { language, direction, robotItems, staffItems, cart, addToCart, changeQty, cartTotal, cartItemCount, placeOrder, clearCart } = useStore();
   const t = translations[language];
+  useInactivityRedirect();
 
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');
@@ -411,13 +413,13 @@ const MenuScreen = () => {
         </div>
       )}
 
-      {/* Admin link */}
+      {/* Back to home button */}
       <button
-        onClick={() => navigate('/admin')}
+        onClick={() => navigate('/')}
         className="fixed bottom-4 left-4 flex items-center gap-1.5 bg-card border border-border px-3 py-2 rounded-lg text-muted-foreground text-xs cursor-pointer transition-all hover:border-primary/30 hover:text-foreground z-50"
       >
-        <Settings className="w-3.5 h-3.5" />
-        Admin
+        <Coffee className="w-3.5 h-3.5" />
+        {t.backToHome || 'Home'}
       </button>
     </div>
   );

@@ -30,6 +30,7 @@ export const translations: Record<Language, Record<string, string>> = {
     fibBank: 'بانکی FIB',
     zainCash: 'زەین کاش',
     fastPay: 'فاست پەی',
+    backToHome: 'سەرەتا',
   },
   ar: {
     welcome: 'مرحباً في PLC',
@@ -60,6 +61,7 @@ export const translations: Record<Language, Record<string, string>> = {
     fibBank: 'بنك FIB',
     zainCash: 'زين كاش',
     fastPay: 'فاست باي',
+    backToHome: 'الرئيسية',
   },
   en: {
     welcome: 'Welcome to PLC',
@@ -90,5 +92,6 @@ export const translations: Record<Language, Record<string, string>> = {
     fibBank: 'FIB Bank',
     zainCash: 'ZainCash',
     fastPay: 'FastPay',
+    backToHome: 'Home',
   }
 };

@@ -411,13 +411,13 @@ const MenuScreen = () => {
         </div>
       )}
 
-      {/* Admin link */}
+      {/* Back to home button */}
       <button
-        onClick={() => navigate('/admin')}
+        onClick={() => navigate('/')}
         className="fixed bottom-4 left-4 flex items-center gap-1.5 bg-card border border-border px-3 py-2 rounded-lg text-muted-foreground text-xs cursor-pointer transition-all hover:border-primary/30 hover:text-foreground z-50"
       >
-        <Settings className="w-3.5 h-3.5" />
-        Admin
+        <Coffee className="w-3.5 h-3.5" />
+        {t.backToHome || 'Home'}
       </button>
     </div>
   );

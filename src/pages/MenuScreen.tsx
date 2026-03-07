@@ -137,7 +137,7 @@ const MenuScreen = () => {
       const saved = localStorage.getItem('plc_payment_config');
       if (saved) return JSON.parse(saved);
     } catch {}
-    return { fib: true, zain: true, fastpay: true };
+    return { plc: true, fib: true, zain: true, fastpay: true };
   })();
 
   const onlinePaymentMethods = ([
@@ -308,11 +308,13 @@ const MenuScreen = () => {
               <span className="text-primary text-base font-bold">{cartTotal.toLocaleString()} IQD</span>
             </div>
 
-            {/* Cash Vending Machine Section */}
+            {/* PLC Cash Vending Machine Section */}
+            {paymentConfig.plc !== false && (
             <div className="mb-3">
               <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
                 <Coins className="w-3 h-3" />
-                {language === 'ku' ? 'پارە بخە ناو ئامێرەکە' : language === 'ar' ? 'أدخل النقود في الجهاز' : 'Insert Cash'}
+                {language === 'ku' ? 'پارەدانی PLC' : language === 'ar' ? 'دفع PLC' : 'PLC Payment'}
+              </div>
               </div>
               
               {/* Balance Display */}
@@ -379,6 +381,7 @@ const MenuScreen = () => {
                 </button>
               )}
             </div>
+            )}
 
             {/* Online Payments */}
             {onlinePaymentMethods.length > 0 && (

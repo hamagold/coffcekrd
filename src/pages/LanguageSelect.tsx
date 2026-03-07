@@ -4,6 +4,9 @@ import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Globe, Coffee, ChevronRight } from 'lucide-react';
 import { getCafeName } from '@/hooks/useAdminLang';
+import kurdistanFlag from '@/assets/flags/kurdistan.png';
+import iraqFlag from '@/assets/flags/iraq.png';
+import usaFlag from '@/assets/flags/usa.png';
 
 const LanguageSelect = () => {
   const { setLanguage } = useStore();
@@ -27,9 +30,9 @@ const LanguageSelect = () => {
   };
 
   const languages = [
-    { code: 'ku' as Language, name: 'کوردی', sub: 'Kurdish', dir: 'rtl', flag: '🇹🇯' },
-    { code: 'ar' as Language, name: 'العربية', sub: 'Arabic', dir: 'rtl', flag: '🇮🇶' },
-    { code: 'en' as Language, name: 'English', sub: 'English', dir: 'ltr', flag: '🇺🇸' },
+    { code: 'ku' as Language, name: 'کوردی', sub: 'Kurdish', dir: 'rtl', flag: kurdistanFlag },
+    { code: 'ar' as Language, name: 'العربية', sub: 'Arabic', dir: 'rtl', flag: iraqFlag },
+    { code: 'en' as Language, name: 'English', sub: 'English', dir: 'ltr', flag: usaFlag },
   ];
 
   return (
@@ -65,7 +68,7 @@ const LanguageSelect = () => {
               className="group w-full px-5 py-4 bg-card border border-border rounded-xl flex items-center justify-between cursor-pointer transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
             >
               <div className="flex items-center gap-3" dir={lang.dir}>
-                <span className="text-3xl">{lang.flag}</span>
+                <img src={lang.flag} alt={lang.name} className="w-8 h-6 rounded object-cover shadow-sm" />
                 <div>
                   <span className="text-foreground text-lg font-semibold block">{lang.name}</span>
                   <span className="text-muted-foreground text-xs">{lang.sub}</span>

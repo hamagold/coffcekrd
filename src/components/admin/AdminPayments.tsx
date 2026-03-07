@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight } from 'lucide-react';
+import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface PaymentConfig {
+  plc: boolean;
   fib: boolean;
   zain: boolean;
   fastpay: boolean;
@@ -13,10 +14,19 @@ export const getPaymentConfig = (): PaymentConfig => {
     const saved = localStorage.getItem('plc_payment_config');
     if (saved) return JSON.parse(saved);
   } catch {}
-  return { fib: true, zain: true, fastpay: true };
+  return { plc: true, fib: true, zain: true, fastpay: true };
 };
 
 const providers = [
+  {
+    id: 'plc' as const,
+    name: { ku: 'PLC سیستەم', ar: 'نظام PLC', en: 'PLC System' },
+    icon: Coins,
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
+    fields: [],
+    description: { ku: 'سیستەمی وەرگرتنی کاش بە ئامێری PLC (وێندینگ مەشین)', ar: 'نظام استلام النقود عبر جهاز PLC', en: 'PLC vending machine cash acceptor system' },
+  },
   {
     id: 'fib' as const,
     name: { ku: 'بانکی FIB', ar: 'بنك FIB', en: 'FIB Bank' },
@@ -130,7 +140,7 @@ const AdminPayments = () => {
         <p className="text-muted-foreground text-xs mb-4">{labels.onlineDesc[lang]}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {providers.map(p => {
           const Icon = p.icon;
           const enabled = config[p.id];
@@ -154,6 +164,12 @@ const AdminPayments = () => {
                 </button>
               </div>
 
+              {'description' in p && p.description && (
+                <div className="text-muted-foreground text-xs mb-3 bg-secondary/50 rounded-lg p-3 border border-border">
+                  {(p as any).description[lang]}
+                </div>
+              )}
+
               {p.fields.map((f, i) => (
                 <div key={i} className="mb-3">
                   <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1.5 font-semibold">{f.label[lang]}</div>
@@ -164,13 +180,15 @@ const AdminPayments = () => {
                   />
                 </div>
               ))}
-              <button
-                disabled={!enabled}
-                className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Save className="w-3.5 h-3.5" />
-                {labels.save[lang]}
-              </button>
+              {p.fields.length > 0 && (
+                <button
+                  disabled={!enabled}
+                  className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {labels.save[lang]}
+                </button>
+              )}
             </div>
           );
         })}

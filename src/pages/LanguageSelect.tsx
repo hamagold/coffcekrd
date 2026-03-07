@@ -36,12 +36,11 @@ const LanguageSelect = () => {
   ];
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background relative overflow-hidden">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden px-4">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,hsl(var(--primary)/0.06)_0%,transparent_70%)]" />
-      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[radial-gradient(circle,hsl(var(--primary)/0.04)_0%,transparent_70%)]" />
 
-      <div className="text-center relative z-10 animate-fade-up">
-        <div className="mb-14">
+      <div className="text-center relative z-10 animate-fade-up w-full max-w-[420px]">
+        <div className="mb-10">
           {logoUrl ? (
             <img src={logoUrl} alt={cafeName} className="w-20 h-20 rounded-2xl object-cover mx-auto mb-5 border border-border shadow-lg" />
           ) : (
@@ -55,26 +54,24 @@ const LanguageSelect = () => {
           <p className="text-muted-foreground text-sm tracking-widest uppercase">CAFETERIA</p>
         </div>
 
-        <div className="flex items-center gap-2 justify-center mb-8">
-          <Globe className="w-4 h-4 text-muted-foreground" />
-          <p className="text-muted-foreground text-sm">Select your language</p>
-        </div>
-
-        <div className="flex flex-col gap-3 w-[320px] mx-auto">
+        <div className="flex flex-col gap-4 w-full">
           {languages.map(lang => (
             <button
               key={lang.code}
               onClick={() => handleSelect(lang.code)}
-              className="group w-full px-5 py-4 bg-card border border-border rounded-xl flex items-center justify-between cursor-pointer transition-all duration-200 hover:border-primary/40 hover:bg-primary/5"
+              className="group relative w-full h-24 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md"
             >
-              <div className="flex items-center gap-3" dir={lang.dir}>
-                <img src={lang.flag} alt={lang.name} className="w-8 h-6 rounded object-cover shadow-sm" />
-                <div>
-                  <span className="text-foreground text-lg font-semibold block">{lang.name}</span>
-                  <span className="text-muted-foreground text-xs">{lang.sub}</span>
-                </div>
+              <img
+                src={lang.flag}
+                alt={lang.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-300" />
+              <div className="relative z-10 flex items-center h-full px-6" dir={lang.dir}>
+                <span className="text-white text-3xl font-bold drop-shadow-lg">
+                  {lang.name}
+                </span>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
             </button>
           ))}
         </div>

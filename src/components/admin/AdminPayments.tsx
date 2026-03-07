@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight } from 'lucide-react';
+import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface PaymentConfig {
+  plc: boolean;
   fib: boolean;
   zain: boolean;
   fastpay: boolean;
@@ -13,10 +14,19 @@ export const getPaymentConfig = (): PaymentConfig => {
     const saved = localStorage.getItem('plc_payment_config');
     if (saved) return JSON.parse(saved);
   } catch {}
-  return { fib: true, zain: true, fastpay: true };
+  return { plc: true, fib: true, zain: true, fastpay: true };
 };
 
 const providers = [
+  {
+    id: 'plc' as const,
+    name: { ku: 'PLC سیستەم', ar: 'نظام PLC', en: 'PLC System' },
+    icon: Coins,
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
+    fields: [],
+    description: { ku: 'سیستەمی وەرگرتنی کاش بە ئامێری PLC (وێندینگ مەشین)', ar: 'نظام استلام النقود عبر جهاز PLC', en: 'PLC vending machine cash acceptor system' },
+  },
   {
     id: 'fib' as const,
     name: { ku: 'بانکی FIB', ar: 'بنك FIB', en: 'FIB Bank' },

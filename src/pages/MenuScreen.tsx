@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { robotCategories, staffCategories } from '@/data/menuData';
@@ -12,6 +13,7 @@ const MenuScreen = () => {
   const navigate = useNavigate();
   const { language, direction, robotItems, staffItems, cart, addToCart, changeQty, cartTotal, cartItemCount, placeOrder, clearCart } = useStore();
   const t = translations[language];
+  useInactivityRedirect();
 
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');

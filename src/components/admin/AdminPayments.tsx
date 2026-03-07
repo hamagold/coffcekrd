@@ -217,6 +217,8 @@ const AdminPayments = () => {
                     className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors"
                     type={f.type} placeholder={f.placeholder}
                     disabled={!enabled}
+                    value={fieldValues[p.id]?.[i] || ''}
+                    onChange={e => updateFieldValue(p.id, i, e.target.value)}
                   />
                 </div>
               ))}

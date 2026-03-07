@@ -159,7 +159,11 @@ const MenuScreen = () => {
             <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
           </div>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
+            <Home className="w-3.5 h-3.5" />
+            {t.backToHome || 'Home'}
+          </button>
           <div className="text-right">
             <div className="text-foreground text-xl font-semibold tabular-nums">{clock}</div>
             <div className="text-muted-foreground text-xs">{dateStr}</div>
@@ -413,14 +417,6 @@ const MenuScreen = () => {
         </div>
       )}
 
-      {/* Back to home button */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed bottom-4 left-4 flex items-center gap-1.5 bg-card border border-border px-3 py-2 rounded-lg text-muted-foreground text-xs cursor-pointer transition-all hover:border-primary/30 hover:text-foreground z-50"
-      >
-        <Coffee className="w-3.5 h-3.5" />
-        {t.backToHome || 'Home'}
-      </button>
     </div>
   );
 };

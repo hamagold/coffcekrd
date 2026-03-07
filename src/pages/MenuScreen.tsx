@@ -54,8 +54,6 @@ const MenuScreen = () => {
   useEffect(() => {
     if (showModal && lastOrderNum && canvasRef.current) {
       generateQR(lastOrderNum, cartTotal);
-      // Auto-print after short delay
-      setTimeout(() => autoPrintLabel(lastOrderNum), 800);
     }
   }, [showModal, lastOrderNum]);
 

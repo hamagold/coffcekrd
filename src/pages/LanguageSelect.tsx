@@ -4,7 +4,7 @@ import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Globe, Coffee, ChevronRight } from 'lucide-react';
 import { getCafeName } from '@/hooks/useAdminLang';
-import kurdistanFlag from '@/assets/flags/kurdistan.png';
+const kurdistanFlag = '/lovable-uploads/bb9b46fd-41da-468f-bde5-dbf486a4dd75.webp';
 import iraqFlag from '@/assets/flags/iraq.png';
 import usaFlag from '@/assets/flags/usa.png';
 

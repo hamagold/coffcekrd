@@ -17,6 +17,19 @@ export const getPaymentConfig = (): PaymentConfig => {
   return { plc: true, fib: true, zain: true, fastpay: true };
 };
 
+// Check if a payment provider has API keys configured
+export const isPaymentConfigured = (providerId: string): boolean => {
+  if (providerId === 'cash' || providerId === 'plc') return true;
+  try {
+    const saved = localStorage.getItem(`plc_payment_keys_${providerId}`);
+    if (!saved) return false;
+    const keys = JSON.parse(saved);
+    // Check that at least one key field has a value
+    return Object.values(keys).some((v: any) => v && String(v).trim().length > 0);
+  } catch {}
+  return false;
+};
+
 const providers = [
   {
     id: 'plc' as const,

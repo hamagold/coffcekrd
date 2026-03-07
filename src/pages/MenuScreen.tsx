@@ -6,7 +6,7 @@ import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { getCafeName } from '@/hooks/useAdminLang';
-import { Coffee, Settings, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();

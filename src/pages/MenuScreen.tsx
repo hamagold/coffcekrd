@@ -7,7 +7,7 @@ import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { getCafeName } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -160,8 +160,11 @@ const MenuScreen = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
-            <Home className="w-3.5 h-3.5" />
+          <button
+            onClick={() => navigate('/')}
+            className="group flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
             {t.backToHome || 'Home'}
           </button>
           <div className="text-right">

@@ -21,6 +21,8 @@ const MenuScreen = () => {
   const [orderType, setOrderType] = useState<OrderType>('dine');
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
+  const [cashBalance, setCashBalance] = useState(0);
+  const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const canvasRef = useRef<HTMLCanvasElement>(null);

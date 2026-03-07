@@ -80,6 +80,17 @@ const providers = [
 const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
   const [config, setConfig] = useState<PaymentConfig>(getPaymentConfig);
+  const [fieldValues, setFieldValues] = useState<Record<string, Record<number, string>>>(() => {
+    const vals: Record<string, Record<number, string>> = {};
+    providers.forEach(p => {
+      try {
+        const saved = localStorage.getItem(`plc_payment_keys_${p.id}`);
+        if (saved) vals[p.id] = JSON.parse(saved);
+        else vals[p.id] = {};
+      } catch { vals[p.id] = {}; }
+    });
+    return vals;
+  });
 
   useEffect(() => {
     const savedLang = localStorage.getItem('plc_admin_lang') as 'ku' | 'ar' | 'en' | null;

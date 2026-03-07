@@ -5,6 +5,8 @@ import { robotCategories, staffCategories } from '@/data/menuData';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
+import { isPaymentConfigured } from '@/components/admin/AdminPayments';
+import { toast } from 'sonner';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
 
 const OnlineOrder = () => {
@@ -73,6 +75,15 @@ const OnlineOrder = () => {
 
   const handleOrder = async () => {
     if (cart.length === 0 || !customerName || !customerPhone) return;
+    // Block if online payment selected but not configured
+    if (payment !== 'cash' && !isPaymentConfigured(payment)) {
+      toast.error(
+        language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
+        language === 'ar' ? `⚠️ ${payment.toUpperCase()} غير مُعد - تواصل مع المسؤول` :
+        `⚠️ ${payment.toUpperCase()} is not configured - contact admin`
+      );
+      return;
+    }
     const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
     localStorage.setItem('plc_order_counter', String(counter));
     const num = String(counter).padStart(3, '0');

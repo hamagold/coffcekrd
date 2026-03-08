@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@/store/StoreContext';
-import { Wallet, Plus, Trash2, Lightbulb, Droplets, HardHat, Package, FileText, X, Users, Phone, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Wallet, Plus, Trash2, Lightbulb, Droplets, HardHat, Package, FileText, X, Users, Phone, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Bell, AlertTriangle } from 'lucide-react';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';

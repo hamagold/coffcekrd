@@ -49,7 +49,7 @@ const MenuScreen = () => {
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
     // Block if online payment selected but not configured
-    if (payment !== 'cash' && !isPaymentConfigured(payment)) {
+    if (payment !== 'cash' && payment !== 'plc' && !isPaymentConfigured(payment)) {
       const { toast } = await import('sonner');
       toast.error(
         language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :

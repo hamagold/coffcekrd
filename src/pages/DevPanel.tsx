@@ -39,6 +39,9 @@ const DevPanel = () => {
   const [sqlResult, setSqlResult] = useState<any[] | null>(null);
   const [sqlError, setSqlError] = useState<string | null>(null);
   const [sqlHistory, setSqlHistory] = useState<string[]>([]);
+  const [importJson, setImportJson] = useState('');
+  const [migrationStatus, setMigrationStatus] = useState<{ table: string; status: string; count: number }[]>([]);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   const addLog = (message: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 99)]);

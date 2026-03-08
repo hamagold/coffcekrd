@@ -1,10 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
 
-export function useInactivityRedirect() {
+export function useInactivityRedirect(hasActiveOrder?: boolean) {
   const navigate = useNavigate();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasActiveOrderRef = useRef(hasActiveOrder);
+
+  // Keep ref in sync
+  useEffect(() => {
+    hasActiveOrderRef.current = hasActiveOrder;
+  }, [hasActiveOrder]);
 
   useEffect(() => {
     let cancelled = false;
@@ -17,6 +23,11 @@ export function useInactivityRedirect() {
       const reset = () => {
         if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
+          // Don't redirect if user has items in cart or active order
+          if (hasActiveOrderRef.current) {
+            reset(); // restart timer instead
+            return;
+          }
           navigate('/');
         }, (inactivity.timeout || 30) * 1000);
       };
@@ -25,7 +36,6 @@ export function useInactivityRedirect() {
       events.forEach(e => window.addEventListener(e, reset));
       reset();
 
-      // Store cleanup ref
       (timerRef as any)._events = events;
       (timerRef as any)._reset = reset;
     });

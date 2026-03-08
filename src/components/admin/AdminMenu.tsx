@@ -144,7 +144,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <div className="flex flex-wrap gap-2">
           {currentCategories.map(cat => (
             <div key={cat.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary border border-border rounded-lg text-xs">
-              <span>{cat.icon}</span>
+              {cat.image ? (
+                <img src={cat.image} alt="" className="w-5 h-5 rounded object-cover" />
+              ) : (
+                <span>{cat.icon}</span>
+              )}
               <span className="text-foreground font-medium">{cat.name[lang] || cat.name.en}</span>
               <button onClick={() => handleDeleteCategory(cat.id)} className="ml-1 text-destructive/60 hover:text-destructive transition-colors">
                 <Trash2 className="w-3 h-3" />

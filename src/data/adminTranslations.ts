@@ -187,6 +187,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     addImage: 'زیادکردنی وێنە',
     noBackgroundImages: 'هیچ وێنەیەک زیاد نەکراوە - وێنەکانی مینۆ بەکاردەهێنرێت',
 
+    // Theme
+    themeMode: 'ڕووکاری سیستەم',
+    themeModeDesc: 'ڕووکاری ڕەش یان سپی بۆ تەواوی سیستەمەکە',
+    darkMode: 'ڕەش',
+    lightMode: 'سپی',
+
     // Reports comparison
     comparedToPrev: 'بەراورد بە پێشووتر',
     change: 'گۆڕانکاری',

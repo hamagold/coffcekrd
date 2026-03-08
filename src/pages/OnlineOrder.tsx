@@ -193,6 +193,11 @@ const OnlineOrder = () => {
                   ? 'bg-primary/10 text-primary border-primary/30 font-semibold'
                   : 'bg-card border-border text-muted-foreground hover:text-foreground'
               }`}>
+              {cat.image ? (
+                <img src={cat.image} alt="" className="w-5 h-5 rounded object-cover" />
+              ) : (
+                <span>{cat.icon}</span>
+              )}
               {cat.name[language]}
             </button>
           ))}

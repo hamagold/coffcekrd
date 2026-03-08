@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_categories ADD COLUMN image text DEFAULT NULL;

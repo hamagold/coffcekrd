@@ -7,6 +7,7 @@ interface DbCategory {
   id: string;
   cat_id: string;
   icon: string;
+  image: string | null;
   name_ku: string;
   name_ar: string;
   name_en: string;
@@ -17,6 +18,7 @@ interface DbCategory {
 const dbToCategory = (row: DbCategory): Category => ({
   id: row.cat_id,
   icon: row.icon,
+  image: row.image || undefined,
   name: { ku: row.name_ku, ar: row.name_ar, en: row.name_en },
 });
 
@@ -60,11 +62,12 @@ export const useCategories = () => {
     return () => { supabase.removeChannel(channel); };
   }, [fetchCategories]);
 
-  const addCategory = useCallback(async (cat: { catId: string; icon: string; nameKu: string; nameAr: string; nameEn: string; menuType: string }) => {
+  const addCategory = useCallback(async (cat: { catId: string; icon: string; image?: string; nameKu: string; nameAr: string; nameEn: string; menuType: string }) => {
     const currentCats = cat.menuType === 'robot' ? robotCategories : staffCategories;
     const { error } = await supabase.from('menu_categories').insert({
       cat_id: cat.catId,
-      icon: cat.icon,
+      icon: cat.icon || '📦',
+      image: cat.image || null,
       name_ku: cat.nameKu,
       name_ar: cat.nameAr,
       name_en: cat.nameEn,

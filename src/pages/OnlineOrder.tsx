@@ -366,7 +366,6 @@ const OnlineOrder = () => {
             <div className="mb-4">
               <OrderQRCode orderNumber={orderNum} />
             </div>
-            </div>
             <div className="text-muted-foreground text-xs mb-4">{t.qrHint}</div>
             <p className="text-muted-foreground text-sm mb-5">
               {language === 'ku' ? 'ئۆردەرەکەت وەرگیرا! پەیوەندیت پێوە دەکرێت.' :

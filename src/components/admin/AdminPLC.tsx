@@ -11,6 +11,7 @@ interface PLCConfig {
   model: string;
   protocol: string;
   autoSend: boolean;
+  machineId: string;
 }
 
 // Cache

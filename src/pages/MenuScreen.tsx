@@ -33,7 +33,7 @@ const MenuScreen = () => {
   const t = translations[language];
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');
-  const [payment, setPayment] = useState<PaymentMethod>('cash');
+  const [payment, setPayment] = useState<PaymentMethod>('plc');
   const [orderType, setOrderType] = useState<OrderType>('dine');
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');

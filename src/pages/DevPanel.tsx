@@ -569,6 +569,140 @@ const DevPanel = () => {
             </div>
           </TabsContent>
 
+          {/* SQL Tab */}
+          <TabsContent value="sql" className="space-y-4 mt-4">
+            <Card>
+              <CardHeader className="py-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Play className="w-4 h-4 text-primary" /> SQL Query Runner
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Run raw SQL queries against the database
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="relative">
+                  <textarea
+                    value={sqlQuery}
+                    onChange={(e) => setSqlQuery(e.target.value)}
+                    className="w-full h-40 bg-secondary text-foreground font-mono text-xs p-4 rounded-lg border border-border resize-y focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="SELECT * FROM app_settings LIMIT 10;"
+                    onKeyDown={(e) => {
+                      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        runSql();
+                      }
+                    }}
+                  />
+                  <span className="absolute bottom-2 right-3 text-[9px] text-muted-foreground">Ctrl+Enter to run</span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Button onClick={runSql} disabled={loading} size="sm" className="gap-2">
+                    <Play className="w-4 h-4" /> {loading ? 'Running...' : 'Run Query'}
+                  </Button>
+                  <Button onClick={() => setSqlQuery('')} variant="ghost" size="sm">
+                    Clear
+                  </Button>
+                  {sqlResult && (
+                    <Button onClick={() => exportData(sqlResult, 'sql_result')} variant="outline" size="sm">
+                      <Download className="w-4 h-4 mr-2" /> Export Result
+                    </Button>
+                  )}
+                </div>
+
+                {/* Quick queries */}
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'All Tables', q: "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name" },
+                    { label: 'Orders Count', q: "SELECT status, count(*) as total FROM orders GROUP BY status" },
+                    { label: 'Menu Items', q: "SELECT item_id, name_en, price, cat FROM menu_items ORDER BY sort_order LIMIT 20" },
+                    { label: 'Users & Roles', q: "SELECT p.name, ur.role FROM profiles p LEFT JOIN user_roles ur ON p.id = ur.user_id" },
+                    { label: 'Settings Keys', q: "SELECT key, updated_at FROM app_settings ORDER BY updated_at DESC" },
+                  ].map(q => (
+                    <button
+                      key={q.label}
+                      onClick={() => setSqlQuery(q.q)}
+                      className="px-2 py-1 bg-secondary hover:bg-accent border border-border rounded-md text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {q.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* SQL History */}
+                {sqlHistory.length > 0 && (
+                  <details className="text-xs">
+                    <summary className="cursor-pointer text-muted-foreground flex items-center gap-1 hover:text-foreground">
+                      <History className="w-3 h-3" /> Query History ({sqlHistory.length})
+                    </summary>
+                    <div className="mt-2 space-y-1 max-h-[150px] overflow-y-auto">
+                      {sqlHistory.map((q, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setSqlQuery(q)}
+                          className="w-full text-left px-2 py-1.5 rounded bg-secondary/50 hover:bg-accent font-mono text-[10px] text-foreground/80 truncate"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                )}
+
+                {/* Error */}
+                {sqlError && (
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-destructive text-xs font-mono">
+                    <div className="flex items-center gap-2 font-semibold mb-1">
+                      <XCircle className="w-4 h-4" /> Error
+                    </div>
+                    {sqlError}
+                  </div>
+                )}
+
+                {/* Results */}
+                {sqlResult && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-success" />
+                      {sqlResult.length} row{sqlResult.length !== 1 ? 's' : ''} returned
+                    </div>
+                    {sqlResult.length > 0 ? (
+                      <div className="overflow-auto max-h-[400px] rounded-lg border border-border">
+                        <table className="w-full border-collapse text-xs">
+                          <thead>
+                            <tr>
+                              {Object.keys(sqlResult[0]).map(key => (
+                                <th key={key} className="bg-secondary text-muted-foreground text-[10px] uppercase tracking-wider p-2 text-left font-semibold border-b border-border sticky top-0">
+                                  {key}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sqlResult.map((row, idx) => (
+                              <tr key={idx} className="border-b border-border/50 hover:bg-accent/30">
+                                {Object.values(row).map((val, ci) => (
+                                  <td key={ci} className="p-2 font-mono text-foreground max-w-[300px] truncate">
+                                    {val === null ? <span className="text-muted-foreground italic">null</span> : 
+                                     typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground py-4 text-sm">
+                        Query executed successfully — no rows returned
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-4 mt-4">
             <div className="flex items-center gap-3">

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Globe, Coffee, ChevronRight } from 'lucide-react';
-import { getCafeName } from '@/hooks/useAdminLang';
+import { fetchCafeConfig } from '@/hooks/useAdminLang';
 const kurdistanFlag = '/lovable-uploads/bb9b46fd-41da-468f-bde5-dbf486a4dd75.webp';
 import iraqFlag from '@/assets/flags/iraq.png';
 import usaFlag from '@/assets/flags/usa.png';
@@ -11,17 +11,14 @@ import usaFlag from '@/assets/flags/usa.png';
 const LanguageSelect = () => {
   const { setLanguage } = useStore();
   const navigate = useNavigate();
-  const [cafeName, setCafeNameState] = useState(getCafeName);
+  const [cafeName, setCafeNameState] = useState('PLC');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleStorage = () => {
-      setCafeNameState(getCafeName());
-      setLogoUrl(localStorage.getItem('plc_cafe_logo'));
-    };
-    handleStorage();
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    fetchCafeConfig().then(cfg => {
+      setCafeNameState(cfg.name);
+      setLogoUrl(cfg.logoUrl);
+    });
   }, []);
 
   const handleSelect = (lang: Language) => {

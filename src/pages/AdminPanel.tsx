@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useAdminLang, getCafeName } from '@/hooks/useAdminLang';
+import { useAdminLang, fetchCafeConfig } from '@/hooks/useAdminLang';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
@@ -30,12 +30,13 @@ const AdminPanel = () => {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
-  const [cafeName, setCafeNameState] = useState(getCafeName);
+  const [cafeName, setCafeNameState] = useState('PLC');
 
   useEffect(() => {
-    const handleStorage = () => setCafeNameState(getCafeName());
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
+    const handler = () => fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
+    window.addEventListener('cafe-config-updated', handler);
+    return () => window.removeEventListener('cafe-config-updated', handler);
   }, []);
 
   useEffect(() => {

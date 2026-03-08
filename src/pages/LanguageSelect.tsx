@@ -75,7 +75,7 @@ const LanguageSelect = () => {
       {/* Lighter gradient - only darken bottom for readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/90 pointer-events-none" />
 
-      <div className="text-center relative z-10 w-full max-w-[460px] px-6">
+      <div className="text-center relative z-10 w-full max-w-[460px] px-6 pb-8 mx-auto">
         {/* Logo & Brand */}
         <div className="mb-12 animate-fade-up">
           {logoUrl ? (

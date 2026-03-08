@@ -94,7 +94,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     try {
       await addCategory(newCat);
       setShowCatModal(false);
-      setNewCat({ catId: '', icon: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
+      setNewCat({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
       toast.success(lang === 'ku' ? 'کاتەگۆری زیادکرا' : lang === 'ar' ? 'تمت الإضافة' : 'Category added');
     } catch (err: any) {
       toast.error(err.message || 'Error');

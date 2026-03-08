@@ -344,10 +344,46 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.catId} onChange={e => setNewCat(p => ({ ...p, catId: e.target.value.toLowerCase().replace(/\s/g, '_') }))} placeholder="pasta" />
               </div>
               <div>
-                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.emoji}</label>
-                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.icon} onChange={e => setNewCat(p => ({ ...p, icon: e.target.value }))} placeholder="🍝" />
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.menuType}</label>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newCat.menuType} onChange={e => setNewCat(p => ({ ...p, menuType: e.target.value }))}>
+                  <option value="robot">{t.robotMenu}</option>
+                  <option value="staff">{t.staffMenu}</option>
+                </select>
               </div>
             </div>
+
+            {/* Icon Type Toggle */}
+            <div className="mb-3">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                {lang === 'ku' ? 'جۆری ئایکۆن' : lang === 'ar' ? 'نوع الأيقونة' : 'Icon Type'}
+              </label>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setCatIconType('emoji')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${catIconType === 'emoji' ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
+                  {lang === 'ku' ? '😀 ئیمۆجی' : lang === 'ar' ? '😀 إيموجي' : '😀 Emoji'}
+                </button>
+                <button type="button" onClick={() => setCatIconType('image')} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${catIconType === 'image' ? 'border-primary bg-primary/10 text-primary' : 'bg-secondary border-border text-muted-foreground'}`}>
+                  {lang === 'ku' ? '🖼️ وێنە' : lang === 'ar' ? '🖼️ صورة' : '🖼️ Image'}
+                </button>
+              </div>
+            </div>
+
+            {catIconType === 'emoji' ? (
+              <div className="mb-3">
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.emoji}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.icon} onChange={e => setNewCat(p => ({ ...p, icon: e.target.value, image: '' }))} placeholder="🍝" />
+              </div>
+            ) : (
+              <div className="mb-3">
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                  {lang === 'ku' ? 'وێنە' : lang === 'ar' ? 'صورة' : 'Image'}
+                </label>
+                <ImageUpload
+                  onUpload={(url) => setNewCat(p => ({ ...p, image: url, icon: '' }))}
+                  currentImage={newCat.image || undefined}
+                  folder="categories"
+                />
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameKu}</label>

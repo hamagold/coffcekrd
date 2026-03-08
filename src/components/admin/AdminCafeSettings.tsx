@@ -237,6 +237,31 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
         </div>
       </div>
 
+      {/* Theme Toggle */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          {theme === 'dark' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
+          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
+        </div>
+        <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setTheme('dark')}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'dark' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+          >
+            <Moon className="w-4 h-4" />
+            {t.darkMode}
+          </button>
+          <button
+            onClick={() => setTheme('light')}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'light' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+          >
+            <Sun className="w-4 h-4" />
+            {t.lightMode}
+          </button>
+        </div>
+      </div>
+
       <button onClick={handleSave} disabled={saving} className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {t.save}

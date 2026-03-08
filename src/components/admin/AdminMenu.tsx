@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { MenuItem, MenuType, Language } from '@/types';
-import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2 } from 'lucide-react';
+import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil } from 'lucide-react';
 import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
-  const { robotItems, staffItems, loading, addItem, deleteItem } = useMenuItems();
+  const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [tab, setTab] = useState<MenuType>('robot');
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
+  const [editItem, setEditItem] = useState<MenuItem | null>(null);
+  const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 
@@ -43,6 +45,33 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
       toast.success(lang === 'ku' ? 'ئایتم سڕایەوە' : lang === 'ar' ? 'تم الحذف' : 'Item deleted');
     } catch (err: any) {
       toast.error(err.message || 'Error');
+    }
+  };
+
+  const openEdit = (item: MenuItem) => {
+    setEditItem(item);
+    setEditData({
+      emoji: item.emoji, nameKu: item.name.ku, nameAr: item.name.ar, nameEn: item.name.en,
+      price: String(item.price), cat: item.cat, image: item.image || '',
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editItem) return;
+    setSaving(true);
+    try {
+      await updateItem(editItem.id, {
+        emoji: editData.emoji, cat: editData.cat,
+        name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
+        desc: editItem.desc, price: parseInt(editData.price) || 0,
+        image: editData.image || undefined,
+      });
+      setEditItem(null);
+      toast.success(lang === 'ku' ? 'ئایتم نوێکرایەوە' : lang === 'ar' ? 'تم التحديث' : 'Item updated');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -104,7 +133,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <td className="p-3">
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
                 </td>
-                <td className="p-3">
+                <td className="p-3 flex gap-1.5">
+                  <button onClick={() => openEdit(item)} className="p-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md cursor-pointer hover:bg-primary/20 transition-all">
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
                   <button onClick={() => handleDelete(item.id)} className="p-1.5 bg-destructive/10 text-destructive border border-destructive/20 rounded-md cursor-pointer hover:bg-destructive/20 transition-all">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -178,6 +210,67 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">
                 {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 {t.addItem}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editItem && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
+          <div className="bg-card border border-border rounded-xl p-6 min-w-[420px] max-h-[90vh] overflow-y-auto animate-modal-in">
+            <h3 className="text-foreground text-base font-bold mb-5 flex items-center gap-2">
+              <Pencil className="w-4 h-4 text-primary" /> {lang === 'ku' ? 'دەستکاری ئایتم' : lang === 'ar' ? 'تعديل العنصر' : 'Edit Item'}
+            </h3>
+
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                {lang === 'ku' ? 'وێنە' : lang === 'ar' ? 'صورة' : 'Image'}
+              </label>
+              <ImageUpload
+                onUpload={(url) => setEditData(p => ({ ...p, image: url }))}
+                currentImage={editData.image || undefined}
+                folder="items"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.emoji}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.emoji} onChange={e => setEditData(p => ({ ...p, emoji: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={editData.cat} onChange={e => setEditData(p => ({ ...p, cat: e.target.value }))}>
+                  {Object.entries(catLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameKu}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.nameKu} onChange={e => setEditData(p => ({ ...p, nameKu: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameEn}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.nameEn} onChange={e => setEditData(p => ({ ...p, nameEn: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameAr}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.nameAr} onChange={e => setEditData(p => ({ ...p, nameAr: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.priceIqd}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={editData.price} onChange={e => setEditData(p => ({ ...p, price: e.target.value }))} />
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setEditItem(null)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
+              <button onClick={handleUpdate} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">
+                {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {lang === 'ku' ? 'نوێکردنەوە' : lang === 'ar' ? 'تحديث' : 'Update'}
               </button>
             </div>
           </div>

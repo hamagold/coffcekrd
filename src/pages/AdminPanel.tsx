@@ -11,10 +11,11 @@ import AdminReports from '@/components/admin/AdminReports';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
 import AdminPLC from '@/components/admin/AdminPLC';
+import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 import StorageSettings from '@/components/settings/StorageSettings';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText } from 'lucide-react';
 import { Language } from '@/types';
 
 const AdminPanel = () => {
@@ -81,6 +82,7 @@ const AdminPanel = () => {
     expenses: [t.expensesTitle, t.expensesSub],
     storage: [t.storageTitle, t.storageSub],
     plc: [t.plcTitle, t.plcSub],
+    plcLogs: [t.plcLogsTitle, t.plcLogsSub],
     cafeSettings: [t.cafeSettingsTitle, t.cafeSettingsSub],
   };
 
@@ -94,6 +96,7 @@ const AdminPanel = () => {
     { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: true },
     { id: 'storage', icon: HardDrive, label: t.storage, section: t.management, superOnly: true },
     { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: true },
+    { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: true },
     { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: true },
   ];
 
@@ -178,6 +181,7 @@ const AdminPanel = () => {
       case 'expenses': return <AdminExpenses lang={lang} />;
       case 'storage': return <StorageSettings lang={lang} />;
       case 'plc': return <AdminPLC lang={lang} />;
+      case 'plcLogs': return <AdminPLCLogs lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;
       default: return <AdminDashboard lang={lang} />;
     }

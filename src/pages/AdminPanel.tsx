@@ -6,7 +6,7 @@ import { useAdminLang, fetchCafeConfig } from '@/hooks/useAdminLang';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminOrders from '@/components/admin/AdminOrders';
 import AdminMenu from '@/components/admin/AdminMenu';
-import AdminPayments from '@/components/admin/AdminPayments';
+// AdminPayments moved to DevPanel
 import AdminReports from '@/components/admin/AdminReports';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
@@ -76,7 +76,7 @@ const AdminPanel = () => {
     dashboard: [t.dashboardTitle, t.dashboardSub],
     orders: [t.ordersTitle, t.ordersSub],
     menu: [t.menuTitle, t.menuSub],
-    payments: [t.paymentsTitle, t.paymentsSub],
+    // payments moved to DevPanel
     reports: [t.reportsTitle, t.reportsSub],
     users: [t.usersTitle, t.usersSub],
     expenses: [t.expensesTitle, t.expensesSub],
@@ -90,7 +90,7 @@ const AdminPanel = () => {
     { id: 'dashboard', icon: LayoutDashboard, label: t.dashboard, section: t.overview },
     { id: 'orders', icon: ClipboardList, label: t.orders, section: t.overview },
     { id: 'menu', icon: UtensilsCrossed, label: t.menuItems, section: t.management, superOnly: true },
-    { id: 'payments', icon: CreditCard, label: t.paymentsApi, section: t.management, superOnly: true },
+    // payments moved to DevPanel
     { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: true },
     { id: 'users', icon: Users, label: t.users, section: t.management, superOnly: true },
     { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: true },
@@ -175,7 +175,7 @@ const AdminPanel = () => {
       case 'dashboard': return <AdminDashboard lang={lang} />;
       case 'orders': return <AdminOrders lang={lang} />;
       case 'menu': return <AdminMenu lang={lang} />;
-      case 'payments': return <AdminPayments />;
+      // payments moved to DevPanel
       case 'reports': return <AdminReports lang={lang} />;
       case 'users': return <AdminUsers lang={lang} />;
       case 'expenses': return <AdminExpenses lang={lang} />;

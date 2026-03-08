@@ -6,8 +6,9 @@ import {
   Settings, Key, Shield, Eye, EyeOff, Terminal, 
   AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight,
   FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History,
-  Upload, ArrowRightLeft, Loader2
+  Upload, ArrowRightLeft, Loader2, HardDrive
 } from 'lucide-react';
+import StorageSettings from '@/components/settings/StorageSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';

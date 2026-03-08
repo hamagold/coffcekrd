@@ -27,6 +27,48 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [offset, setOffset] = useState(0);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+
+  // Load staff data
+  useEffect(() => {
+    const loadStaff = async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'staff_salaries')
+        .single();
+      if (data?.value) {
+        setStaff((data.value as any).staff || []);
+      }
+    };
+    loadStaff();
+  }, []);
+
+  // Calculate staff salary expenses for a given date range
+  const getStaffExpensesForRange = (range: { start: Date; end: Date }) => {
+    let total = 0;
+    staff.forEach(s => {
+      // Check each month in the range
+      const startMonth = range.start.getMonth() + 1;
+      const startYear = range.start.getFullYear();
+      const endMonth = range.end.getMonth() + 1;
+      const endYear = range.end.getFullYear();
+      
+      // For daily/weekly: check if the month of the range has a paid salary
+      // For monthly: check the specific month
+      for (let y = startYear; y <= endYear; y++) {
+        const mStart = y === startYear ? startMonth : 1;
+        const mEnd = y === endYear ? endMonth : 12;
+        for (let m = mStart; m <= mEnd; m++) {
+          const key = `${y}-${m}`;
+          if (s.payments[key]) {
+            total += s.salary;
+          }
+        }
+      }
+    });
+    return total;
+  };
 
   const now = new Date();
 

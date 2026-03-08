@@ -145,6 +145,9 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const expByType = (exps: typeof expenses, type: string) =>
     exps.filter(e => e.type === type).reduce((s, e) => s + e.amount, 0);
 
+  // Add staff salaries as a virtual expense type for the breakdown
+  const staffSalaryLabel = { icon: Users, label: lang === 'ku' ? 'مووچەی ستاف' : lang === 'ar' ? 'رواتب الموظفين' : 'Staff Salaries' };
+
   // Daily trend data for line chart
   const trendData = useMemo(() => {
     const days: { date: string; income: number; expenses: number; profit: number }[] = [];

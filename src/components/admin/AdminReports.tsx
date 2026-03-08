@@ -1,10 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useStore } from '@/store/StoreContext';
-import { BarChart3, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Trophy, Lightbulb, Droplets, HardHat, Package, FileText, Calendar, ChevronLeft, ChevronRight, ShoppingCart, PieChart, LayoutDashboard, Receipt, TrendingUpIcon } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Trophy, Lightbulb, Droplets, HardHat, Package, FileText, Calendar, ChevronLeft, ChevronRight, ShoppingCart, PieChart, LayoutDashboard, Receipt, TrendingUpIcon, Users } from 'lucide-react';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { supabase } from '@/integrations/supabase/client';
+
+interface StaffMember {
+  id: string;
+  name: string;
+  phone: string;
+  salary: number;
+  payments: Record<string, boolean>;
+}
 
 const MONTH_NAMES = {
   ku: ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'],
@@ -18,6 +27,48 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [offset, setOffset] = useState(0);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+
+  // Load staff data
+  useEffect(() => {
+    const loadStaff = async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'staff_salaries')
+        .single();
+      if (data?.value) {
+        setStaff((data.value as any).staff || []);
+      }
+    };
+    loadStaff();
+  }, []);
+
+  // Calculate staff salary expenses for a given date range
+  const getStaffExpensesForRange = (range: { start: Date; end: Date }) => {
+    let total = 0;
+    staff.forEach(s => {
+      // Check each month in the range
+      const startMonth = range.start.getMonth() + 1;
+      const startYear = range.start.getFullYear();
+      const endMonth = range.end.getMonth() + 1;
+      const endYear = range.end.getFullYear();
+      
+      // For daily/weekly: check if the month of the range has a paid salary
+      // For monthly: check the specific month
+      for (let y = startYear; y <= endYear; y++) {
+        const mStart = y === startYear ? startMonth : 1;
+        const mEnd = y === endYear ? endMonth : 12;
+        for (let m = mStart; m <= mEnd; m++) {
+          const key = `${y}-${m}`;
+          if (s.payments[key]) {
+            total += s.salary;
+          }
+        }
+      }
+    });
+    return total;
+  };
 
   const now = new Date();
 
@@ -53,13 +104,16 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const current = filterByRange(currentRange);
   const previous = filterByRange(previousRange);
 
+  const staffExpenseCurrent = getStaffExpensesForRange(currentRange);
+  const staffExpensePrevious = getStaffExpensesForRange(previousRange);
+
   const income = current.orders.reduce((s, o) => s + o.total, 0);
-  const expenseTotal = current.expenses.reduce((s, e) => s + e.amount, 0);
+  const expenseTotal = current.expenses.reduce((s, e) => s + e.amount, 0) + staffExpenseCurrent;
   const profit = income - expenseTotal;
   const orderCount = current.orders.length;
 
   const prevIncome = previous.orders.reduce((s, o) => s + o.total, 0);
-  const prevExpense = previous.expenses.reduce((s, e) => s + e.amount, 0);
+  const prevExpense = previous.expenses.reduce((s, e) => s + e.amount, 0) + staffExpensePrevious;
   const prevProfit = prevIncome - prevExpense;
 
   const pctChange = (curr: number, prev: number) => {
@@ -90,6 +144,9 @@ const AdminReports = ({ lang }: { lang: Language }) => {
 
   const expByType = (exps: typeof expenses, type: string) =>
     exps.filter(e => e.type === type).reduce((s, e) => s + e.amount, 0);
+
+  // Add staff salaries as a virtual expense type for the breakdown
+  const staffSalaryLabel = { icon: Users, label: lang === 'ku' ? 'مووچەی ستاف' : lang === 'ar' ? 'رواتب الموظفين' : 'Staff Salaries' };
 
   // Daily trend data for line chart
   const trendData = useMemo(() => {
@@ -419,6 +476,28 @@ const AdminReports = ({ lang }: { lang: Language }) => {
                   </div>
                 );
               })}
+              {/* Staff Salaries Card */}
+              {staffExpenseCurrent > 0 || staffExpensePrevious > 0 ? (
+                <div className="bg-secondary/40 rounded-xl p-3.5 border border-border/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Users className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <span className="text-foreground text-xs font-semibold">{staffSalaryLabel.label}</span>
+                    </div>
+                    <ChangeIndicator value={pctChange(staffExpenseCurrent, staffExpensePrevious)} />
+                  </div>
+                  <div className="flex gap-1.5 h-2 rounded-full overflow-hidden bg-background mb-1.5">
+                    <div className="bg-primary/25 rounded-full transition-all duration-500" style={{ width: `${Math.max(4, (staffExpensePrevious / Math.max(staffExpenseCurrent, staffExpensePrevious, 1)) * 100)}%` }} />
+                    <div className="bg-primary rounded-full transition-all duration-500" style={{ width: `${Math.max(4, (staffExpenseCurrent / Math.max(staffExpenseCurrent, staffExpensePrevious, 1)) * 100)}%` }} />
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-[9px]">{t.previousPeriod}: {staffExpensePrevious.toLocaleString()}</span>
+                    <span className="text-primary text-[9px] font-bold">{staffExpenseCurrent.toLocaleString()} IQD</span>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </TabsContent>

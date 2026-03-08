@@ -144,62 +144,64 @@ const AdminReports = ({ lang }: { lang: Language }) => {
 
   return (
     <div dir={dir} className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-foreground text-lg font-bold flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <BarChart3 className="w-4 h-4 text-primary" />
+      {/* Header + Period + Date Nav combined */}
+      <div className="bg-gradient-to-br from-primary/5 via-card to-card rounded-2xl border border-border p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-foreground text-lg font-bold flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm">
+              <BarChart3 className="w-5 h-5 text-primary" />
+            </div>
+            {t.financialReports}
+          </h2>
+          <div className="flex gap-1.5 bg-secondary/80 rounded-lg p-1 border border-border">
+            {([{ key: 'daily', label: t.daily }, { key: 'weekly', label: t.weekly }, { key: 'monthly', label: t.monthly }] as const).map(p => (
+              <button key={p.key} onClick={() => { setPeriod(p.key as any); setOffset(0); }}
+                className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${period === p.key ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+                {p.label}
+              </button>
+            ))}
           </div>
-          {t.financialReports}
-        </h2>
-      </div>
-
-      {/* Period Selector */}
-      <div className="flex gap-2">
-        {([{ key: 'daily', label: t.daily }, { key: 'weekly', label: t.weekly }, { key: 'monthly', label: t.monthly }] as const).map(p => (
-          <button key={p.key} onClick={() => { setPeriod(p.key as any); setOffset(0); }}
-            className={`px-4 py-1.5 rounded-lg text-xs font-semibold border transition-all ${period === p.key ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-card text-muted-foreground hover:text-foreground'}`}>
-            {p.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Date Navigation */}
-      <div className="bg-card rounded-xl border border-border p-3 flex items-center justify-between">
-        <button onClick={() => setOffset(o => o + 1)}
-          className="w-8 h-8 rounded-lg bg-secondary hover:bg-accent border border-border flex items-center justify-center transition-colors">
-          {dir === 'rtl' ? <ChevronRight className="w-4 h-4 text-foreground" /> : <ChevronLeft className="w-4 h-4 text-foreground" />}
-        </button>
-        <div className="text-center">
-          <div className="text-foreground font-bold text-sm">{dateLabel}</div>
-          {offset > 0 && (
-            <button onClick={() => setOffset(0)} className="text-primary text-[10px] font-medium hover:underline mt-0.5">
-              {lang === 'ku' ? 'گەڕانەوە بۆ ئەمڕۆ' : lang === 'ar' ? 'العودة لليوم' : 'Back to today'}
-            </button>
-          )}
         </div>
-        <button onClick={() => setOffset(o => Math.max(0, o - 1))} disabled={!canGoForward}
-          className={`w-8 h-8 rounded-lg border border-border flex items-center justify-center transition-colors ${canGoForward ? 'bg-secondary hover:bg-accent' : 'bg-muted opacity-40 cursor-not-allowed'}`}>
-          {dir === 'rtl' ? <ChevronLeft className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
-        </button>
-      </div>
 
-      {/* Content Tabs */}
-      <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 h-11 mb-4">
-          <TabsTrigger value="summary" className="text-xs font-semibold gap-1.5">
-            <LayoutDashboard className="w-3.5 h-3.5" />
-            {tabLabels.summary[lang]}
-          </TabsTrigger>
-          <TabsTrigger value="charts" className="text-xs font-semibold gap-1.5">
-            <BarChart3 className="w-3.5 h-3.5" />
-            {tabLabels.charts[lang]}
-          </TabsTrigger>
-          <TabsTrigger value="expenses" className="text-xs font-semibold gap-1.5">
-            <Receipt className="w-3.5 h-3.5" />
-            {tabLabels.expenses[lang]}
-          </TabsTrigger>
-        </TabsList>
+        {/* Date Navigation */}
+        <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-2.5 border border-border/50">
+          <button onClick={() => setOffset(o => o + 1)}
+            className="w-8 h-8 rounded-lg bg-card hover:bg-accent border border-border flex items-center justify-center transition-colors shadow-sm">
+            {dir === 'rtl' ? <ChevronRight className="w-4 h-4 text-foreground" /> : <ChevronLeft className="w-4 h-4 text-foreground" />}
+          </button>
+          <div className="text-center">
+            <div className="text-foreground font-bold text-sm">{dateLabel}</div>
+            {offset > 0 && (
+              <button onClick={() => setOffset(0)} className="text-primary text-[10px] font-medium hover:underline mt-0.5">
+                {lang === 'ku' ? 'گەڕانەوە بۆ ئەمڕۆ' : lang === 'ar' ? 'العودة لليوم' : 'Back to today'}
+              </button>
+            )}
+          </div>
+          <button onClick={() => setOffset(o => Math.max(0, o - 1))} disabled={!canGoForward}
+            className={`w-8 h-8 rounded-lg border border-border flex items-center justify-center transition-colors shadow-sm ${canGoForward ? 'bg-card hover:bg-accent' : 'bg-muted opacity-40 cursor-not-allowed'}`}>
+            {dir === 'rtl' ? <ChevronLeft className="w-4 h-4 text-foreground" /> : <ChevronRight className="w-4 h-4 text-foreground" />}
+          </button>
+        </div>
+
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { label: t.totalIncome, value: income, change: incomeChange, color: 'text-success', dot: 'bg-success' },
+            { label: t.totalExpenses, value: expenseTotal, change: expenseChange, color: 'text-destructive', dot: 'bg-destructive' },
+            { label: t.netProfitLoss, value: profit, change: profitChange, color: profit >= 0 ? 'text-primary' : 'text-destructive', dot: profit >= 0 ? 'bg-primary' : 'bg-destructive' },
+            { label: t.orderCount, value: orderCount, change: pctChange(orderCount, previous.orders.length), color: 'text-primary', dot: 'bg-primary', noIQD: true },
+          ].map((s, i) => (
+            <div key={i} className="text-center py-2">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                <span className="text-muted-foreground text-[9px] font-medium">{s.label}</span>
+              </div>
+              <div className={`${s.color} text-base font-bold`}>{s.value.toLocaleString()}{s.noIQD ? '' : ' IQD'}</div>
+              <ChangeIndicator value={s.change} />
+            </div>
+          ))}
+        </div>
+      </div>
 
         {/* ===== TAB 1: Summary ===== */}
         <TabsContent value="summary" className="space-y-4 mt-0">

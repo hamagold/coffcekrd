@@ -90,20 +90,18 @@ serve(async (req) => {
       });
     }
 
-    // Log the attempt in app_settings as plc_log
+    const anySuccess = results.some((r: any) => r.success);
+
+    // Log the attempt
     const logEntry = {
       orderNumber,
       itemCount: items.length,
       total,
-      plcIp: plcConfig.ip,
-      plcPort: plcConfig.port,
-      success: !plcError,
-      error: plcError,
-      response: plcResponse,
+      machines: results,
+      success: anySuccess,
       timestamp: new Date().toISOString(),
     };
 
-    // Store last PLC log
     const { data: existing } = await supabase
       .from("app_settings")
       .select("id, value")
@@ -112,7 +110,6 @@ serve(async (req) => {
 
     const logs = existing ? ((existing.value as any)?.logs || []) : [];
     logs.unshift(logEntry);
-    // Keep only last 50 logs
     if (logs.length > 50) logs.length = 50;
 
     if (existing) {
@@ -128,9 +125,9 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        success: !plcError,
-        message: plcError || "Order sent to PLC successfully",
-        plcResponse,
+        success: anySuccess,
+        message: anySuccess ? "Order sent to PLC machines" : "Failed to send to all machines",
+        results,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );

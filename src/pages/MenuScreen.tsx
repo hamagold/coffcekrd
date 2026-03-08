@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import OrderQRCode, { OrderQRCodeHandle } from '@/components/OrderQRCode';
 import { useNavigate } from 'react-router-dom';
 import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
@@ -38,6 +39,7 @@ const MenuScreen = () => {
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const qrRef = useRef<OrderQRCodeHandle>(null);
 
   useEffect(() => {
     const update = () => {
@@ -74,12 +76,6 @@ const MenuScreen = () => {
     setShowModal(true);
   };
 
-  useEffect(() => {
-    if (showModal && lastOrderNum && canvasRef.current) {
-      generateQR(lastOrderNum, cartTotal);
-    }
-  }, [showModal, lastOrderNum]);
-
   // QR is now handled by OrderQRCode component
 
   const [cafeName, setCafeName] = useState('PLC');
@@ -89,7 +85,7 @@ const MenuScreen = () => {
   }, []);
 
   const doPrint = (orderNum: string) => {
-    const qrDataUrl = canvasRef.current?.toDataURL('image/png') || '';
+    const qrDataUrl = qrRef.current?.getDataUrl() || '';
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
     document.body.appendChild(iframe);

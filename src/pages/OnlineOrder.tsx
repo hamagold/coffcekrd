@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import OrderQRCode from '@/components/OrderQRCode';
+import { getNextDailyOrderNumber } from '@/utils/orderCounter';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
@@ -73,9 +74,7 @@ const OnlineOrder = () => {
       );
       return;
     }
-    const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
-    localStorage.setItem('plc_order_counter', String(counter));
-    const num = String(counter).padStart(3, '0');
+    const num = getNextDailyOrderNumber();
 
     // Insert into database
     await supabase.from('orders').insert({

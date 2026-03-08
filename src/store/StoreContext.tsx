@@ -3,6 +3,7 @@ import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 import { supabase } from '@/integrations/supabase/client';
 import { useMenuItems } from '@/hooks/useMenuItems';
+import { getNextDailyOrderNumber } from '@/utils/orderCounter';
 
 interface StoreContextType {
   // Language
@@ -116,9 +117,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const cartItemCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const placeOrder = useCallback(async (payment: PaymentMethod, orderType: OrderType): Promise<string> => {
-    const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
-    localStorage.setItem('plc_order_counter', String(counter));
-    const orderNum = String(counter).padStart(3, '0');
+    const orderNum = getNextDailyOrderNumber();
 
     // Insert into database
     await supabase.from('orders').insert({

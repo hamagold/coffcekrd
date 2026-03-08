@@ -7,7 +7,10 @@ import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from
 import { supabase } from '@/integrations/supabase/client';
 import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
 import { toast } from 'sonner';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
+import fibLogo from '@/assets/payments/fib-logo.png';
+import zaincashLogo from '@/assets/payments/zaincash-logo.png';
+import fastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const OnlineOrder = () => {
   const { robotItems, staffItems } = useStore();
@@ -332,9 +335,9 @@ const OnlineOrder = () => {
               {(() => {
                 const cfg = onlinePaymentConfig;
                 const online = [
-                  { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-3.5 h-3.5" />, label: t.fibBank, show: cfg.fib },
-                  { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-3.5 h-3.5" />, label: t.zainCash, show: cfg.zain },
-                  { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-3.5 h-3.5" />, label: t.fastPay, show: cfg.fastpay },
+                  { id: 'fib' as PaymentMethod, icon: <img src={fibLogo} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank, show: cfg.fib },
+                  { id: 'zain' as PaymentMethod, icon: <img src={zaincashLogo} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash, show: cfg.zain },
+                  { id: 'fastpay' as PaymentMethod, icon: <img src={fastpayLogo} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay, show: cfg.fastpay },
                 ].filter(m => m.show !== false);
                 if (online.length === 0) return null;
                 return (

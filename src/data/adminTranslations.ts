@@ -373,6 +373,11 @@ export const adminT: Record<Language, Record<string, string>> = {
     seconds: 'ثانية',
     inactivityEnabled: 'العودة التلقائية مفعلة',
 
+    backgroundImages: 'صور الخلفية',
+    backgroundImagesDesc: 'تظهر الصور خلف صفحة اختيار اللغة',
+    addImage: 'إضافة صورة',
+    noBackgroundImages: 'لم تتم إضافة صور - سيتم استخدام صور القائمة',
+
     comparedToPrev: 'مقارنة بالفترة السابقة',
     change: 'التغيير',
     previousPeriod: 'الفترة السابقة',
@@ -556,6 +561,11 @@ export const adminT: Record<Language, Record<string, string>> = {
     inactivityDesc: 'Auto-redirect to home page after inactivity',
     seconds: 'seconds',
     inactivityEnabled: 'Auto-redirect enabled',
+
+    backgroundImages: 'Background Images',
+    backgroundImagesDesc: 'Images shown behind the language selection page',
+    addImage: 'Add Image',
+    noBackgroundImages: 'No images added — menu images will be used',
 
     comparedToPrev: 'Compared to previous',
     change: 'Change',

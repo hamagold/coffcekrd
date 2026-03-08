@@ -130,6 +130,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     supplies: 'کەلوپەلەکان',
     other: 'هی تر',
     staffSalary: 'مووچەی کارمەندان',
+    selectMonth: 'هەڵبژاردنی مانگ',
+    selectWeek: 'هەڵبژاردنی هەفتە',
+    week: 'هەفتە',
+    orderCount: 'ژمارەی ئۆردەر',
+    avgOrderValue: 'تێکڕای ئۆردەر',
+    summary: 'پوختە',
 
     // Users
     userManagement: 'بەڕێوەبردنی بەکارهێنەرەکان',
@@ -347,6 +353,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     supplies: 'المستلزمات',
     other: 'أخرى',
     staffSalary: 'رواتب الموظفين',
+    selectMonth: 'اختيار الشهر',
+    selectWeek: 'اختيار الأسبوع',
+    week: 'أسبوع',
+    orderCount: 'عدد الطلبات',
+    avgOrderValue: 'متوسط الطلب',
+    summary: 'ملخص',
 
     userManagement: 'إدارة المستخدمين',
     addUser: 'إضافة مستخدم',
@@ -555,6 +567,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     supplies: 'Supplies',
     other: 'Other',
     staffSalary: 'Staff Salary',
+    selectMonth: 'Select Month',
+    selectWeek: 'Select Week',
+    week: 'Week',
+    orderCount: 'Order Count',
+    avgOrderValue: 'Avg Order Value',
+    summary: 'Summary',
 
     userManagement: 'User Management',
     addUser: 'Add User',

@@ -1,21 +1,25 @@
 import { useState } from 'react';
 import { MenuItem, MenuType, Language } from '@/types';
-import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil } from 'lucide-react';
+import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil, FolderPlus, Tag } from 'lucide-react';
 import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
+import { useCategories } from '@/hooks/useCategories';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
   const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
+  const { robotCategories, staffCategories, addCategory, deleteCategory, loading: catsLoading } = useCategories();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [tab, setTab] = useState<MenuType>('robot');
   const [showModal, setShowModal] = useState(false);
+  const [showCatModal, setShowCatModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
+  const [newCat, setNewCat] = useState({ catId: '', icon: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 

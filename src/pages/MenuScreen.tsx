@@ -218,16 +218,7 @@ const MenuScreen = () => {
       return;
     }
 
-    // Regular cash/PLC flow
-    if (payment !== 'cash' && payment !== 'plc' && !(await isPaymentConfigured(payment))) {
-      const { toast } = await import('sonner');
-      toast.error(
-        language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
-        language === 'ar' ? `⚠️ ${payment.toUpperCase()} غير مُعد - تواصل مع المسؤول` :
-        `⚠️ ${payment.toUpperCase()} is not configured - contact admin`
-      );
-      return;
-    }
+    // Regular cash/PLC flow (online payments handled above)
 
     // Store current cart info before placing order (cart gets cleared)
     const isRobotOrder = menuType === 'robot';

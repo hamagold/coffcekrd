@@ -628,6 +628,7 @@ const MenuScreen = () => {
               {/* PLC Vending Machine UI */}
               {payment === 'plc' && (
                 <div className="rounded-xl border border-border p-3 mt-1" style={{ background: `${FROOZT_COLORS.lilac}05` }}>
+                  {/* Balance Display */}
                   <div className={`relative overflow-hidden rounded-xl border-2 p-3 mb-2.5 text-center transition-all duration-500 ${
                     cashBalance >= cartTotal && cartTotal > 0
                       ? 'border-success bg-success/10'
@@ -642,9 +643,9 @@ const MenuScreen = () => {
                     <div className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] mb-0.5 font-bold">
                       {language === 'ku' ? 'باڵانس' : language === 'ar' ? 'الرصيد' : 'Balance'}
                     </div>
-                    <div className={`text-2xl font-black tabular-nums transition-all duration-300 ${
+                    <div className={`text-2xl font-black tabular-nums transition-all duration-300 ${balanceBump ? 'animate-balance-bump' : ''} ${
                       cashBalance >= cartTotal && cartTotal > 0 ? 'text-success' : cashBalance > 0 ? 'text-warning' : 'text-muted-foreground'
-                    }`}>
+                    }`} onAnimationEnd={() => setBalanceBump(false)}>
                       {cashBalance.toLocaleString()} <span className="text-xs font-normal opacity-60">IQD</span>
                     </div>
                     {cartTotal > 0 && cashBalance < cartTotal && (
@@ -663,26 +664,38 @@ const MenuScreen = () => {
                     )}
                   </div>
 
+                  {/* Cash denomination buttons */}
                   <div className="grid grid-cols-2 gap-1.5">
                     {([
                       { amount: 5000, img: cash5000 },
                       { amount: 10000, img: cash10000 },
                       { amount: 25000, img: cash25000 },
                       { amount: 50000, img: cash50000 },
-                    ]).map(({ amount, img }) => (
-                      <button
-                        key={amount}
-                        onClick={() => {
-                          setCashBalance(prev => prev + amount);
-                          setLastInserted(amount);
-                        }}
-                        className="group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card hover:scale-[1.03] active:scale-95 overflow-hidden"
-                      >
-                        <img src={img} alt={`${amount} IQD`} className="w-full h-10 sm:h-12 object-cover rounded-lg mb-0.5" />
-                        <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
-                        <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
-                      </button>
-                    ))}
+                    ]).map(({ amount, img }) => {
+                      const isInserting = insertingAmount === amount;
+                      return (
+                        <button
+                          key={amount}
+                          disabled={!!insertingAmount}
+                          onClick={() => {
+                            setInsertingAmount(amount);
+                            setTimeout(() => {
+                              setCashBalance(prev => prev + amount);
+                              setLastInserted(amount);
+                              setBalanceBump(true);
+                              setInsertingAmount(null);
+                            }, 550);
+                          }}
+                          className={`group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card overflow-hidden ${insertingAmount ? 'opacity-70' : 'hover:scale-[1.03] active:scale-95'}`}
+                        >
+                          <div className={`relative ${isInserting ? 'animate-cash-insert' : ''}`}>
+                            <img src={img} alt={`${amount} IQD`} className="w-full h-10 sm:h-12 object-cover rounded-lg mb-0.5" />
+                          </div>
+                          <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
+                          <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {cashBalance > 0 && (

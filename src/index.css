@@ -558,3 +558,25 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
+
+/* Gradient theme special styles */
+.theme-gradient body,
+.theme-gradient {
+  background: linear-gradient(135deg, hsl(260 20% 6%), hsl(280 15% 8%), hsl(220 20% 7%));
+}
+
+.theme-gradient .bg-primary,
+.theme-gradient [class*="bg-primary"] {
+  background: linear-gradient(135deg, hsl(280 70% 58%), hsl(200 80% 55%)) !important;
+}
+
+.theme-gradient .border-primary {
+  border-color: hsl(280 70% 58%);
+}
+
+.theme-gradient .text-primary {
+  background: linear-gradient(135deg, hsl(280 70% 58%), hsl(200 80% 55%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

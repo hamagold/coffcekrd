@@ -8,7 +8,7 @@ import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured } from '@/components/admin/AdminPayments';
 import { getCafeName } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins, Menu as MenuIcon } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ const MenuScreen = () => {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
+  const [showMobileCart, setShowMobileCart] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -161,31 +162,41 @@ const MenuScreen = () => {
   return (
     <div className="flex flex-col w-full h-screen bg-background overflow-hidden" dir={direction}>
       {/* Top Bar */}
-      <div className="bg-card border-b border-border px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Coffee className="w-5 h-5 text-primary" />
+      <div className="bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           </div>
           <div>
-            <span className="text-foreground text-base font-bold tracking-wide">{cafeName}</span>
-            <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
+            <span className="text-foreground text-sm sm:text-base font-bold tracking-wide">{cafeName}</span>
+            <span className="text-muted-foreground text-[9px] sm:text-[10px] block leading-none">CAFETERIA</span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate('/')}
-            className="group flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="group flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/20 text-primary px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
-            {t.backToHome || 'Home'}
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">{t.backToHome || 'Home'}</span>
           </button>
-          <div className="text-right">
+          <div className="text-right hidden sm:block">
             <div className="text-foreground text-xl font-semibold tabular-nums">{clock}</div>
             <div className="text-muted-foreground text-xs">{dateStr}</div>
           </div>
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
+          <button onClick={() => navigate('/')} className="hidden md:flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
             <Globe className="w-3.5 h-3.5" />
             {t.changeLang}
+          </button>
+          {/* Mobile cart toggle */}
+          <button
+            onClick={() => setShowMobileCart(!showMobileCart)}
+            className="lg:hidden relative flex items-center gap-1 bg-primary/10 border border-primary/20 text-primary px-2.5 py-1.5 rounded-xl text-xs font-semibold"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartItemCount}</span>
+            )}
           </button>
         </div>
       </div>
@@ -194,35 +205,57 @@ const MenuScreen = () => {
       <div className="flex bg-card border-b border-border shrink-0">
         <button
           onClick={() => setMenuType('robot')}
-          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-transparent hover:bg-secondary'}`}
+          className={`flex-1 py-2.5 sm:py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-2 sm:gap-3 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'robot' ? 'bg-info/15 text-info' : 'bg-secondary text-muted-foreground'}`}>
-            <Bot className="w-5 h-5" />
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${menuType === 'robot' ? 'bg-info/15 text-info' : 'bg-secondary text-muted-foreground'}`}>
+            <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="text-left">
-            <div className={`text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</div>
-            <div className="text-[11px] text-muted-foreground">{t.tabRobotSub}</div>
+            <div className={`text-xs sm:text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</div>
+            <div className="text-[9px] sm:text-[11px] text-muted-foreground hidden sm:block">{t.tabRobotSub}</div>
           </div>
         </button>
         <div className="w-px bg-border" />
         <button
           onClick={() => setMenuType('staff')}
-          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-transparent hover:bg-secondary'}`}
+          className={`flex-1 py-2.5 sm:py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-2 sm:gap-3 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'staff' ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground'}`}>
-            <ChefHat className="w-5 h-5" />
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${menuType === 'staff' ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground'}`}>
+            <ChefHat className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="text-left">
-            <div className={`text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</div>
-            <div className="text-[11px] text-muted-foreground">{t.tabStaffSub}</div>
+            <div className={`text-xs sm:text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</div>
+            <div className="text-[9px] sm:text-[11px] text-muted-foreground hidden sm:block">{t.tabStaffSub}</div>
           </div>
         </button>
       </div>
 
+      {/* Mobile Categories (horizontal scroll) */}
+      <div className="md:hidden flex gap-2 overflow-x-auto px-3 py-2 bg-card border-b border-border shrink-0">
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium border transition-all ${
+              activeCategory === cat.id
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border bg-secondary text-muted-foreground'
+            }`}
+          >
+            {cat.image ? (
+              <img src={cat.image} alt="" className="w-4 h-4 rounded object-cover" />
+            ) : (
+              <span className="text-sm">{cat.icon}</span>
+            )}
+            {cat.name[language]}
+          </button>
+        ))}
+      </div>
+
       {/* Menu Body */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Categories Sidebar */}
-        <div className="w-44 bg-card border-r border-border overflow-y-auto shrink-0 py-2">
+        {/* Categories Sidebar - hidden on mobile */}
+        <div className="hidden md:block w-44 bg-card border-r border-border overflow-y-auto shrink-0 py-2">
           {categories.map(cat => (
             <button
               key={cat.id}
@@ -244,7 +277,7 @@ const MenuScreen = () => {
         </div>
 
         {/* Items Grid */}
-        <div className="flex-1 overflow-y-auto p-5 grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-4 content-start">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-4 content-start">
           {items.map(item => (
             <button
               key={item.id}
@@ -253,32 +286,40 @@ const MenuScreen = () => {
             >
               <div className="relative overflow-hidden">
                 {menuImages[item.id] ? (
-                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
+                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-24 sm:h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
+                ) : item.image ? (
+                  <img src={item.image} alt={item.name[language]} className="w-full h-24 sm:h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  <div className="w-full h-36 bg-secondary flex items-center justify-center">
-                    <span className="text-4xl opacity-40">{item.emoji}</span>
+                  <div className="w-full h-24 sm:h-36 bg-secondary flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl opacity-40">{item.emoji}</span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <div className="p-3.5">
-                <div className="text-foreground text-sm font-semibold mb-0.5">{item.name[language]}</div>
-                <div className="text-muted-foreground text-[11px] mb-2.5">{item.desc[language]}</div>
-                <div className="text-primary text-base font-bold">{item.price.toLocaleString()} <span className="text-xs font-normal text-primary/60">IQD</span></div>
+              <div className="p-2 sm:p-3.5">
+                <div className="text-foreground text-xs sm:text-sm font-semibold mb-0.5 truncate">{item.name[language]}</div>
+                <div className="text-muted-foreground text-[10px] sm:text-[11px] mb-1.5 sm:mb-2.5 line-clamp-1 sm:line-clamp-2">{item.desc[language]}</div>
+                <div className="text-primary text-sm sm:text-base font-bold">{item.price.toLocaleString()} <span className="text-[10px] sm:text-xs font-normal text-primary/60">IQD</span></div>
               </div>
             </button>
           ))}
         </div>
 
-        {/* Order Panel */}
-        <div className="w-80 bg-card border-l border-border flex flex-col shrink-0">
-          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+        {/* Order Panel - overlay on mobile, sidebar on desktop */}
+        {showMobileCart && <div className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setShowMobileCart(false)} />}
+        <div className={`${showMobileCart ? 'fixed inset-y-0 right-0 z-50 w-[85vw] max-w-[360px] shadow-2xl' : 'hidden'} lg:relative lg:block lg:w-80 bg-card border-l border-border flex flex-col shrink-0`}>
+          <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-border flex items-center justify-between">
             <div>
               <div className="text-foreground text-sm font-semibold">{t.orderTitle}</div>
               <div className="text-muted-foreground text-xs">{cartItemCount} {t.items}</div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ShoppingCart className="w-4 h-4 text-primary" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ShoppingCart className="w-4 h-4 text-primary" />
+              </div>
+              <button onClick={() => setShowMobileCart(false)} className="lg:hidden w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
@@ -496,8 +537,8 @@ const MenuScreen = () => {
 
       {/* Order Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
-          <div className="bg-card border border-border rounded-2xl p-8 min-w-[400px] max-w-[480px] text-center animate-modal-in">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
+          <div className="bg-card border border-border rounded-2xl p-5 sm:p-8 w-full max-w-[480px] text-center animate-modal-in">
             <div className="w-14 h-14 rounded-full bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-5">
               <Check className="w-7 h-7 text-success" />
             </div>

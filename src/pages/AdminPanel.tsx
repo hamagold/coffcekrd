@@ -14,7 +14,7 @@ import AdminPLC from '@/components/admin/AdminPLC';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 import StorageSettings from '@/components/settings/StorageSettings';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X } from 'lucide-react';
 import { Language } from '@/types';
 
 const AdminPanel = () => {
@@ -22,6 +22,7 @@ const AdminPanel = () => {
   const { user, loading, signIn, signOut } = useAuth();
   const { lang, setLang, t, dir } = useAdminLang();
   const [page, setPage] = useState('dashboard');
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
@@ -111,7 +112,7 @@ const AdminPanel = () => {
     return (
       <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center" dir={dir}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,hsl(var(--primary)/0.05)_0%,transparent_70%)]" />
-        <div className="bg-card border border-border rounded-2xl p-8 w-[380px] text-center relative z-10 animate-fade-up">
+        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 w-full max-w-[380px] mx-4 text-center relative z-10 animate-fade-up">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
             <Lock className="w-7 h-7 text-primary" />
           </div>
@@ -185,16 +186,24 @@ const AdminPanel = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background" dir={dir}>
+      {/* Mobile sidebar overlay */}
+      {showMobileSidebar && <div className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setShowMobileSidebar(false)} />}
+
       {/* Sidebar */}
-      <div className="w-56 shrink-0 bg-card border-r border-border flex flex-col">
-        <div className="px-5 py-5 border-b border-border flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Coffee className="w-4 h-4 text-primary" />
+      <div className={`${showMobileSidebar ? 'fixed inset-y-0 left-0 z-50 w-64 shadow-2xl' : 'hidden'} lg:relative lg:block lg:w-56 shrink-0 bg-card border-r border-border flex flex-col`}>
+        <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Coffee className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <div className="text-foreground text-sm font-bold">{cafeName}</div>
+              <div className="text-muted-foreground text-[10px]">{t.adminPanel.toUpperCase()}</div>
+            </div>
           </div>
-          <div>
-            <div className="text-foreground text-sm font-bold">{cafeName}</div>
-            <div className="text-muted-foreground text-[10px]">{t.adminPanel.toUpperCase()}</div>
-          </div>
+          <button onClick={() => setShowMobileSidebar(false)} className="lg:hidden w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-muted-foreground">
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         <div className="mx-3 my-3 bg-secondary border border-border rounded-lg p-2.5 flex items-center gap-2.5">
@@ -229,7 +238,7 @@ const AdminPanel = () => {
             return (
               <div key={item.id}>
                 {sectionHeader}
-                <button onClick={() => setPage(item.id)} className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all text-[13px] mb-0.5 text-left ${page === item.id ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}>
+                <button onClick={() => { setPage(item.id); setShowMobileSidebar(false); }} className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer transition-all text-[13px] mb-0.5 text-left ${page === item.id ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}>
                   <Icon className="w-4 h-4" />
                   {item.label}
                 </button>
@@ -250,14 +259,20 @@ const AdminPanel = () => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="px-6 py-4 bg-card border-b border-border flex items-center justify-between">
-          <div>
-            <div className="text-foreground text-lg font-bold">{pageTitles[page]?.[0]}</div>
-            <div className="text-muted-foreground text-xs mt-0.5">{pageTitles[page]?.[1]}</div>
+        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-card border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden w-9 h-9 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+              <MenuIcon className="w-5 h-5" />
+            </button>
+            <div>
+              <div className="text-foreground text-base sm:text-lg font-bold">{pageTitles[page]?.[0]}</div>
+              <div className="text-muted-foreground text-[10px] sm:text-xs mt-0.5 hidden sm:block">{pageTitles[page]?.[1]}</div>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Language switcher in header */}
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               {(['ku', 'ar', 'en'] as Language[]).map(l => (
                 <button key={l} onClick={() => setLang(l)}
                   className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-all border ${lang === l ? 'border-primary bg-primary/10 text-primary' : 'border-border bg-secondary text-muted-foreground'}`}>
@@ -265,11 +280,11 @@ const AdminPanel = () => {
                 </button>
               ))}
             </div>
-            <span className="text-foreground text-lg font-semibold tabular-nums">{clock}</span>
-            <span className="text-muted-foreground text-xs">{dateStr}</span>
+            <span className="text-foreground text-sm sm:text-lg font-semibold tabular-nums">{clock}</span>
+            <span className="text-muted-foreground text-[10px] sm:text-xs hidden sm:inline">{dateStr}</span>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6">
           {renderPage()}
         </div>
       </div>

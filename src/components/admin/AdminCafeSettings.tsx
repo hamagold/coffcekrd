@@ -254,6 +254,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
                 { id: 'warm' as Theme, label: lang === 'ku' ? 'گەرم' : lang === 'ar' ? 'دافئ' : 'Warm', icon: <Flame className="w-3.5 h-3.5" />, color: 'hsl(25, 85%, 50%)' },
                 { id: 'rose' as Theme, label: lang === 'ku' ? 'وەردی' : lang === 'ar' ? 'وردي' : 'Rose', icon: <Heart className="w-3.5 h-3.5" />, color: 'hsl(346, 77%, 60%)' },
                 { id: 'purple' as Theme, label: lang === 'ku' ? 'مۆر' : lang === 'ar' ? 'بنفسجي' : 'Purple', icon: <Sparkles className="w-3.5 h-3.5" />, color: 'hsl(262, 60%, 58%)' },
+                { id: 'gradient' as Theme, label: lang === 'ku' ? 'ڕەنگاوڕەنگ' : lang === 'ar' ? 'متدرج' : 'Gradient', icon: <Palette className="w-3.5 h-3.5" />, color: 'linear-gradient(135deg, hsl(280, 70%, 58%), hsl(200, 80%, 55%))' },
               ]).map(item => (
                 <button
                   key={item.id}

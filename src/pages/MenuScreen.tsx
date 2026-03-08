@@ -31,7 +31,7 @@ const MenuScreen = () => {
   const navigate = useNavigate();
   const { language, direction, robotItems, staffItems, cart, addToCart, changeQty, cartTotal, cartItemCount, placeOrder, clearCart } = useStore();
   const t = translations[language];
-  useInactivityRedirect();
+  useInactivityRedirect(cartItemCount > 0);
 
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');

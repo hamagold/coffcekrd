@@ -35,29 +35,7 @@ const OnlineOrder = () => {
     fetchPaymentConfig().then(setOnlinePaymentConfig);
     fetchPaymentLogos().then(setPaymentLogos);
   }, []);
-  const generateQR = (num: string) => {
-    const canvas = qrCanvasRef.current;
-    if (!canvas) return;
-    canvas.width = 140; canvas.height = 140;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, 140, 140);
-    ctx.fillStyle = '#000000';
-    const s = 7;
-    const drawFinder = (x: number, y: number) => {
-      ctx.fillRect(x, y, s*7, s); ctx.fillRect(x, y+s*6, s*7, s);
-      ctx.fillRect(x, y, s, s*7); ctx.fillRect(x+s*6, y, s, s*7);
-      ctx.fillRect(x+s*2, y+s*2, s*3, s*3);
-    };
-    drawFinder(0, 0); drawFinder(140-s*7, 0); drawFinder(0, 140-s*7);
-    let seed = num.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    for (let r = 0; r < 14; r++) for (let c = 0; c < 14; c++) {
-      seed = (seed * 9301 + 49297) % 233280;
-      if (seed / 233280 > 0.5) ctx.fillRect(49 + c * s, 49 + r * s, s - 1, s - 1);
-    }
-    ctx.fillStyle = '#333'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
-    ctx.fillText('#' + num, 70, 135);
-  };
+  // QR is now handled by OrderQRCode component
 
   const t = translations[language];
   const direction = language === 'en' ? 'ltr' : 'rtl';

@@ -79,9 +79,36 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     }
   };
 
-  const catLabels: Record<string, string> = {
-    hot: t.hotDrinks, cold: t.coldDrinks, shake: t.shakes, juice: t.juices,
-    sandwich: t.sandwiches, food: t.food, dessert: t.desserts, salad: t.salads,
+  const allCategories = [...robotCategories, ...staffCategories];
+  const catLabels: Record<string, string> = {};
+  allCategories.forEach(c => { catLabels[c.id] = c.name[lang] || c.name.en; });
+  const currentCategories = tab === 'robot' ? robotCategories : staffCategories;
+
+  const handleAddCategory = async () => {
+    if (!newCat.catId.trim()) {
+      toast.error(lang === 'ku' ? 'ناسنامەی کاتەگۆری پێویستە' : 'Category ID required');
+      return;
+    }
+    setSaving(true);
+    try {
+      await addCategory(newCat);
+      setShowCatModal(false);
+      setNewCat({ catId: '', icon: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
+      toast.success(lang === 'ku' ? 'کاتەگۆری زیادکرا' : lang === 'ar' ? 'تمت الإضافة' : 'Category added');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteCategory = async (catId: string) => {
+    try {
+      await deleteCategory(catId);
+      toast.success(lang === 'ku' ? 'کاتەگۆری سڕایەوە' : lang === 'ar' ? 'تم الحذف' : 'Category deleted');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    }
   };
 
   if (loading) {

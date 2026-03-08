@@ -480,7 +480,7 @@ const MenuScreen = () => {
                 handlePlaceOrder();
                 setCashBalance(0);
               }}
-              disabled={cart.length === 0 || (payment === 'cash' && cashBalance < cartTotal)}
+              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal)}
               className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {t.placeOrder}

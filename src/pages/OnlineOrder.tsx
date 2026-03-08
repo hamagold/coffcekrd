@@ -5,12 +5,12 @@ import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
+import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { toast } from 'sonner';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
-import fibLogo from '@/assets/payments/fib-logo.png';
-import zaincashLogo from '@/assets/payments/zaincash-logo.png';
-import fastpayLogo from '@/assets/payments/fastpay-logo.png';
+import defaultFibLogo from '@/assets/payments/fib-logo.png';
+import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
+import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const OnlineOrder = () => {
   const { robotItems, staffItems } = useStore();

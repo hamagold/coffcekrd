@@ -31,8 +31,6 @@ const MenuScreen = () => {
   const navigate = useNavigate();
   const { language, direction, robotItems, staffItems, cart, addToCart, changeQty, cartTotal, cartItemCount, placeOrder, clearCart } = useStore();
   const t = translations[language];
-  useInactivityRedirect(cartItemCount > 0);
-
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');
   const [payment, setPayment] = useState<PaymentMethod>('cash');
@@ -40,6 +38,8 @@ const MenuScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
   const [cashBalance, setCashBalance] = useState(0);
+
+  useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [insertingAmount, setInsertingAmount] = useState<number | null>(null);
   const [balanceBump, setBalanceBump] = useState(false);

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus } from 'lucide-react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { fetchCafeConfig, saveCafeConfig, invalidateCafeCache, CafeConfig } from '@/hooks/useAdminLang';
 import { supabase } from '@/integrations/supabase/client';
+import { useTheme } from '@/hooks/useTheme';
 
 // Cache for background images
 let cachedBgImages: string[] | null = null;

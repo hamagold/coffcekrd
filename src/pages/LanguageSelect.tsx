@@ -4,9 +4,32 @@ import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Coffee } from 'lucide-react';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { menuImages } from '@/data/menuImages';
 const kurdistanFlag = '/lovable-uploads/bb9b46fd-41da-468f-bde5-dbf486a4dd75.webp';
 import iraqFlag from '@/assets/flags/iraq.png';
 import usaFlag from '@/assets/flags/usa.png';
+
+// Get all menu images as an array for the floating background
+const allMenuImages = Object.values(menuImages);
+
+// Predefined positions for floating items to avoid random repositioning on re-render
+const floatingPositions = [
+  { x: 5, y: 8, size: 70, delay: 0, duration: 18, rotate: 12 },
+  { x: 78, y: 5, size: 65, delay: 2, duration: 22, rotate: -8 },
+  { x: 15, y: 35, size: 55, delay: 4, duration: 20, rotate: 15 },
+  { x: 85, y: 30, size: 60, delay: 1, duration: 19, rotate: -12 },
+  { x: 8, y: 65, size: 58, delay: 3, duration: 21, rotate: 10 },
+  { x: 75, y: 60, size: 68, delay: 5, duration: 17, rotate: -15 },
+  { x: 45, y: 3, size: 52, delay: 2.5, duration: 23, rotate: 20 },
+  { x: 50, y: 85, size: 62, delay: 1.5, duration: 18, rotate: -10 },
+  { x: 25, y: 80, size: 50, delay: 4.5, duration: 20, rotate: 8 },
+  { x: 70, y: 82, size: 56, delay: 3.5, duration: 22, rotate: -18 },
+  { x: 92, y: 50, size: 48, delay: 0.5, duration: 19, rotate: 14 },
+  { x: 3, y: 50, size: 54, delay: 6, duration: 21, rotate: -6 },
+  { x: 35, y: 20, size: 46, delay: 7, duration: 24, rotate: 22 },
+  { x: 60, y: 40, size: 50, delay: 3, duration: 16, rotate: -20 },
+  { x: 40, y: 60, size: 44, delay: 5.5, duration: 25, rotate: 16 },
+];
 
 const LanguageSelect = () => {
   const { setLanguage } = useStore();
@@ -35,17 +58,38 @@ const LanguageSelect = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
-      {/* Decorative geometric shapes */}
-      <div className="absolute top-[-80px] right-[-80px] w-[260px] h-[260px] rounded-full opacity-[0.07]" style={{ background: '#f6f26d' }} />
-      <div className="absolute bottom-[-60px] left-[-60px] w-[200px] h-[200px] rounded-full opacity-[0.07]" style={{ background: '#9eecff' }} />
-      <div className="absolute top-[20%] left-[8%] w-[80px] h-[80px] rounded-2xl rotate-12 opacity-[0.05]" style={{ background: '#ffb0be' }} />
-      <div className="absolute bottom-[25%] right-[10%] w-[60px] h-[60px] rounded-full opacity-[0.06]" style={{ background: '#e2bdff' }} />
+      {/* Floating menu images background */}
+      <div className="absolute inset-0 pointer-events-none">
+        {allMenuImages.slice(0, floatingPositions.length).map((img, i) => {
+          const pos = floatingPositions[i];
+          return (
+            <div
+              key={i}
+              className="absolute rounded-2xl overflow-hidden shadow-lg border border-border/20"
+              style={{
+                left: `${pos.x}%`,
+                top: `${pos.y}%`,
+                width: `${pos.size}px`,
+                height: `${pos.size}px`,
+                opacity: 0.12,
+                transform: `rotate(${pos.rotate}deg)`,
+                animation: `floatItem ${pos.duration}s ease-in-out ${pos.delay}s infinite`,
+              }}
+            >
+              <img
+                src={img}
+                alt=""
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          );
+        })}
+      </div>
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: 'linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)',
-        backgroundSize: '60px 60px'
-      }} />
+      {/* Gradient overlays for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/85 to-background pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(var(--background))_70%)] pointer-events-none" />
 
       <div className="text-center relative z-10 w-full max-w-[460px] px-6">
         {/* Logo & Brand */}
@@ -138,6 +182,24 @@ const LanguageSelect = () => {
           </p>
         </div>
       </div>
+
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes floatItem {
+          0%, 100% {
+            transform: rotate(var(--rotate, 0deg)) translateY(0px) scale(1);
+          }
+          25% {
+            transform: rotate(var(--rotate, 0deg)) translateY(-15px) scale(1.05);
+          }
+          50% {
+            transform: rotate(var(--rotate, 0deg)) translateY(-8px) scale(0.98);
+          }
+          75% {
+            transform: rotate(var(--rotate, 0deg)) translateY(-20px) scale(1.03);
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -34,6 +34,10 @@ const DevPanel = () => {
   const [editingRow, setEditingRow] = useState<{ idx: number; data: any } | null>(null);
   const [newRowJson, setNewRowJson] = useState('');
   const [showAddRow, setShowAddRow] = useState(false);
+  const [sqlQuery, setSqlQuery] = useState('SELECT * FROM app_settings LIMIT 10;');
+  const [sqlResult, setSqlResult] = useState<any[] | null>(null);
+  const [sqlError, setSqlError] = useState<string | null>(null);
+  const [sqlHistory, setSqlHistory] = useState<string[]>([]);
 
   const addLog = (message: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 99)]);

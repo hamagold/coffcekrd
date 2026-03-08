@@ -116,9 +116,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const cartItemCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const placeOrder = useCallback(async (payment: PaymentMethod, orderType: OrderType): Promise<string> => {
-    const counter = parseInt(localStorage.getItem('plc_order_counter') || '0') + 1;
-    localStorage.setItem('plc_order_counter', String(counter));
-    const orderNum = String(counter).padStart(3, '0');
+    const orderNum = getNextDailyOrderNumber();
 
     // Insert into database
     await supabase.from('orders').insert({

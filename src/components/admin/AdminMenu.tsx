@@ -1,40 +1,63 @@
 import { useState } from 'react';
-import { useStore } from '@/store/StoreContext';
 import { MenuItem, MenuType, Language } from '@/types';
-import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat } from 'lucide-react';
+import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2 } from 'lucide-react';
 import { adminT } from '@/data/adminTranslations';
+import { useMenuItems } from '@/hooks/useMenuItems';
+import ImageUpload from '@/components/ImageUpload';
+import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
-  const { robotItems, staffItems, setRobotItems, setStaffItems } = useStore();
+  const { robotItems, staffItems, loading, addItem, deleteItem } = useMenuItems();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [tab, setTab] = useState<MenuType>('robot');
   const [showModal, setShowModal] = useState(false);
-  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType });
+  const [saving, setSaving] = useState(false);
+  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const item: MenuItem = {
       id: 'custom_' + Date.now(), cat: newItem.cat, emoji: newItem.emoji || '☕',
       name: { ku: newItem.nameKu || 'نو', ar: newItem.nameAr || 'جديد', en: newItem.nameEn || 'New Item' },
       desc: { ku: '', ar: '', en: '' }, price: parseInt(newItem.price) || 0,
+      image: newItem.image || undefined,
     };
-    if (newItem.type === 'robot') setRobotItems(prev => [...prev, item]);
-    else setStaffItems(prev => [...prev, item]);
-    setShowModal(false);
-    setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' });
+    setSaving(true);
+    try {
+      await addItem(item, newItem.type);
+      setShowModal(false);
+      setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot', image: '' });
+      toast.success(lang === 'ku' ? 'ئایتم زیادکرا' : lang === 'ar' ? 'تمت الإضافة' : 'Item added');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (tab === 'robot') setRobotItems(prev => prev.filter(i => i.id !== id));
-    else setStaffItems(prev => prev.filter(i => i.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteItem(id);
+      toast.success(lang === 'ku' ? 'ئایتم سڕایەوە' : lang === 'ar' ? 'تم الحذف' : 'Item deleted');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    }
   };
 
   const catLabels: Record<string, string> = {
     hot: t.hotDrinks, cold: t.coldDrinks, shake: t.shakes, juice: t.juices,
     sandwich: t.sandwiches, food: t.food, dessert: t.desserts, salad: t.salads,
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div dir={dir}>
@@ -68,7 +91,13 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
           <tbody>
             {items.map(item => (
               <tr key={item.id} className="hover:bg-secondary/50 border-b border-border transition-colors">
-                <td className="p-3 text-lg">{item.emoji}</td>
+                <td className="p-3">
+                  {item.image ? (
+                    <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-lg">{item.emoji}</span>
+                  )}
+                </td>
                 <td className="p-3 text-foreground text-xs font-medium">{item.name[lang] || item.name.en}</td>
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
@@ -88,10 +117,23 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
 
       {showModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
-          <div className="bg-card border border-border rounded-xl p-6 min-w-[420px] animate-modal-in">
+          <div className="bg-card border border-border rounded-xl p-6 min-w-[420px] max-h-[90vh] overflow-y-auto animate-modal-in">
             <h3 className="text-foreground text-base font-bold mb-5 flex items-center gap-2">
               <Plus className="w-4 h-4 text-primary" /> {t.addItem}
             </h3>
+
+            {/* Image Upload */}
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                {lang === 'ku' ? 'وێنە' : lang === 'ar' ? 'صورة' : 'Image'}
+              </label>
+              <ImageUpload
+                onUpload={(url) => setNewItem(p => ({ ...p, image: url }))}
+                currentImage={newItem.image || undefined}
+                folder="items"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.emoji}</label>
@@ -133,7 +175,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
-              <button onClick={handleAdd} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">{t.addItem}</button>
+              <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">
+                {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {t.addItem}
+              </button>
             </div>
           </div>
         </div>

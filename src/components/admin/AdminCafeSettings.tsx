@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon, Droplets, Leaf, Heart, Flame, Palette } from 'lucide-react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon, Droplets, Leaf, Heart, Flame, Palette, Sparkles, Star, Waves, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
@@ -242,19 +242,23 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
               <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
             </div>
             <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {([
-                { id: 'dark' as Theme, label: lang === 'ku' ? 'ڕەش' : lang === 'ar' ? 'داكن' : 'Dark', icon: <Moon className="w-4 h-4" />, color: 'hsl(38, 92%, 55%)' },
-                { id: 'light' as Theme, label: lang === 'ku' ? 'سپی' : lang === 'ar' ? 'فاتح' : 'Light', icon: <Sun className="w-4 h-4" />, color: 'hsl(38, 92%, 50%)' },
-                { id: 'blue' as Theme, label: lang === 'ku' ? 'شین' : lang === 'ar' ? 'أزرق' : 'Blue', icon: <Droplets className="w-4 h-4" />, color: 'hsl(210, 100%, 56%)' },
-                { id: 'green' as Theme, label: lang === 'ku' ? 'سەوز' : lang === 'ar' ? 'أخضر' : 'Green', icon: <Leaf className="w-4 h-4" />, color: 'hsl(152, 60%, 45%)' },
-                { id: 'rose' as Theme, label: lang === 'ku' ? 'وەردی' : lang === 'ar' ? 'وردي' : 'Rose', icon: <Heart className="w-4 h-4" />, color: 'hsl(346, 77%, 60%)' },
-                { id: 'warm' as Theme, label: lang === 'ku' ? 'گەرم' : lang === 'ar' ? 'دافئ' : 'Warm', icon: <Flame className="w-4 h-4" />, color: 'hsl(25, 85%, 50%)' },
+                { id: 'dark' as Theme, label: lang === 'ku' ? 'ڕەش' : lang === 'ar' ? 'داكن' : 'Dark', icon: <Moon className="w-3.5 h-3.5" />, color: 'hsl(38, 92%, 55%)' },
+                { id: 'light' as Theme, label: lang === 'ku' ? 'سپی' : lang === 'ar' ? 'فاتح' : 'Light', icon: <Sun className="w-3.5 h-3.5" />, color: 'hsl(38, 92%, 50%)' },
+                { id: 'midnight' as Theme, label: lang === 'ku' ? 'نیوەشەو' : lang === 'ar' ? 'منتصف' : 'Midnight', icon: <Star className="w-3.5 h-3.5" />, color: 'hsl(220, 70%, 55%)' },
+                { id: 'blue' as Theme, label: lang === 'ku' ? 'شین' : lang === 'ar' ? 'أزرق' : 'Blue', icon: <Droplets className="w-3.5 h-3.5" />, color: 'hsl(210, 100%, 56%)' },
+                { id: 'teal' as Theme, label: lang === 'ku' ? 'شینەکەوز' : lang === 'ar' ? 'أزرق مخضر' : 'Teal', icon: <Waves className="w-3.5 h-3.5" />, color: 'hsl(174, 70%, 42%)' },
+                { id: 'green' as Theme, label: lang === 'ku' ? 'سەوز' : lang === 'ar' ? 'أخضر' : 'Green', icon: <Leaf className="w-3.5 h-3.5" />, color: 'hsl(152, 60%, 45%)' },
+                { id: 'amber' as Theme, label: lang === 'ku' ? 'زەرد' : lang === 'ar' ? 'كهرماني' : 'Amber', icon: <Zap className="w-3.5 h-3.5" />, color: 'hsl(45, 93%, 47%)' },
+                { id: 'warm' as Theme, label: lang === 'ku' ? 'گەرم' : lang === 'ar' ? 'دافئ' : 'Warm', icon: <Flame className="w-3.5 h-3.5" />, color: 'hsl(25, 85%, 50%)' },
+                { id: 'rose' as Theme, label: lang === 'ku' ? 'وەردی' : lang === 'ar' ? 'وردي' : 'Rose', icon: <Heart className="w-3.5 h-3.5" />, color: 'hsl(346, 77%, 60%)' },
+                { id: 'purple' as Theme, label: lang === 'ku' ? 'مۆر' : lang === 'ar' ? 'بنفسجي' : 'Purple', icon: <Sparkles className="w-3.5 h-3.5" />, color: 'hsl(262, 60%, 58%)' },
               ]).map(item => (
                 <button
                   key={item.id}
                   onClick={() => setTheme(item.id)}
-                  className={`py-3 px-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all border cursor-pointer ${
+                  className={`py-2.5 px-1 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-1 transition-all border cursor-pointer ${
                     theme === item.id
                       ? 'border-primary shadow-md'
                       : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'

@@ -187,6 +187,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     addImage: 'زیادکردنی وێنە',
     noBackgroundImages: 'هیچ وێنەیەک زیاد نەکراوە - وێنەکانی مینۆ بەکاردەهێنرێت',
 
+    // Theme
+    themeMode: 'ڕووکاری سیستەم',
+    themeModeDesc: 'ڕووکاری ڕەش یان سپی بۆ تەواوی سیستەمەکە',
+    darkMode: 'ڕەش',
+    lightMode: 'سپی',
+
     // Reports comparison
     comparedToPrev: 'بەراورد بە پێشووتر',
     change: 'گۆڕانکاری',
@@ -378,6 +384,11 @@ export const adminT: Record<Language, Record<string, string>> = {
     addImage: 'إضافة صورة',
     noBackgroundImages: 'لم تتم إضافة صور - سيتم استخدام صور القائمة',
 
+    themeMode: 'مظهر النظام',
+    themeModeDesc: 'المظهر الداكن أو الفاتح لكامل النظام',
+    darkMode: 'داكن',
+    lightMode: 'فاتح',
+
     comparedToPrev: 'مقارنة بالفترة السابقة',
     change: 'التغيير',
     previousPeriod: 'الفترة السابقة',
@@ -566,6 +577,11 @@ export const adminT: Record<Language, Record<string, string>> = {
     backgroundImagesDesc: 'Images shown behind the language selection page',
     addImage: 'Add Image',
     noBackgroundImages: 'No images added — menu images will be used',
+
+    themeMode: 'System Theme',
+    themeModeDesc: 'Dark or light theme for the entire system',
+    darkMode: 'Dark',
+    lightMode: 'Light',
 
     comparedToPrev: 'Compared to previous',
     change: 'Change',

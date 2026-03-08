@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus } from 'lucide-react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { fetchCafeConfig, saveCafeConfig, invalidateCafeCache, CafeConfig } from '@/hooks/useAdminLang';
 import { supabase } from '@/integrations/supabase/client';
+import { useTheme } from '@/hooks/useTheme';
 
 // Cache for background images
 let cachedBgImages: string[] | null = null;
@@ -25,6 +26,7 @@ export const invalidateBgImagesCache = () => {
 };
 
 const AdminCafeSettings = ({ lang }: { lang: Language }) => {
+  const { theme, setTheme } = useTheme();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [name, setName] = useState('PLC');
@@ -232,6 +234,31 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
               <span className="text-muted-foreground text-xs">{t.seconds}</span>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Theme Toggle */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          {theme === 'dark' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
+          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
+        </div>
+        <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setTheme('dark')}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'dark' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+          >
+            <Moon className="w-4 h-4" />
+            {t.darkMode}
+          </button>
+          <button
+            onClick={() => setTheme('light')}
+            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'light' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+          >
+            <Sun className="w-4 h-4" />
+            {t.lightMode}
+          </button>
         </div>
       </div>
 

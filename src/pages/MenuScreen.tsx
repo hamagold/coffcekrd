@@ -537,8 +537,8 @@ const MenuScreen = () => {
 
       {/* Order Success Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
-          <div className="bg-card border border-border rounded-2xl p-8 min-w-[400px] max-w-[480px] text-center animate-modal-in">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
+          <div className="bg-card border border-border rounded-2xl p-5 sm:p-8 w-full max-w-[480px] text-center animate-modal-in">
             <div className="w-14 h-14 rounded-full bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-5">
               <Check className="w-7 h-7 text-success" />
             </div>

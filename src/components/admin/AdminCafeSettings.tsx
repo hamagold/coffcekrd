@@ -26,6 +26,7 @@ export const invalidateBgImagesCache = () => {
 };
 
 const AdminCafeSettings = ({ lang }: { lang: Language }) => {
+  const { theme, setTheme } = useTheme();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [name, setName] = useState('PLC');

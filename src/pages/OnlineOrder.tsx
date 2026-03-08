@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import OrderQRCode from '@/components/OrderQRCode';
+import { getNextDailyOrderNumber } from '@/utils/orderCounter';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';

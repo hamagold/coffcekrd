@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PLCConfig {
   ip: string;
@@ -12,23 +13,55 @@ interface PLCConfig {
   autoSend: boolean;
 }
 
+// Cache
+let cachedPLCConfig: PLCConfig | null = null;
+
+export const fetchPLCConfig = async (): Promise<PLCConfig> => {
+  if (cachedPLCConfig) return cachedPLCConfig;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'plc_config')
+    .single();
+  cachedPLCConfig = (data?.value as any) || { ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false };
+  return cachedPLCConfig!;
+};
+
+export const invalidatePLCCache = () => {
+  cachedPLCConfig = null;
+};
+
 const AdminPLC = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
 
-  const [config, setConfig] = useState<PLCConfig>(() => {
-    try {
-      const saved = localStorage.getItem('plc_plc_config');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return { ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false };
-  });
-
+  const [config, setConfig] = useState<PLCConfig>({ ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false });
   const [connected, setConnected] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    localStorage.setItem('plc_plc_config', JSON.stringify(config));
-    toast.success(t.saved);
+  useEffect(() => {
+    fetchPLCConfig().then(cfg => {
+      setConfig(cfg);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('app_settings')
+        .update({ value: config as any, updated_at: new Date().toISOString() })
+        .eq('key', 'plc_config');
+      if (error) throw error;
+      invalidatePLCCache();
+      toast.success(t.saved);
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleTest = () => {
@@ -38,6 +71,14 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
       toast.success(t.connected);
     }, 1500);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div dir={dir}>
@@ -65,7 +106,7 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
       </div>
 
       {/* Config */}
-      <div className="grid grid-cols-2 gap-4 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         <div className="bg-card rounded-xl border border-border p-5">
           <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.ipAddress}</label>
           <input className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors font-mono" value={config.ip} onChange={e => setConfig(p => ({ ...p, ip: e.target.value }))} placeholder="192.168.1.100" />
@@ -110,8 +151,8 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
         </button>
       </div>
 
-      <button onClick={handleSave} className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center justify-center gap-2">
-        <Save className="w-4 h-4" />
+      <button onClick={handleSave} disabled={saving} className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {t.saveSettings}
       </button>
     </div>

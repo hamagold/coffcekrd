@@ -24,7 +24,7 @@ export const fetchPLCConfig = async (): Promise<PLCConfig> => {
     .select('value')
     .eq('key', 'plc_config')
     .single();
-  cachedPLCConfig = (data?.value as any) || { ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false };
+  cachedPLCConfig = (data?.value as any) || { ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false, machineId: 'machine-01' };
   return cachedPLCConfig!;
 };
 
@@ -36,7 +36,7 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
 
-  const [config, setConfig] = useState<PLCConfig>({ ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false });
+  const [config, setConfig] = useState<PLCConfig>({ ip: '192.168.1.100', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP', autoSend: false, machineId: 'machine-01' });
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

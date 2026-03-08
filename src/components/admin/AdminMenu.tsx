@@ -394,17 +394,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.nameEn} onChange={e => setNewCat(p => ({ ...p, nameEn: e.target.value }))} placeholder="Pasta" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="mb-3">
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameAr}</label>
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.nameAr} onChange={e => setNewCat(p => ({ ...p, nameAr: e.target.value }))} placeholder="معكرونة" />
-              </div>
-              <div>
-                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.menuType}</label>
-                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newCat.menuType} onChange={e => setNewCat(p => ({ ...p, menuType: e.target.value }))}>
-                  <option value="robot">{t.robotMenu}</option>
-                  <option value="staff">{t.staffMenu}</option>
-                </select>
               </div>
             </div>
             <div className="flex gap-2 justify-end">

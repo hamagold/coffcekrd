@@ -1,9 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Save, Image, Trash2, Timer, Loader2 } from 'lucide-react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { fetchCafeConfig, saveCafeConfig, invalidateCafeCache, CafeConfig } from '@/hooks/useAdminLang';
+import { supabase } from '@/integrations/supabase/client';
+
+// Cache for background images
+let cachedBgImages: string[] | null = null;
+
+export const fetchBackgroundImages = async (): Promise<string[]> => {
+  if (cachedBgImages) return cachedBgImages;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'background_images')
+    .single();
+  cachedBgImages = (data?.value as any)?.images || [];
+  return cachedBgImages!;
+};
+
+export const invalidateBgImagesCache = () => {
+  cachedBgImages = null;
+};
 
 const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
@@ -11,14 +30,17 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const [name, setName] = useState('PLC');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [inactivity, setInactivity] = useState({ enabled: true, timeout: 30 });
+  const [bgImages, setBgImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
 
   useEffect(() => {
-    fetchCafeConfig().then(config => {
+    Promise.all([fetchCafeConfig(), fetchBackgroundImages()]).then(([config, images]) => {
       setName(config.name);
       setLogoUrl(config.logoUrl);
       setInactivity(config.inactivity);
+      setBgImages(images);
       setLoading(false);
     });
   }, []);
@@ -45,6 +67,48 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       setLogoUrl(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const saveBgImages = async (images: string[]) => {
+    const { data: existing } = await supabase
+      .from('app_settings')
+      .select('id')
+      .eq('key', 'background_images')
+      .single();
+
+    if (existing) {
+      await supabase
+        .from('app_settings')
+        .update({ value: { images } as any, updated_at: new Date().toISOString() })
+        .eq('key', 'background_images');
+    } else {
+      await supabase
+        .from('app_settings')
+        .insert({ key: 'background_images', value: { images } as any });
+    }
+    invalidateBgImagesCache();
+  };
+
+  const handleBgImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBg(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const newImages = [...bgImages, reader.result as string];
+      setBgImages(newImages);
+      await saveBgImages(newImages);
+      toast.success(t.saved);
+      setUploadingBg(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeBgImage = async (index: number) => {
+    const newImages = bgImages.filter((_, i) => i !== index);
+    setBgImages(newImages);
+    await saveBgImages(newImages);
+    toast.success(t.saved);
   };
 
   if (loading) {
@@ -103,6 +167,39 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
           </div>
           <p className="text-muted-foreground text-xs mt-2">{t.cafeLogoDesc}</p>
         </div>
+      </div>
+
+      {/* Background Images */}
+      <div className="bg-card rounded-xl border border-border p-6 mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <ImagePlus className="w-4 h-4 text-muted-foreground" />
+          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.backgroundImages}</label>
+        </div>
+        <p className="text-muted-foreground text-xs mb-4">{t.backgroundImagesDesc}</p>
+
+        {bgImages.length === 0 ? (
+          <p className="text-muted-foreground/60 text-xs mb-4 italic">{t.noBackgroundImages}</p>
+        ) : (
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 mb-4">
+            {bgImages.map((img, i) => (
+              <div key={i} className="relative group">
+                <img src={img} alt="" className="w-full aspect-square rounded-lg object-cover border border-border" />
+                <button
+                  onClick={() => removeBgImage(i)}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <label className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-all">
+          {uploadingBg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+          {t.addImage}
+          <input type="file" accept="image/*" className="hidden" onChange={handleBgImageUpload} disabled={uploadingBg} />
+        </label>
       </div>
 
       {/* Inactivity Timeout */}

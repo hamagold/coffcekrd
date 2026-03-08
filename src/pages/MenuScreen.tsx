@@ -13,6 +13,10 @@ import { fetchCafeConfig } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
 import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
+import cash5000 from '@/assets/cash/5000.jpg';
+import cash10000 from '@/assets/cash/10000.jpg';
+import cash25000 from '@/assets/cash/25000.jpg';
+import cash50000 from '@/assets/cash/50000.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const FROOZT_COLORS = {

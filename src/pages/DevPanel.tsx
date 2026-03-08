@@ -5,7 +5,8 @@ import {
   Lock, Database, Table2, RefreshCw, Trash2, Download, 
   Settings, Key, Shield, Eye, EyeOff, Terminal, 
   AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight,
-  FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History
+  FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History,
+  Upload, ArrowRightLeft, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

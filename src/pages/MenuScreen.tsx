@@ -6,7 +6,7 @@ import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
-import { isPaymentConfigured } from '@/components/admin/AdminPayments';
+import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
 import { getCafeName } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins, Menu as MenuIcon } from 'lucide-react';
 
@@ -51,7 +51,7 @@ const MenuScreen = () => {
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
     // Block if online payment selected but not configured
-    if (payment !== 'cash' && payment !== 'plc' && !isPaymentConfigured(payment)) {
+    if (payment !== 'cash' && payment !== 'plc' && !(await isPaymentConfigured(payment))) {
       const { toast } = await import('sonner');
       toast.error(
         language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
@@ -145,13 +145,11 @@ const MenuScreen = () => {
   const autoPrintLabel = (orderNum: string) => doPrint(orderNum);
   const printLabel = () => doPrint(lastOrderNum);
 
-  const paymentConfig = (() => {
-    try {
-      const saved = localStorage.getItem('plc_payment_config');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    return { plc: true, fib: true, zain: true, fastpay: true };
-  })();
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+
+  useEffect(() => {
+    fetchPaymentConfig().then(setPaymentConfig);
+  }, []);
 
   const onlinePaymentMethods = ([
     { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },

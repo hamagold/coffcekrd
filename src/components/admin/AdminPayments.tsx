@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins } from 'lucide-react';
+import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface PaymentConfig {
   plc: boolean;
@@ -9,25 +10,48 @@ export interface PaymentConfig {
   fastpay: boolean;
 }
 
-export const getPaymentConfig = (): PaymentConfig => {
-  try {
-    const saved = localStorage.getItem('plc_payment_config');
-    if (saved) return JSON.parse(saved);
-  } catch {}
-  return { plc: true, fib: true, zain: true, fastpay: true };
+export interface PaymentKeys {
+  [providerId: string]: Record<number, string>;
+}
+
+// Cache
+let cachedPaymentConfig: PaymentConfig | null = null;
+let cachedPaymentKeys: PaymentKeys | null = null;
+
+export const fetchPaymentConfig = async (): Promise<PaymentConfig> => {
+  if (cachedPaymentConfig) return cachedPaymentConfig;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'payment_config')
+    .single();
+  cachedPaymentConfig = (data?.value as any) || { plc: true, fib: true, zain: true, fastpay: true };
+  return cachedPaymentConfig!;
+};
+
+export const fetchPaymentKeys = async (): Promise<PaymentKeys> => {
+  if (cachedPaymentKeys) return cachedPaymentKeys;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'payment_keys')
+    .single();
+  cachedPaymentKeys = (data?.value as any) || {};
+  return cachedPaymentKeys!;
+};
+
+export const invalidatePaymentCache = () => {
+  cachedPaymentConfig = null;
+  cachedPaymentKeys = null;
 };
 
 // Check if a payment provider has API keys configured
-export const isPaymentConfigured = (providerId: string): boolean => {
+export const isPaymentConfigured = async (providerId: string): Promise<boolean> => {
   if (providerId === 'cash' || providerId === 'plc') return true;
-  try {
-    const saved = localStorage.getItem(`plc_payment_keys_${providerId}`);
-    if (!saved) return false;
-    const keys = JSON.parse(saved);
-    // Check that at least one key field has a value
-    return Object.values(keys).some((v: any) => v && String(v).trim().length > 0);
-  } catch {}
-  return false;
+  const keys = await fetchPaymentKeys();
+  const providerKeys = keys[providerId];
+  if (!providerKeys) return false;
+  return Object.values(providerKeys).some((v: any) => v && String(v).trim().length > 0);
 };
 
 const providers = [
@@ -79,35 +103,45 @@ const providers = [
 
 const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
-  const [config, setConfig] = useState<PaymentConfig>(getPaymentConfig);
-  const [fieldValues, setFieldValues] = useState<Record<string, Record<number, string>>>(() => {
-    const vals: Record<string, Record<number, string>> = {};
-    providers.forEach(p => {
-      try {
-        const saved = localStorage.getItem(`plc_payment_keys_${p.id}`);
-        if (saved) vals[p.id] = JSON.parse(saved);
-        else vals[p.id] = {};
-      } catch { vals[p.id] = {}; }
-    });
-    return vals;
-  });
+  const [config, setConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [fieldValues, setFieldValues] = useState<PaymentKeys>({});
+  const [loading, setLoading] = useState(true);
+  const [savingKeys, setSavingKeys] = useState<string | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('plc_admin_lang') as 'ku' | 'ar' | 'en' | null;
     if (savedLang) setLang(savedLang);
+
+    const load = async () => {
+      const [cfg, keys] = await Promise.all([fetchPaymentConfig(), fetchPaymentKeys()]);
+      setConfig(cfg);
+      setFieldValues(keys);
+      setLoading(false);
+    };
+    load();
   }, []);
 
-  const toggleProvider = (id: keyof PaymentConfig) => {
-    setConfig(prev => {
-      const updated = { ...prev, [id]: !prev[id] };
-      localStorage.setItem('plc_payment_config', JSON.stringify(updated));
-      toast.success(
-        lang === 'ku' ? `${id.toUpperCase()} ${updated[id] ? 'چالاک کرا' : 'ناچالاک کرا'}` :
-        lang === 'ar' ? `${id.toUpperCase()} ${updated[id] ? 'تم التفعيل' : 'تم التعطيل'}` :
-        `${id.toUpperCase()} ${updated[id] ? 'enabled' : 'disabled'}`
-      );
-      return updated;
-    });
+  const toggleProvider = async (id: keyof PaymentConfig) => {
+    const updated = { ...config, [id]: !config[id] };
+    setConfig(updated);
+    
+    const { error } = await supabase
+      .from('app_settings')
+      .update({ value: updated as any, updated_at: new Date().toISOString() })
+      .eq('key', 'payment_config');
+
+    if (error) {
+      toast.error(error.message);
+      setConfig(config); // revert
+      return;
+    }
+
+    invalidatePaymentCache();
+    toast.success(
+      lang === 'ku' ? `${id.toUpperCase()} ${updated[id] ? 'چالاک کرا' : 'ناچالاک کرا'}` :
+      lang === 'ar' ? `${id.toUpperCase()} ${updated[id] ? 'تم التفعيل' : 'تم التعطيل'}` :
+      `${id.toUpperCase()} ${updated[id] ? 'enabled' : 'disabled'}`
+    );
   };
 
   const updateFieldValue = (providerId: string, fieldIndex: number, value: string) => {
@@ -117,8 +151,22 @@ const AdminPayments = () => {
     }));
   };
 
-  const saveProviderKeys = (providerId: string) => {
-    localStorage.setItem(`plc_payment_keys_${providerId}`, JSON.stringify(fieldValues[providerId] || {}));
+  const saveProviderKeys = async (providerId: string) => {
+    setSavingKeys(providerId);
+    const updatedKeys = { ...fieldValues };
+
+    const { error } = await supabase
+      .from('app_settings')
+      .update({ value: updatedKeys as any, updated_at: new Date().toISOString() })
+      .eq('key', 'payment_keys');
+
+    setSavingKeys(null);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    invalidatePaymentCache();
     toast.success(
       lang === 'ku' ? `${providerId.toUpperCase()} پاشکەوت کرا ✓` :
       lang === 'ar' ? `تم حفظ ${providerId.toUpperCase()} ✓` :
@@ -140,13 +188,20 @@ const AdminPayments = () => {
     showInMenu: { ku: 'نیشاندانی لە مینۆ', ar: 'إظهار في القائمة', en: 'Show in Menu' },
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div dir={direction}>
       <h2 className="text-foreground text-lg font-bold mb-6 flex items-center gap-2">
         {labels.title[lang]}
       </h2>
 
-      {/* Language selector for admin */}
       <div className="flex gap-2 mb-6">
         {(['ku', 'ar', 'en'] as const).map(l => (
           <button key={l} onClick={() => { setLang(l); localStorage.setItem('plc_admin_lang', l); }}
@@ -156,7 +211,6 @@ const AdminPayments = () => {
         ))}
       </div>
 
-      {/* Cash Section */}
       <div className="bg-card rounded-xl border border-border p-5 mb-5">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
@@ -172,7 +226,6 @@ const AdminPayments = () => {
         </div>
       </div>
 
-      {/* Online Section */}
       <div className="mb-4">
         <h3 className="text-foreground text-base font-bold mb-1 flex items-center gap-2">
           {labels.onlineTitle[lang]}
@@ -224,11 +277,11 @@ const AdminPayments = () => {
               ))}
               {p.fields.length > 0 && (
                 <button
-                  disabled={!enabled}
+                  disabled={!enabled || savingKeys === p.id}
                   onClick={() => saveProviderKeys(p.id)}
                   className="w-full mt-2 p-2.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  <Save className="w-3.5 h-3.5" />
+                  {savingKeys === p.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                   {labels.save[lang]}
                 </button>
               )}

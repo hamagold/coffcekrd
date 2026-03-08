@@ -734,14 +734,22 @@ const MenuScreen = () => {
                         <button
                           key={amount}
                           disabled={!!insertingAmount}
-                          onClick={() => {
+                          onClick={async () => {
                             setInsertingAmount(amount);
-                            setTimeout(() => {
-                              setCashBalance(prev => prev + amount);
-                              setLastInserted(amount);
-                              setBalanceBump(true);
-                              setInsertingAmount(null);
-                            }, 550);
+                            // Send to edge function (simulates PLC cash insert)
+                            try {
+                              await supabase.functions.invoke('plc-cash-insert', {
+                                body: { machine_id: plcMachineId || 'machine-01', amount, action: 'insert' },
+                              });
+                            } catch (err) {
+                              // Fallback: update locally if edge function fails
+                              setTimeout(() => {
+                                setCashBalance(prev => prev + amount);
+                                setLastInserted(amount);
+                                setBalanceBump(true);
+                              }, 500);
+                            }
+                            setTimeout(() => setInsertingAmount(null), 550);
                           }}
                           className={`group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card overflow-hidden ${insertingAmount ? 'opacity-70' : 'hover:scale-[1.03] active:scale-95'}`}
                         >
@@ -757,7 +765,14 @@ const MenuScreen = () => {
 
                   {cashBalance > 0 && (
                     <button
-                      onClick={() => { setCashBalance(0); setLastInserted(null); }}
+                      onClick={async () => {
+                        setCashBalance(0); setLastInserted(null);
+                        try {
+                          await supabase.functions.invoke('plc-cash-insert', {
+                            body: { machine_id: plcMachineId || 'machine-01', action: 'reset' },
+                          });
+                        } catch {}
+                      }}
                       className="w-full mt-2 text-[10px] text-destructive hover:text-destructive/80 transition-colors font-bold"
                     >
                       {language === 'ku' ? '✕ باڵانس بسڕەوە' : language === 'ar' ? '✕ مسح الرصيد' : '✕ Clear Balance'}

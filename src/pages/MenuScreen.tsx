@@ -33,7 +33,7 @@ const MenuScreen = () => {
   const t = translations[language];
   const [menuType, setMenuType] = useState<MenuType>('robot');
   const [activeCategory, setActiveCategory] = useState('hot');
-  const [payment, setPayment] = useState<PaymentMethod>('cash');
+  const [payment, setPayment] = useState<PaymentMethod>('plc');
   const [orderType, setOrderType] = useState<OrderType>('dine');
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
@@ -648,40 +648,26 @@ const MenuScreen = () => {
               <span className="text-base font-black" style={{ color: FROOZT_COLORS.banana }}>{cartTotal.toLocaleString()} IQD</span>
             </div>
 
-            {/* === CASH PAYMENT SECTION === */}
+            {/* === PLC CASH PAYMENT SECTION === */}
             <div className="mb-3">
               <div className="text-muted-foreground text-[10px] uppercase tracking-[0.15em] mb-2 font-bold flex items-center gap-1.5">
-                <Banknote className="w-3 h-3" />
+                <Coins className="w-3 h-3" />
                 {language === 'ku' ? 'پارەدانی کاش' : language === 'ar' ? 'الدفع النقدي' : 'Cash Payment'}
               </div>
-              <div className="grid grid-cols-2 gap-1.5 mb-2">
+              {paymentConfig.plc !== false && (
                 <button
-                  onClick={() => { setPayment('cash'); setCashBalance(0); setLastInserted(null); }}
-                  className={`flex items-center gap-1.5 p-2.5 border rounded-xl cursor-pointer text-[11px] font-bold transition-all ${
-                    payment === 'cash'
+                  onClick={() => { setPayment('plc'); }}
+                  className={`w-full flex items-center justify-center gap-1.5 p-2.5 border rounded-xl cursor-pointer text-[11px] font-bold transition-all mb-2 ${
+                    payment === 'plc'
                       ? 'border-transparent shadow-sm'
                       : 'bg-card border-border text-muted-foreground hover:text-foreground'
                   }`}
-                  style={payment === 'cash' ? { background: `${FROOZT_COLORS.ice}15`, color: FROOZT_COLORS.ice, borderColor: `${FROOZT_COLORS.ice}40` } : {}}
+                  style={payment === 'plc' ? { background: `${FROOZT_COLORS.lilac}15`, color: FROOZT_COLORS.lilac, borderColor: `${FROOZT_COLORS.lilac}40` } : {}}
                 >
-                  <Banknote className="w-4 h-4" />
-                  {language === 'ku' ? 'کاش بەدەست' : language === 'ar' ? 'نقد يدوي' : 'Manual Cash'}
+                  <Coins className="w-4 h-4" />
+                  {language === 'ku' ? 'کاش بە PLC' : language === 'ar' ? 'نقد PLC' : 'PLC Cash'}
                 </button>
-                {paymentConfig.plc !== false && (
-                  <button
-                    onClick={() => { setPayment('plc'); }}
-                    className={`flex items-center gap-1.5 p-2.5 border rounded-xl cursor-pointer text-[11px] font-bold transition-all ${
-                      payment === 'plc'
-                        ? 'border-transparent shadow-sm'
-                        : 'bg-card border-border text-muted-foreground hover:text-foreground'
-                    }`}
-                    style={payment === 'plc' ? { background: `${FROOZT_COLORS.lilac}15`, color: FROOZT_COLORS.lilac, borderColor: `${FROOZT_COLORS.lilac}40` } : {}}
-                  >
-                    <Coins className="w-4 h-4" />
-                    {language === 'ku' ? 'کاش بە PLC' : language === 'ar' ? 'نقد PLC' : 'PLC Cash'}
-                  </button>
-                )}
-              </div>
+              )}
 
               {/* PLC Vending Machine UI */}
               {payment === 'plc' && (

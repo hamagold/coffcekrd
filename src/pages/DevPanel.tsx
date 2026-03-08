@@ -332,16 +332,48 @@ const DevPanel = () => {
 
           {/* Database Tab */}
           <TabsContent value="database" className="space-y-4 mt-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Button onClick={fetchTables} disabled={loading} variant="outline" size="sm">
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh Tables
               </Button>
               {selectedTable && (
-                <Button onClick={() => exportData(tableData, selectedTable)} variant="outline" size="sm">
-                  <Download className="w-4 h-4 mr-2" /> Export {selectedTable}
-                </Button>
+                <>
+                  <Button onClick={() => exportData(tableData, selectedTable)} variant="outline" size="sm">
+                    <Download className="w-4 h-4 mr-2" /> Export {selectedTable}
+                  </Button>
+                  <Button onClick={() => { setShowAddRow(!showAddRow); setNewRowJson('{\n  \n}'); }} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-2" /> Add Row
+                  </Button>
+                </>
               )}
             </div>
+
+            {/* Add New Row */}
+            {showAddRow && selectedTable && (
+              <Card className="border-primary/30">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-primary" /> Insert into {selectedTable}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <textarea
+                    value={newRowJson}
+                    onChange={(e) => setNewRowJson(e.target.value)}
+                    className="w-full h-32 bg-secondary text-foreground font-mono text-xs p-3 rounded-lg border border-border resize-y focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder='{"key": "value"}'
+                  />
+                  <div className="flex gap-2">
+                    <Button onClick={addNewRow} size="sm" disabled={loading}>
+                      <Save className="w-4 h-4 mr-2" /> Insert
+                    </Button>
+                    <Button onClick={() => setShowAddRow(false)} variant="ghost" size="sm">
+                      <X className="w-4 h-4 mr-2" /> Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
               {/* Tables List */}
@@ -353,7 +385,7 @@ const DevPanel = () => {
                   tables.map(t => (
                     <button
                       key={t.name}
-                      onClick={() => fetchTableData(t.name)}
+                      onClick={() => { fetchTableData(t.name); setEditingRow(null); setShowAddRow(false); }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
                         selectedTable === t.name 
                           ? 'bg-primary text-primary-foreground' 
@@ -389,25 +421,90 @@ const DevPanel = () => {
                         Select a table to view data
                       </div>
                     ) : (
-                      <div className="max-h-[500px] overflow-auto">
+                      <div className="max-h-[600px] overflow-auto">
                         {tableData.map((row, idx) => (
                           <div key={idx} className="border-b border-border">
                             <button
                               onClick={() => toggleRow(idx)}
                               className="w-full px-4 py-2 flex items-center justify-between hover:bg-accent/50 text-left"
                             >
-                              <span className="text-xs text-foreground font-mono truncate max-w-[80%]">
-                                {JSON.stringify(row).slice(0, 100)}...
+                              <span className="text-xs text-foreground font-mono truncate max-w-[70%]">
+                                {row.id ? `${String(row.id).slice(0, 8)}...` : ''} {row.key || row.name || row.name_en || row.order_number || row.item_id || row.cat_id || ''}
                               </span>
-                              {expandedRows.has(idx) ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); startEditRow(idx); }}
+                                  className="p-1 hover:bg-primary/10 rounded text-primary"
+                                  title="Edit"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); deleteRow(row); }}
+                                  className="p-1 hover:bg-destructive/10 rounded text-destructive"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                                {expandedRows.has(idx) ? (
+                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                )}
+                              </div>
                             </button>
-                            {expandedRows.has(idx) && (
+
+                            {/* Edit Mode */}
+                            {editingRow?.idx === idx && (
+                              <div className="px-4 py-3 bg-primary/5 border-t border-primary/20 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                                    <Pencil className="w-3 h-3" /> Editing Row
+                                  </span>
+                                  <div className="flex gap-2">
+                                    <Button onClick={saveEditRow} size="sm" disabled={loading} className="h-7 text-xs">
+                                      <Save className="w-3 h-3 mr-1" /> Save
+                                    </Button>
+                                    <Button onClick={() => setEditingRow(null)} variant="ghost" size="sm" className="h-7 text-xs">
+                                      <X className="w-3 h-3 mr-1" /> Cancel
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                                  {Object.entries(editingRow.data).map(([key, value]) => (
+                                    <div key={key} className="flex items-start gap-2">
+                                      <label className="text-[10px] font-mono text-muted-foreground min-w-[120px] pt-2 shrink-0">{key}</label>
+                                      {typeof value === 'object' && value !== null ? (
+                                        <textarea
+                                          value={JSON.stringify(value, null, 2)}
+                                          onChange={(e) => handleEditField(key, e.target.value)}
+                                          className="flex-1 bg-background border border-border rounded-md px-2 py-1.5 text-xs font-mono resize-y min-h-[60px] focus:outline-none focus:ring-1 focus:ring-primary"
+                                          disabled={key === 'id'}
+                                        />
+                                      ) : (
+                                        <Input
+                                          value={String(value ?? '')}
+                                          onChange={(e) => handleEditField(key, e.target.value)}
+                                          className="flex-1 h-8 text-xs font-mono"
+                                          disabled={key === 'id'}
+                                        />
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* View Mode */}
+                            {expandedRows.has(idx) && editingRow?.idx !== idx && (
                               <div className="px-4 py-3 bg-secondary/50">
-                                <div className="flex justify-end mb-2">
+                                <div className="flex justify-end mb-2 gap-3">
+                                  <button
+                                    onClick={() => startEditRow(idx)}
+                                    className="text-xs text-primary flex items-center gap-1 hover:underline"
+                                  >
+                                    <Pencil className="w-3 h-3" /> Edit
+                                  </button>
                                   <button
                                     onClick={() => copyToClipboard(JSON.stringify(row, null, 2))}
                                     className="text-xs text-primary flex items-center gap-1 hover:underline"

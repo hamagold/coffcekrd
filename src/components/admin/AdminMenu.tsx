@@ -303,7 +303,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
                 <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={editData.cat} onChange={e => setEditData(p => ({ ...p, cat: e.target.value }))}>
-                  {Object.entries(catLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  {(tab === 'robot' ? robotCategories : staffCategories).map(c => (
+                    <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
+                  ))}
                 </select>
               </div>
             </div>

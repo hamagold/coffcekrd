@@ -167,7 +167,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         </button>
       </div>
 
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr>

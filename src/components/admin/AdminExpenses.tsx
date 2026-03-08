@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '@/store/StoreContext';
-import { Wallet, Plus, Trash2, Lightbulb, Droplets, HardHat, Package, FileText, X, Users, Phone, CheckCircle2, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Wallet, Plus, Trash2, Lightbulb, Droplets, HardHat, Package, FileText, X, Users, Phone, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Bell, AlertTriangle } from 'lucide-react';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -54,7 +54,23 @@ const AdminExpenses = ({ lang }: { lang: Language }) => {
         .eq('key', 'staff_salaries')
         .single();
       if (data?.value) {
-        setStaff((data.value as any).staff || []);
+        const loadedStaff: StaffMember[] = (data.value as any).staff || [];
+        setStaff(loadedStaff);
+        
+        // Check for unpaid salaries notification
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        const key = `${currentYear}-${currentMonth}`;
+        const unpaid = loadedStaff.filter(s => !s.payments[key]);
+        if (unpaid.length > 0) {
+          const monthName = MONTH_NAMES[lang][currentMonth - 1];
+          toast.warning(
+            lang === 'ku' ? `⚠️ ${unpaid.length} ستاف مووچەی ${monthName} نەدراوە` :
+            lang === 'ar' ? `⚠️ ${unpaid.length} موظف لم يتم دفع راتب ${monthName}` :
+            `⚠️ ${unpaid.length} staff unpaid for ${monthName}`,
+            { duration: 8000 }
+          );
+        }
       }
       setLoadingStaff(false);
     };
@@ -205,6 +221,48 @@ const AdminExpenses = ({ lang }: { lang: Language }) => {
 
         {/* ===== Staff Tab ===== */}
         <TabsContent value="staff" className="mt-0 space-y-4">
+          {/* Unpaid Salary Alert */}
+          {(() => {
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const key = `${currentYear}-${currentMonth}`;
+            const unpaid = staff.filter(s => !s.payments[key]);
+            const monthName = MONTH_NAMES[lang][currentMonth - 1];
+            if (unpaid.length > 0 && !loadingStaff) {
+              return (
+                <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-warning/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertTriangle className="w-4 h-4 text-warning" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-foreground text-sm font-bold mb-1 flex items-center gap-2">
+                      <Bell className="w-3.5 h-3.5 text-warning" />
+                      {lang === 'ku' ? 'یادخستنەوەی مووچە' : lang === 'ar' ? 'تذكير بالرواتب' : 'Salary Reminder'}
+                    </div>
+                    <div className="text-muted-foreground text-xs mb-2">
+                      {lang === 'ku' ? `${unpaid.length} ستاف مووچەی ${monthName} نەدراوە:` :
+                       lang === 'ar' ? `${unpaid.length} موظف لم يتم دفع راتب ${monthName}:` :
+                       `${unpaid.length} staff unpaid for ${monthName}:`}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {unpaid.map(s => (
+                        <span key={s.id} className="px-2 py-0.5 bg-warning/10 border border-warning/20 rounded-md text-[10px] font-semibold text-foreground">
+                          {s.name} — {s.salary.toLocaleString()} IQD
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-warning text-[10px] font-bold mt-2">
+                      {lang === 'ku' ? `کۆی نەدراو: ${unpaid.reduce((s, m) => s + m.salary, 0).toLocaleString()} IQD` :
+                       lang === 'ar' ? `إجمالي غير مدفوع: ${unpaid.reduce((s, m) => s + m.salary, 0).toLocaleString()} IQD` :
+                       `Total unpaid: ${unpaid.reduce((s, m) => s + m.salary, 0).toLocaleString()} IQD`}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
           <div className="flex items-center justify-between">
             <h2 className="text-foreground text-base font-bold flex items-center gap-2">
               <Users className="w-4 h-4 text-muted-foreground" /> {t.staffManagement}

@@ -203,6 +203,23 @@ const AdminReports = ({ lang }: { lang: Language }) => {
         </div>
       </div>
 
+      {/* Content Tabs */}
+      <Tabs defaultValue="summary" className="w-full">
+        <TabsList className="w-full grid grid-cols-3 h-11 mb-4">
+          <TabsTrigger value="summary" className="text-xs font-semibold gap-1.5">
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            {tabLabels.summary[lang]}
+          </TabsTrigger>
+          <TabsTrigger value="charts" className="text-xs font-semibold gap-1.5">
+            <BarChart3 className="w-3.5 h-3.5" />
+            {tabLabels.charts[lang]}
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className="text-xs font-semibold gap-1.5">
+            <Receipt className="w-3.5 h-3.5" />
+            {tabLabels.expenses[lang]}
+          </TabsTrigger>
+        </TabsList>
+
         {/* ===== TAB 1: Summary ===== */}
         <TabsContent value="summary" className="space-y-4 mt-0">
           {/* Stats Cards */}

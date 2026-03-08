@@ -272,6 +272,59 @@ const AdminReports = ({ lang }: { lang: Language }) => {
 
         {/* ===== TAB 2: Charts ===== */}
         <TabsContent value="charts" className="space-y-4 mt-0">
+          {/* Income Trend Line Chart */}
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-success/10 flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5 text-success" />
+              </div>
+              <span className="text-foreground font-semibold text-sm">
+                {lang === 'ku' ? 'ڕەوتی داهات' : lang === 'ar' ? 'اتجاه الدخل' : 'Income Trend'}
+              </span>
+            </div>
+            <div className="p-4">
+              {trendData.length <= 1 ? (
+                <div className="text-center text-muted-foreground py-10 text-sm">
+                  {lang === 'ku' ? 'بۆ بینینی چارتی هێڵی، مانگانە یان هەفتانە هەڵبژێرە' : lang === 'ar' ? 'لرؤية الرسم البياني، اختر أسبوعي أو شهري' : 'Select weekly or monthly to see trend chart'}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
+                      labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold', marginBottom: '4px' }}
+                      formatter={(value: number, name: string) => [
+                        `${value.toLocaleString()} IQD`,
+                        name === 'income' ? (lang === 'ku' ? 'داهات' : lang === 'ar' ? 'الدخل' : 'Income') :
+                        name === 'expenses' ? (lang === 'ku' ? 'خەرجی' : lang === 'ar' ? 'المصاريف' : 'Expenses') :
+                        (lang === 'ku' ? 'قازانج' : lang === 'ar' ? 'الربح' : 'Profit')
+                      ]}
+                    />
+                    <Area type="monotone" dataKey="income" stroke="hsl(var(--success))" fill="url(#incomeGrad)" strokeWidth={2.5} dot={{ r: 3, fill: 'hsl(var(--success))' }} />
+                    <Area type="monotone" dataKey="expenses" stroke="hsl(var(--destructive))" fill="url(#expenseGrad)" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--destructive))' }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+              <div className="flex items-center justify-center gap-5 mt-2 text-[10px] text-muted-foreground">
+                <span className="flex items-center gap-1.5"><span className="w-3 h-1 rounded-full bg-success inline-block" /> {lang === 'ku' ? 'داهات' : lang === 'ar' ? 'الدخل' : 'Income'}</span>
+                <span className="flex items-center gap-1.5"><span className="w-3 h-1 rounded-full bg-destructive inline-block" /> {lang === 'ku' ? 'خەرجی' : lang === 'ar' ? 'المصاريف' : 'Expenses'}</span>
+              </div>
+            </div>
+          </div>
+
           {/* Income vs Expenses */}
           <div className="bg-card rounded-xl border border-border overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border flex items-center gap-2">

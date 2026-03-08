@@ -24,6 +24,7 @@ export interface MenuItem {
 export interface Category {
   id: string;
   icon: string;
+  image?: string;
   name: MultiLangText;
 }
 

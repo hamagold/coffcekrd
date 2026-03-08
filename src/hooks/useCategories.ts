@@ -7,6 +7,7 @@ interface DbCategory {
   id: string;
   cat_id: string;
   icon: string;
+  image: string | null;
   name_ku: string;
   name_ar: string;
   name_en: string;
@@ -17,6 +18,7 @@ interface DbCategory {
 const dbToCategory = (row: DbCategory): Category => ({
   id: row.cat_id,
   icon: row.icon,
+  image: row.image || undefined,
   name: { ku: row.name_ku, ar: row.name_ar, en: row.name_en },
 });
 

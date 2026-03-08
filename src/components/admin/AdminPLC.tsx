@@ -108,6 +108,15 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
 
       {/* Config */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        <div className="bg-card rounded-xl border border-border p-5 md:col-span-2">
+          <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">
+            {lang === 'ku' ? 'ناسنامەی ئامێر (Machine ID)' : lang === 'ar' ? 'معرف الجهاز' : 'Machine ID'}
+          </label>
+          <input className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors font-mono" value={config.machineId} onChange={e => setConfig(p => ({ ...p, machineId: e.target.value }))} placeholder="machine-01" />
+          <p className="text-muted-foreground text-[10px] mt-1.5">
+            {lang === 'ku' ? 'ئەم ناسنامەیە بۆ پەیوەندیکردن لەگەڵ ئامێری PLC بەکاردێت' : lang === 'ar' ? 'يُستخدم هذا المعرف للاتصال بجهاز PLC' : 'This ID is used to connect with the PLC machine'}
+          </p>
+        </div>
         <div className="bg-card rounded-xl border border-border p-5">
           <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.ipAddress}</label>
           <input className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors font-mono" value={config.ip} onChange={e => setConfig(p => ({ ...p, ip: e.target.value }))} placeholder="192.168.1.100" />

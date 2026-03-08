@@ -159,12 +159,6 @@ const LanguageSelect = () => {
           })}
         </div>
 
-        {/* Footer tagline */}
-        <div className="mt-10 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-          <p className="text-muted-foreground text-[11px] tracking-[0.2em] uppercase font-medium">
-            Made by robots, loved by humans
-          </p>
-        </div>
       </div>
 
     </div>

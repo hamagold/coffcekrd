@@ -127,14 +127,13 @@ const AdminReports = ({ lang }: { lang: Language }) => {
       </div>
 
       {/* Period Tabs */}
-      <div className="bg-card rounded-xl border border-border p-1.5 inline-flex gap-1">
-        {([{ key: 'daily', label: t.daily }, { key: 'weekly', label: t.weekly }, { key: 'monthly', label: t.monthly }] as const).map(p => (
-          <button key={p.key} onClick={() => { setPeriod(p.key as any); setOffset(0); }}
-            className={`px-5 py-2 rounded-lg text-xs font-semibold transition-all ${period === p.key ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-secondary'}`}>
-            {p.label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={period} onValueChange={(v) => { setPeriod(v as any); setOffset(0); }} className="w-full">
+        <TabsList className="w-full grid grid-cols-3 h-11">
+          <TabsTrigger value="daily" className="text-xs font-semibold">{t.daily}</TabsTrigger>
+          <TabsTrigger value="weekly" className="text-xs font-semibold">{t.weekly}</TabsTrigger>
+          <TabsTrigger value="monthly" className="text-xs font-semibold">{t.monthly}</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Date Navigation */}
       <div className="bg-card rounded-xl border border-border p-4 flex items-center justify-between">

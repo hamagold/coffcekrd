@@ -43,6 +43,7 @@ const MenuScreen = () => {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [insertingAmount, setInsertingAmount] = useState<number | null>(null);
   const [balanceBump, setBalanceBump] = useState(false);
+  const [plcMachineId, setPlcMachineId] = useState<string | null>(null);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);

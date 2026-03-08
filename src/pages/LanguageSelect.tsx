@@ -54,33 +54,22 @@ const LanguageSelect = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
-      {/* Floating menu images background */}
+      {/* Full-size slideshow background */}
       <div className="absolute inset-0 pointer-events-none">
-        {bgImages.slice(0, floatingPositions.length).map((img, i) => {
-          const pos = floatingPositions[i];
-          return (
-            <div
-              key={i}
-              className="absolute rounded-2xl overflow-hidden shadow-lg border border-border/20"
-              style={{
-                left: `${pos.x}%`,
-                top: `${pos.y}%`,
-                width: `${pos.size}px`,
-                height: `${pos.size}px`,
-                opacity: 0.35,
-                transform: `rotate(${pos.rotate}deg)`,
-                animation: `floatItem ${pos.duration}s ease-in-out ${pos.delay}s infinite`,
-              }}
-            >
-              <img
-                src={img}
-                alt=""
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          );
-        })}
+        {bgImages.map((img, i) => (
+          <div
+            key={i}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: currentSlide === i ? 1 : 0 }}
+          >
+            <img
+              src={img}
+              alt=""
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        ))}
       </div>
 
       {/* Gradient overlays for depth */}

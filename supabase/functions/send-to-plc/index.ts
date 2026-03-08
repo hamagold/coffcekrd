@@ -23,15 +23,17 @@ serve(async (req) => {
       .eq("key", "plc_config")
       .single();
 
-    const plcConfig = (plcData?.value as any) || {
-      ip: "192.168.1.100",
-      port: "502",
-      model: "Siemens S7-1200",
-      protocol: "Modbus TCP",
-      autoSend: false,
-    };
+    const rawConfig = (plcData?.value as any) || {};
+    
+    // Support multi-machine config
+    const machines = rawConfig.machines || [{
+      machineId: rawConfig.machineId || "machine-01",
+      ip: rawConfig.ip || "192.168.1.100",
+      port: rawConfig.port || "502",
+    }];
+    const autoSend = rawConfig.autoSend || false;
 
-    if (!plcConfig.autoSend) {
+    if (!autoSend) {
       return new Response(
         JSON.stringify({ success: false, message: "Auto-send is disabled in PLC settings" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
@@ -55,27 +57,37 @@ serve(async (req) => {
       timestamp: new Date().toISOString(),
     };
 
-    const plcUrl = `http://${plcConfig.ip}:${plcConfig.port}`;
+    // Send to all machines
+    const results: any[] = [];
+    for (const machine of machines) {
+      const plcUrl = `http://${machine.ip}:${machine.port}`;
+      let plcResponse = null;
+      let plcError = null;
 
-    // Attempt to send to PLC via HTTP
-    let plcResponse = null;
-    let plcError = null;
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
 
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        const resp = await fetch(`${plcUrl}/api/order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(plcPayload),
+          signal: controller.signal,
+        });
 
-      const resp = await fetch(`${plcUrl}/api/order`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(plcPayload),
-        signal: controller.signal,
+        clearTimeout(timeout);
+        plcResponse = await resp.text();
+      } catch (err: any) {
+        plcError = err.message || "Failed to connect to PLC";
+      }
+
+      results.push({
+        machineId: machine.machineId,
+        ip: machine.ip,
+        success: !plcError,
+        error: plcError,
+        response: plcResponse,
       });
-
-      clearTimeout(timeout);
-      plcResponse = await resp.text();
-    } catch (err: any) {
-      plcError = err.message || "Failed to connect to PLC";
     }
 
     // Log the attempt in app_settings as plc_log

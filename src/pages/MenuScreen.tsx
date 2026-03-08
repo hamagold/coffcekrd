@@ -39,8 +39,13 @@ const MenuScreen = () => {
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'failed' | 'expired'>('pending');
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrRef = useRef<OrderQRCodeHandle>(null);
+  const paymentPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const update = () => {

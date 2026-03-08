@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      menu_categories: {
+        Row: {
+          cat_id: string
+          created_at: string
+          icon: string
+          id: string
+          menu_type: string
+          name_ar: string
+          name_en: string
+          name_ku: string
+          sort_order: number
+        }
+        Insert: {
+          cat_id: string
+          created_at?: string
+          icon?: string
+          id?: string
+          menu_type?: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          sort_order?: number
+        }
+        Update: {
+          cat_id?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          menu_type?: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           cat: string

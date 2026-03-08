@@ -19,7 +19,8 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
-  const [newCat, setNewCat] = useState({ catId: '', icon: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
+  const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
+  const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
 
   const items = tab === 'robot' ? robotItems : staffItems;
 

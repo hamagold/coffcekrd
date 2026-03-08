@@ -66,6 +66,61 @@ const MenuScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Load PLC machine ID and subscribe to realtime balance updates
+  useEffect(() => {
+    let channel: any;
+    const setup = async () => {
+      try {
+        const plcConfig = await fetchPLCConfig();
+        const machineId = plcConfig.machineId || 'machine-01';
+        setPlcMachineId(machineId);
+
+        // Subscribe to realtime changes on plc_sessions for this machine
+        channel = supabase
+          .channel(`plc-session-${machineId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'plc_sessions',
+              filter: `machine_id=eq.${machineId}`,
+            },
+            (payload: any) => {
+              const newBalance = payload.new?.balance;
+              if (typeof newBalance === 'number') {
+                setCashBalance(prev => {
+                  if (newBalance !== prev) {
+                    setBalanceBump(true);
+                    setLastInserted(newBalance - prev > 0 ? newBalance - prev : null);
+                  }
+                  return newBalance;
+                });
+              }
+            }
+          )
+          .subscribe();
+
+        // Also fetch current session balance
+        const { data } = await supabase
+          .from('plc_sessions')
+          .select('balance')
+          .eq('machine_id', machineId)
+          .eq('status', 'active')
+          .single();
+        if (data) {
+          setCashBalance(data.balance);
+        }
+      } catch (err) {
+        console.log('PLC config load error:', err);
+      }
+    };
+    setup();
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, []);
+
   const { robotCategories, staffCategories } = useCategories();
   const categories = menuType === 'robot' ? robotCategories : staffCategories;
   const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);

@@ -76,7 +76,7 @@ const LanguageSelect = () => {
                 top: `${pos.y}%`,
                 width: `${pos.size}px`,
                 height: `${pos.size}px`,
-                opacity: 0.12,
+                opacity: 0.35,
                 transform: `rotate(${pos.rotate}deg)`,
                 animation: `floatItem ${pos.duration}s ease-in-out ${pos.delay}s infinite`,
               }}
@@ -93,8 +93,8 @@ const LanguageSelect = () => {
       </div>
 
       {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/85 to-background pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(var(--background))_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background/60 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,hsl(var(--background))_85%)] pointer-events-none" />
 
       <div className="text-center relative z-10 w-full max-w-[460px] px-6">
         {/* Logo & Brand */}

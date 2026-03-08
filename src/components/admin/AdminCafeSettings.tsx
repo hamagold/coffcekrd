@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon } from 'lucide-react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2, Plus, ImagePlus, Sun, Moon, Droplets, Leaf, Heart, Flame, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
 import { fetchCafeConfig, saveCafeConfig, invalidateCafeCache, CafeConfig } from '@/hooks/useAdminLang';
 import { supabase } from '@/integrations/supabase/client';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme, Theme } from '@/hooks/useTheme';
 
 // Cache for background images
 let cachedBgImages: string[] | null = null;
@@ -235,28 +235,36 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
             </label>
           </div>
 
-          {/* Theme Toggle */}
+          {/* Theme Selector */}
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-center gap-2 mb-2">
-              {theme === 'dark' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
+              <Palette className="w-4 h-4 text-muted-foreground" />
               <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
             </div>
             <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setTheme('dark')}
-                className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'dark' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
-              >
-                <Moon className="w-4 h-4" />
-                {t.darkMode}
-              </button>
-              <button
-                onClick={() => setTheme('light')}
-                className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'light' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
-              >
-                <Sun className="w-4 h-4" />
-                {t.lightMode}
-              </button>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { id: 'dark' as Theme, label: lang === 'ku' ? 'ڕەش' : lang === 'ar' ? 'داكن' : 'Dark', icon: <Moon className="w-4 h-4" />, color: 'hsl(38, 92%, 55%)' },
+                { id: 'light' as Theme, label: lang === 'ku' ? 'سپی' : lang === 'ar' ? 'فاتح' : 'Light', icon: <Sun className="w-4 h-4" />, color: 'hsl(38, 92%, 50%)' },
+                { id: 'blue' as Theme, label: lang === 'ku' ? 'شین' : lang === 'ar' ? 'أزرق' : 'Blue', icon: <Droplets className="w-4 h-4" />, color: 'hsl(210, 100%, 56%)' },
+                { id: 'green' as Theme, label: lang === 'ku' ? 'سەوز' : lang === 'ar' ? 'أخضر' : 'Green', icon: <Leaf className="w-4 h-4" />, color: 'hsl(152, 60%, 45%)' },
+                { id: 'rose' as Theme, label: lang === 'ku' ? 'وەردی' : lang === 'ar' ? 'وردي' : 'Rose', icon: <Heart className="w-4 h-4" />, color: 'hsl(346, 77%, 60%)' },
+                { id: 'warm' as Theme, label: lang === 'ku' ? 'گەرم' : lang === 'ar' ? 'دافئ' : 'Warm', icon: <Flame className="w-4 h-4" />, color: 'hsl(25, 85%, 50%)' },
+              ]).map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => setTheme(item.id)}
+                  className={`py-3 px-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition-all border cursor-pointer ${
+                    theme === item.id
+                      ? 'border-primary shadow-md'
+                      : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'
+                  }`}
+                  style={theme === item.id ? { background: item.color, color: '#fff', borderColor: item.color } : {}}
+                >
+                  {item.icon}
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>

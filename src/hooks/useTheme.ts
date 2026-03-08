@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-type Theme = 'dark' | 'light';
+export type Theme = 'dark' | 'light' | 'blue' | 'green' | 'rose' | 'warm';
+
+const ALL_THEME_CLASSES = ['light', 'theme-blue', 'theme-green', 'theme-rose', 'theme-warm'];
 
 let cachedTheme: Theme | null = null;
 
@@ -37,9 +39,16 @@ export const saveTheme = async (theme: Theme): Promise<void> => {
 };
 
 const applyTheme = (theme: Theme) => {
-  document.documentElement.classList.remove('light');
-  if (theme === 'light') {
-    document.documentElement.classList.add('light');
+  const el = document.documentElement;
+  ALL_THEME_CLASSES.forEach(cls => el.classList.remove(cls));
+  
+  switch (theme) {
+    case 'light': el.classList.add('light'); break;
+    case 'blue': el.classList.add('theme-blue'); break;
+    case 'green': el.classList.add('theme-green'); break;
+    case 'rose': el.classList.add('theme-rose'); break;
+    case 'warm': el.classList.add('theme-warm'); break;
+    // 'dark' is the default :root
   }
 };
 

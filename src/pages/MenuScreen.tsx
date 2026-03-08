@@ -722,46 +722,14 @@ const MenuScreen = () => {
                     )}
                   </div>
 
-                  {/* Cash denomination buttons */}
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {([
-                      { amount: 5000, img: cash5000 },
-                      { amount: 10000, img: cash10000 },
-                      { amount: 25000, img: cash25000 },
-                      { amount: 50000, img: cash50000 },
-                    ]).map(({ amount, img }) => {
-                      const isInserting = insertingAmount === amount;
-                      return (
-                        <button
-                          key={amount}
-                          disabled={!!insertingAmount}
-                          onClick={async () => {
-                            setInsertingAmount(amount);
-                            // Send to edge function (simulates PLC cash insert)
-                            try {
-                              await supabase.functions.invoke('plc-cash-insert', {
-                                body: { machine_id: plcMachineId || 'machine-01', amount, action: 'insert' },
-                              });
-                            } catch (err) {
-                              // Fallback: update locally if edge function fails
-                              setTimeout(() => {
-                                setCashBalance(prev => prev + amount);
-                                setLastInserted(amount);
-                                setBalanceBump(true);
-                              }, 500);
-                            }
-                            setTimeout(() => setInsertingAmount(null), 550);
-                          }}
-                          className={`group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card overflow-hidden ${insertingAmount ? 'opacity-70' : 'hover:scale-[1.03] active:scale-95'}`}
-                        >
-                          <div className={`relative ${isInserting ? 'animate-cash-insert' : ''}`}>
-                            <img src={img} alt={`${amount} IQD`} className="w-full h-10 sm:h-12 object-cover rounded-lg mb-0.5" />
-                          </div>
-                          <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
-                          <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
-                        </button>
-                      );
-                    })}
+                  {/* Waiting for machine cash insert */}
+                  <div className="text-center py-3">
+                    <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs font-semibold">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {language === 'ku' ? 'چاوەڕوانی داخڵکردنی پارە لە ئامێرەکە...' : 
+                       language === 'ar' ? 'في انتظار إدخال النقد من الجهاز...' :
+                       'Waiting for cash from machine...'}
+                    </div>
                   </div>
 
                   {cashBalance > 0 && (

@@ -38,11 +38,15 @@ const LanguageSelect = () => {
   const [cafeName, setCafeNameState] = useState('PLC');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [hoveredLang, setHoveredLang] = useState<Language | null>(null);
+  const [bgImages, setBgImages] = useState<string[]>(defaultMenuImages);
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => {
       setCafeNameState(cfg.name);
       setLogoUrl(cfg.logoUrl);
+    });
+    fetchBackgroundImages().then(images => {
+      if (images.length > 0) setBgImages(images);
     });
   }, []);
 

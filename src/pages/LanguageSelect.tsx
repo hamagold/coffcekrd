@@ -168,23 +168,6 @@ const LanguageSelect = () => {
         </div>
       </div>
 
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes floatItem {
-          0%, 100% {
-            transform: rotate(var(--rotate, 0deg)) translateY(0px) scale(1);
-          }
-          25% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-15px) scale(1.05);
-          }
-          50% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-8px) scale(0.98);
-          }
-          75% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-20px) scale(1.03);
-          }
-        }
-      `}</style>
     </div>
   );
 };

@@ -264,7 +264,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
                       ? 'border-primary shadow-md'
                       : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'
                   }`}
-                  style={theme === item.id ? { background: item.color, color: '#fff', borderColor: item.color } : {}}
+                  style={theme === item.id ? { background: item.color, color: '#fff', borderColor: item.id === 'gradient' ? 'hsl(280, 70%, 58%)' : item.color } : {}}
                 >
                   {item.icon}
                   {item.label}

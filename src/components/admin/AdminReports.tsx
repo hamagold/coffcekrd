@@ -476,6 +476,28 @@ const AdminReports = ({ lang }: { lang: Language }) => {
                   </div>
                 );
               })}
+              {/* Staff Salaries Card */}
+              {staffExpenseCurrent > 0 || staffExpensePrevious > 0 ? (
+                <div className="bg-secondary/40 rounded-xl p-3.5 border border-border/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Users className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <span className="text-foreground text-xs font-semibold">{staffSalaryLabel.label}</span>
+                    </div>
+                    <ChangeIndicator value={pctChange(staffExpenseCurrent, staffExpensePrevious)} />
+                  </div>
+                  <div className="flex gap-1.5 h-2 rounded-full overflow-hidden bg-background mb-1.5">
+                    <div className="bg-primary/25 rounded-full transition-all duration-500" style={{ width: `${Math.max(4, (staffExpensePrevious / Math.max(staffExpenseCurrent, staffExpensePrevious, 1)) * 100)}%` }} />
+                    <div className="bg-primary rounded-full transition-all duration-500" style={{ width: `${Math.max(4, (staffExpenseCurrent / Math.max(staffExpenseCurrent, staffExpensePrevious, 1)) * 100)}%` }} />
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground text-[9px]">{t.previousPeriod}: {staffExpensePrevious.toLocaleString()}</span>
+                    <span className="text-primary text-[9px] font-bold">{staffExpenseCurrent.toLocaleString()} IQD</span>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </TabsContent>

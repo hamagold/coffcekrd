@@ -53,7 +53,7 @@ const LanguageSelect = () => {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
+    <div className="flex min-h-screen flex-col justify-end bg-background relative overflow-hidden">
       {/* Full-size slideshow background */}
       <div className="absolute inset-0 pointer-events-none">
         {bgImages.map((img, i) => (
@@ -72,9 +72,8 @@ const LanguageSelect = () => {
         ))}
       </div>
 
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background/60 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,hsl(var(--background))_85%)] pointer-events-none" />
+      {/* Lighter gradient - only darken bottom for readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/90 pointer-events-none" />
 
       <div className="text-center relative z-10 w-full max-w-[460px] px-6">
         {/* Logo & Brand */}

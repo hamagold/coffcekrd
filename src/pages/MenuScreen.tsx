@@ -305,15 +305,21 @@ const MenuScreen = () => {
           ))}
         </div>
 
-        {/* Order Panel */}
-        <div className="w-80 bg-card border-l border-border flex flex-col shrink-0">
-          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+        {/* Order Panel - overlay on mobile, sidebar on desktop */}
+        {showMobileCart && <div className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setShowMobileCart(false)} />}
+        <div className={`${showMobileCart ? 'fixed inset-y-0 right-0 z-50 w-[85vw] max-w-[360px] shadow-2xl' : 'hidden'} lg:relative lg:block lg:w-80 bg-card border-l border-border flex flex-col shrink-0`}>
+          <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-border flex items-center justify-between">
             <div>
               <div className="text-foreground text-sm font-semibold">{t.orderTitle}</div>
               <div className="text-muted-foreground text-xs">{cartItemCount} {t.items}</div>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ShoppingCart className="w-4 h-4 text-primary" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ShoppingCart className="w-4 h-4 text-primary" />
+              </div>
+              <button onClick={() => setShowMobileCart(false)} className="lg:hidden w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground">
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
 

@@ -8,7 +8,7 @@ import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured } from '@/components/admin/AdminPayments';
 import { getCafeName } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins, Menu as MenuIcon } from 'lucide-react';
 
 const MenuScreen = () => {
   const navigate = useNavigate();

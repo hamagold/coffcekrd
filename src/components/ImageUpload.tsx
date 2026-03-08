@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { getStorageType, getR2Config } from '@/components/settings/StorageSettings';
+import { fetchStorageConfig } from '@/components/settings/StorageSettings';
 import { toast } from 'sonner';
 import { Upload, Camera, Loader2, ImageIcon, X } from 'lucide-react';
 
@@ -32,17 +32,16 @@ const ImageUpload = ({ onUpload, folder = 'items', className = '', currentImage 
     return data.publicUrl;
   };
 
-  const uploadToR2 = async (file: File): Promise<string> => {
-    const config = getR2Config();
-    if (!config) throw new Error('R2 config not found');
+  const uploadToR2 = async (file: File, r2Config: any): Promise<string> => {
+    if (!r2Config) throw new Error('R2 config not found');
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('accountId', config.accountId);
-    formData.append('accessKeyId', config.accessKeyId);
-    formData.append('secretAccessKey', config.secretAccessKey);
-    formData.append('bucketName', config.bucketName);
-    formData.append('publicDomain', config.publicDomain || '');
+    formData.append('accountId', r2Config.accountId);
+    formData.append('accessKeyId', r2Config.accessKeyId);
+    formData.append('secretAccessKey', r2Config.secretAccessKey);
+    formData.append('bucketName', r2Config.bucketName);
+    formData.append('publicDomain', r2Config.publicDomain || '');
     formData.append('folder', folder);
 
     const { data, error } = await supabase.functions.invoke('upload-to-r2', {
@@ -66,11 +65,11 @@ const ImageUpload = ({ onUpload, folder = 'items', className = '', currentImage 
 
     setUploading(true);
     try {
-      const storageType = getStorageType();
+      const config = await fetchStorageConfig();
       let url: string;
 
-      if (storageType === 'cloudflare-r2') {
-        url = await uploadToR2(file);
+      if (config.storageType === 'cloudflare-r2') {
+        url = await uploadToR2(file, config.r2Config);
       } else {
         url = await uploadToCloud(file);
       }

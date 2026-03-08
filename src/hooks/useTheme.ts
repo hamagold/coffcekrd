@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type Theme = 'dark' | 'light' | 'blue' | 'green' | 'rose' | 'warm' | 'purple' | 'midnight' | 'teal' | 'amber';
+export type Theme = 'dark' | 'light' | 'blue' | 'green' | 'rose' | 'warm' | 'purple' | 'midnight' | 'teal' | 'amber' | 'gradient';
 
-const ALL_THEME_CLASSES = ['light', 'theme-blue', 'theme-green', 'theme-rose', 'theme-warm', 'theme-purple', 'theme-midnight', 'theme-teal', 'theme-amber'];
+const ALL_THEME_CLASSES = ['light', 'theme-blue', 'theme-green', 'theme-rose', 'theme-warm', 'theme-purple', 'theme-midnight', 'theme-teal', 'theme-amber', 'theme-gradient'];
 
 let cachedTheme: Theme | null = null;
 
@@ -52,6 +52,7 @@ const applyTheme = (theme: Theme) => {
     case 'midnight': el.classList.add('theme-midnight'); break;
     case 'teal': el.classList.add('theme-teal'); break;
     case 'amber': el.classList.add('theme-amber'); break;
+    case 'gradient': el.classList.add('theme-gradient'); break;
     // 'dark' is the default :root
   }
 };

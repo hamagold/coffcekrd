@@ -484,16 +484,16 @@ const MenuScreen = () => {
               <button
                 key={item.id}
                 onClick={() => addToCart(item)}
-                className="group bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all text-left hover:shadow-xl animate-fade-up"
+                className="group bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all text-left hover:shadow-xl animate-fade-up flex flex-col"
                 style={{ '--hover-accent': accentColor } as any}
               >
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden aspect-[4/3]">
                   {menuImages[item.id] ? (
-                    <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-28 sm:h-36 object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : item.image ? (
-                    <img src={item.image} alt={item.name[language]} className="w-full h-28 sm:h-36 object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <img src={item.image} alt={item.name[language]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : (
-                    <div className="w-full h-28 sm:h-36 bg-secondary flex items-center justify-center">
+                    <div className="w-full h-full bg-secondary flex items-center justify-center">
                       <span className="text-3xl sm:text-4xl opacity-40">{item.emoji}</span>
                     </div>
                   )}
@@ -503,11 +503,11 @@ const MenuScreen = () => {
                     style={{ background: accentColor }}
                   />
                 </div>
-                <div className="p-2 sm:p-3.5">
-                  <div className="text-foreground text-[11px] sm:text-sm font-bold mb-0.5 truncate">{item.name[language]}</div>
-                  <div className="text-muted-foreground text-[9px] sm:text-[11px] mb-1.5 sm:mb-3 line-clamp-1 sm:line-clamp-2">{item.desc[language]}</div>
-                  <div className="flex items-center justify-between">
-                    <div className="text-primary text-[13px] sm:text-base font-black">{item.price.toLocaleString()} <span className="text-[9px] sm:text-xs font-normal text-primary/60">IQD</span></div>
+                <div className="p-2.5 sm:p-3.5 flex flex-col flex-1">
+                  <div className="text-foreground text-xs sm:text-sm font-bold mb-0.5 truncate">{item.name[language]}</div>
+                  <div className="text-muted-foreground text-[9px] sm:text-[11px] mb-1.5 sm:mb-2 line-clamp-1 sm:line-clamp-2">{item.desc[language]}</div>
+                  <div className="flex items-center justify-between mt-auto">
+                    <div className="text-primary text-sm sm:text-base font-black">{item.price.toLocaleString()} <span className="text-[9px] sm:text-xs font-normal text-primary/60">IQD</span></div>
                     <div
                       className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-75"
                       style={{ background: `${accentColor}30`, color: accentColor }}

@@ -72,7 +72,8 @@ const MenuScreen = () => {
     const setup = async () => {
       try {
         const plcConfig = await fetchPLCConfig();
-        const machineId = plcConfig.machineId || 'machine-01';
+        // Use first machine's ID (multi-machine support)
+        const machineId = plcConfig.machines?.[0]?.machineId || plcConfig.machineId || 'machine-01';
         setPlcMachineId(machineId);
 
         // Subscribe to realtime changes on plc_sessions for this machine

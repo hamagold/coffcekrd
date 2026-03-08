@@ -97,5 +97,20 @@ export const useMenuItems = () => {
     if (error) throw error;
   }, []);
 
-  return { robotItems, staffItems, loading, addItem, deleteItem, refetch: fetchItems };
+  const updateItem = useCallback(async (itemId: string, updates: Partial<MenuItem>) => {
+    const dbUpdates: Record<string, any> = {};
+    if (updates.name) {
+      if (updates.name.ku !== undefined) dbUpdates.name_ku = updates.name.ku;
+      if (updates.name.ar !== undefined) dbUpdates.name_ar = updates.name.ar;
+      if (updates.name.en !== undefined) dbUpdates.name_en = updates.name.en;
+    }
+    if (updates.price !== undefined) dbUpdates.price = updates.price;
+    if (updates.image !== undefined) dbUpdates.image = updates.image || null;
+    if (updates.emoji !== undefined) dbUpdates.emoji = updates.emoji;
+    if (updates.cat !== undefined) dbUpdates.cat = updates.cat;
+    const { error } = await supabase.from('menu_items').update(dbUpdates).eq('item_id', itemId);
+    if (error) throw error;
+  }, []);
+
+  return { robotItems, staffItems, loading, addItem, deleteItem, updateItem, refetch: fetchItems };
 };

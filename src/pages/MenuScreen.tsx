@@ -477,17 +477,17 @@ const MenuScreen = () => {
         </div>
 
         {/* Items Grid */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-5 grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 sm:gap-4 content-start">
+        <div className="flex-1 overflow-y-auto p-2 sm:p-4 lg:p-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2 sm:gap-3 lg:gap-4 content-start">
           {items.map((item, i) => {
             const accentColor = [FROOZT_COLORS.banana, FROOZT_COLORS.ice, FROOZT_COLORS.pink, FROOZT_COLORS.lilac][i % 4];
             return (
               <button
                 key={item.id}
                 onClick={() => addToCart(item)}
-                className="group bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all text-left hover:shadow-xl animate-fade-up flex flex-col"
+                className="group bg-card border border-border rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all text-left hover:shadow-xl animate-fade-up flex flex-col"
                 style={{ '--hover-accent': accentColor } as any}
               >
-                <div className="relative overflow-hidden aspect-[4/3]">
+                <div className="relative overflow-hidden aspect-[5/4] sm:aspect-[4/3] lg:aspect-[4/3]">
                   {menuImages[item.id] ? (
                     <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                   ) : item.image ? (

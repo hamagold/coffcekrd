@@ -162,31 +162,41 @@ const MenuScreen = () => {
   return (
     <div className="flex flex-col w-full h-screen bg-background overflow-hidden" dir={direction}>
       {/* Top Bar */}
-      <div className="bg-card border-b border-border px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Coffee className="w-5 h-5 text-primary" />
+      <div className="bg-card border-b border-border px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           </div>
           <div>
-            <span className="text-foreground text-base font-bold tracking-wide">{cafeName}</span>
-            <span className="text-muted-foreground text-[10px] block leading-none">CAFETERIA</span>
+            <span className="text-foreground text-sm sm:text-base font-bold tracking-wide">{cafeName}</span>
+            <span className="text-muted-foreground text-[9px] sm:text-[10px] block leading-none">CAFETERIA</span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => navigate('/')}
-            className="group flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="group flex items-center gap-1.5 sm:gap-2 bg-primary/10 border border-primary/20 text-primary px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-semibold cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
-            {t.backToHome || 'Home'}
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">{t.backToHome || 'Home'}</span>
           </button>
-          <div className="text-right">
+          <div className="text-right hidden sm:block">
             <div className="text-foreground text-xl font-semibold tabular-nums">{clock}</div>
             <div className="text-muted-foreground text-xs">{dateStr}</div>
           </div>
-          <button onClick={() => navigate('/')} className="flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
+          <button onClick={() => navigate('/')} className="hidden md:flex items-center gap-1.5 bg-secondary border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:text-foreground hover:border-primary/30 transition-all">
             <Globe className="w-3.5 h-3.5" />
             {t.changeLang}
+          </button>
+          {/* Mobile cart toggle */}
+          <button
+            onClick={() => setShowMobileCart(!showMobileCart)}
+            className="lg:hidden relative flex items-center gap-1 bg-primary/10 border border-primary/20 text-primary px-2.5 py-1.5 rounded-xl text-xs font-semibold"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartItemCount}</span>
+            )}
           </button>
         </div>
       </div>

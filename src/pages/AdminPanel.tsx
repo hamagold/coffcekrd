@@ -14,7 +14,7 @@ import AdminPLC from '@/components/admin/AdminPLC';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 import StorageSettings from '@/components/settings/StorageSettings';
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X } from 'lucide-react';
 import { Language } from '@/types';
 
 const AdminPanel = () => {

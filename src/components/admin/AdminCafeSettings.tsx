@@ -25,10 +25,13 @@ export const invalidateBgImagesCache = () => {
   cachedBgImages = null;
 };
 
+type SettingsTab = 'general' | 'appearance' | 'behavior';
+
 const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const { theme, setTheme } = useTheme();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   const [name, setName] = useState('PLC');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [inactivity, setInactivity] = useState({ enabled: true, timeout: 30 });
@@ -65,9 +68,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      setLogoUrl(reader.result as string);
-    };
+    reader.onload = () => setLogoUrl(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -121,148 +122,186 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
     );
   }
 
+  const tabs: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'general', label: lang === 'ku' ? 'گشتی' : lang === 'ar' ? 'عام' : 'General', icon: <Coffee className="w-4 h-4" /> },
+    { id: 'appearance', label: lang === 'ku' ? 'ڕووکار' : lang === 'ar' ? 'المظهر' : 'Appearance', icon: <ImagePlus className="w-4 h-4" /> },
+    { id: 'behavior', label: lang === 'ku' ? 'ڕەفتار' : lang === 'ar' ? 'السلوك' : 'Behavior', icon: <Timer className="w-4 h-4" /> },
+  ];
+
   return (
     <div dir={dir}>
       <h2 className="text-foreground text-lg font-bold mb-2 flex items-center gap-2">
         <Coffee className="w-5 h-5 text-muted-foreground" />
         {t.cafeSettingsTitle}
       </h2>
-      <p className="text-muted-foreground text-sm mb-6">{t.cafeSettingsSub}</p>
+      <p className="text-muted-foreground text-sm mb-5">{t.cafeSettingsSub}</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-        {/* Cafe Name */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.cafeName}</label>
-          <input
-            className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-lg font-bold focus:outline-none focus:border-primary/50 transition-colors"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="PLC"
-          />
-          <p className="text-muted-foreground text-xs mt-2">{t.cafeNameDesc}</p>
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 bg-secondary/50 rounded-xl p-1 border border-border">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+              activeTab === tab.id
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+            }`}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* General Tab */}
+      {activeTab === 'general' && (
+        <div className="space-y-4 animate-fade-up">
+          {/* Cafe Name */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.cafeName}</label>
+            <input
+              className="w-full p-3 bg-secondary border border-border rounded-lg text-foreground text-lg font-bold focus:outline-none focus:border-primary/50 transition-colors"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="PLC"
+            />
+            <p className="text-muted-foreground text-xs mt-2">{t.cafeNameDesc}</p>
+          </div>
+
+          {/* Cafe Logo */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.cafeLogo}</label>
+            <div className="flex items-center gap-4">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="w-16 h-16 rounded-xl object-cover border border-border" />
+              ) : (
+                <div className="w-16 h-16 rounded-xl bg-secondary border border-border flex items-center justify-center">
+                  <Image className="w-6 h-6 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <label className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-all flex items-center gap-1.5">
+                  <Image className="w-3.5 h-3.5" />
+                  {t.uploadLogo}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                </label>
+                {logoUrl && (
+                  <button onClick={() => setLogoUrl(null)} className="px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-destructive/20 transition-all flex items-center gap-1.5">
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {t.removeLogo}
+                  </button>
+                )}
+              </div>
+            </div>
+            <p className="text-muted-foreground text-xs mt-2">{t.cafeLogoDesc}</p>
+          </div>
         </div>
+      )}
 
-        {/* Cafe Logo */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.cafeLogo}</label>
-          <div className="flex items-center gap-4">
-            {logoUrl ? (
-              <img src={logoUrl} alt="Logo" className="w-16 h-16 rounded-xl object-cover border border-border" />
+      {/* Appearance Tab */}
+      {activeTab === 'appearance' && (
+        <div className="space-y-4 animate-fade-up">
+          {/* Background Images */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <ImagePlus className="w-4 h-4 text-muted-foreground" />
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.backgroundImages}</label>
+            </div>
+            <p className="text-muted-foreground text-xs mb-4">{t.backgroundImagesDesc}</p>
+
+            {bgImages.length === 0 ? (
+              <p className="text-muted-foreground/60 text-xs mb-4 italic">{t.noBackgroundImages}</p>
             ) : (
-              <div className="w-16 h-16 rounded-xl bg-secondary border border-border flex items-center justify-center">
-                <Image className="w-6 h-6 text-muted-foreground" />
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 mb-4">
+                {bgImages.map((img, i) => (
+                  <div key={i} className="relative group">
+                    <img src={img} alt="" className="w-full aspect-square rounded-lg object-cover border border-border" />
+                    <button
+                      onClick={() => removeBgImage(i)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
-            <div className="flex flex-col gap-2">
-              <label className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-all flex items-center gap-1.5">
-                <Image className="w-3.5 h-3.5" />
-                {t.uploadLogo}
-                <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+
+            <label className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-all">
+              {uploadingBg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+              {t.addImage}
+              <input type="file" accept="image/*" className="hidden" onChange={handleBgImageUpload} disabled={uploadingBg} />
+            </label>
+          </div>
+
+          {/* Theme Toggle */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-2 mb-2">
+              {theme === 'dark' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
+            </div>
+            <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setTheme('dark')}
+                className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'dark' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+              >
+                <Moon className="w-4 h-4" />
+                {t.darkMode}
+              </button>
+              <button
+                onClick={() => setTheme('light')}
+                className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'light' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
+              >
+                <Sun className="w-4 h-4" />
+                {t.lightMode}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Behavior Tab */}
+      {activeTab === 'behavior' && (
+        <div className="space-y-4 animate-fade-up">
+          {/* Inactivity Timeout */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Timer className="w-4 h-4 text-muted-foreground" />
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.inactivityTimeout}</label>
+            </div>
+            <p className="text-muted-foreground text-xs mb-4">{t.inactivityDesc}</p>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={inactivity.enabled}
+                  onChange={e => setInactivity({ ...inactivity, enabled: e.target.checked })}
+                  className="w-4 h-4 accent-primary"
+                />
+                <span className="text-foreground text-sm">{t.inactivityEnabled}</span>
               </label>
-              {logoUrl && (
-                <button onClick={() => setLogoUrl(null)} className="px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-destructive/20 transition-all flex items-center gap-1.5">
-                  <Trash2 className="w-3.5 h-3.5" />
-                  {t.removeLogo}
-                </button>
+              {inactivity.enabled && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={5}
+                    max={300}
+                    value={inactivity.timeout}
+                    onChange={e => setInactivity({ ...inactivity, timeout: Number(e.target.value) })}
+                    className="w-20 p-2 bg-secondary border border-border rounded-lg text-foreground text-sm text-center focus:outline-none focus:border-primary/50"
+                  />
+                  <span className="text-muted-foreground text-xs">{t.seconds}</span>
+                </div>
               )}
             </div>
           </div>
-          <p className="text-muted-foreground text-xs mt-2">{t.cafeLogoDesc}</p>
         </div>
-      </div>
+      )}
 
-      {/* Background Images */}
-      <div className="bg-card rounded-xl border border-border p-6 mb-5">
-        <div className="flex items-center gap-2 mb-2">
-          <ImagePlus className="w-4 h-4 text-muted-foreground" />
-          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.backgroundImages}</label>
-        </div>
-        <p className="text-muted-foreground text-xs mb-4">{t.backgroundImagesDesc}</p>
-
-        {bgImages.length === 0 ? (
-          <p className="text-muted-foreground/60 text-xs mb-4 italic">{t.noBackgroundImages}</p>
-        ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 mb-4">
-            {bgImages.map((img, i) => (
-              <div key={i} className="relative group">
-                <img src={img} alt="" className="w-full aspect-square rounded-lg object-cover border border-border" />
-                <button
-                  onClick={() => removeBgImage(i)}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <label className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold cursor-pointer hover:bg-primary/20 transition-all">
-          {uploadingBg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-          {t.addImage}
-          <input type="file" accept="image/*" className="hidden" onChange={handleBgImageUpload} disabled={uploadingBg} />
-        </label>
-      </div>
-
-      {/* Inactivity Timeout */}
-      <div className="bg-card rounded-xl border border-border p-6 mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Timer className="w-4 h-4 text-muted-foreground" />
-          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.inactivityTimeout}</label>
-        </div>
-        <p className="text-muted-foreground text-xs mb-4">{t.inactivityDesc}</p>
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={inactivity.enabled}
-              onChange={e => setInactivity({ ...inactivity, enabled: e.target.checked })}
-              className="w-4 h-4 accent-primary"
-            />
-            <span className="text-foreground text-sm">{t.inactivityEnabled}</span>
-          </label>
-          {inactivity.enabled && (
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={5}
-                max={300}
-                value={inactivity.timeout}
-                onChange={e => setInactivity({ ...inactivity, timeout: Number(e.target.value) })}
-                className="w-20 p-2 bg-secondary border border-border rounded-lg text-foreground text-sm text-center focus:outline-none focus:border-primary/50"
-              />
-              <span className="text-muted-foreground text-xs">{t.seconds}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Theme Toggle */}
-      <div className="bg-card rounded-xl border border-border p-6 mb-5">
-        <div className="flex items-center gap-2 mb-2">
-          {theme === 'dark' ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
-          <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">{t.themeMode}</label>
-        </div>
-        <p className="text-muted-foreground text-xs mb-4">{t.themeModeDesc}</p>
-        <div className="flex gap-3">
-          <button
-            onClick={() => setTheme('dark')}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'dark' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
-          >
-            <Moon className="w-4 h-4" />
-            {t.darkMode}
-          </button>
-          <button
-            onClick={() => setTheme('light')}
-            className={`flex-1 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all border ${theme === 'light' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary text-muted-foreground border-border hover:border-primary/30'}`}
-          >
-            <Sun className="w-4 h-4" />
-            {t.lightMode}
-          </button>
-        </div>
-      </div>
-
-      <button onClick={handleSave} disabled={saving} className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50">
+      {/* Save Button */}
+      <button onClick={handleSave} disabled={saving} className="mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {t.save}
       </button>

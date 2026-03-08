@@ -233,7 +233,11 @@ const MenuScreen = () => {
                   : 'border-l-2 border-l-transparent text-muted-foreground hover:bg-secondary hover:text-foreground'
               }`}
             >
-              <span className="text-lg">{cat.icon}</span>
+              {cat.image ? (
+                <img src={cat.image} alt="" className="w-6 h-6 rounded object-cover" />
+              ) : (
+                <span className="text-lg">{cat.icon}</span>
+              )}
               <span className="text-sm font-medium">{cat.name[language]}</span>
             </button>
           ))}

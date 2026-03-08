@@ -62,11 +62,12 @@ export const useCategories = () => {
     return () => { supabase.removeChannel(channel); };
   }, [fetchCategories]);
 
-  const addCategory = useCallback(async (cat: { catId: string; icon: string; nameKu: string; nameAr: string; nameEn: string; menuType: string }) => {
+  const addCategory = useCallback(async (cat: { catId: string; icon: string; image?: string; nameKu: string; nameAr: string; nameEn: string; menuType: string }) => {
     const currentCats = cat.menuType === 'robot' ? robotCategories : staffCategories;
     const { error } = await supabase.from('menu_categories').insert({
       cat_id: cat.catId,
-      icon: cat.icon,
+      icon: cat.icon || '📦',
+      image: cat.image || null,
       name_ku: cat.nameKu,
       name_ar: cat.nameAr,
       name_en: cat.nameEn,

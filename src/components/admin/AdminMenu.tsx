@@ -232,7 +232,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               </div>
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.menuType}</label>
-                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.type} onChange={e => setNewItem(p => ({ ...p, type: e.target.value as MenuType }))}>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.type} onChange={e => { const type = e.target.value as MenuType; const cats = type === 'robot' ? robotCategories : staffCategories; setNewItem(p => ({ ...p, type, cat: cats[0]?.id || '' })); }}>
                   <option value="robot">{t.robotMenu}</option>
                   <option value="staff">{t.staffMenu}</option>
                 </select>
@@ -261,7 +261,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
             <div className="mb-4">
               <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
               <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.cat} onChange={e => setNewItem(p => ({ ...p, cat: e.target.value }))}>
-                {Object.entries(catLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                {(newItem.type === 'robot' ? robotCategories : staffCategories).map(c => (
+                  <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
+                ))}
               </select>
             </div>
             <div className="flex gap-2 justify-end">
@@ -301,7 +303,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
                 <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={editData.cat} onChange={e => setEditData(p => ({ ...p, cat: e.target.value }))}>
-                  {Object.entries(catLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                  {(tab === 'robot' ? robotCategories : staffCategories).map(c => (
+                    <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
+                  ))}
                 </select>
               </div>
             </div>

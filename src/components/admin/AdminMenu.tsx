@@ -125,9 +125,32 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <h2 className="text-foreground text-base font-bold flex items-center gap-2">
           <UtensilsCrossed className="w-4 h-4 text-muted-foreground" /> {t.menuManagement}
         </h2>
-        <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5 hover:opacity-90 transition-all">
-          <Plus className="w-3.5 h-3.5" /> {t.addItem}
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setShowCatModal(true)} className="px-3 py-1.5 bg-accent text-accent-foreground rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5 hover:opacity-90 transition-all">
+            <FolderPlus className="w-3.5 h-3.5" /> {lang === 'ku' ? 'کاتەگۆری' : lang === 'ar' ? 'فئة' : 'Category'}
+          </button>
+          <button onClick={() => setShowModal(true)} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5 hover:opacity-90 transition-all">
+            <Plus className="w-3.5 h-3.5" /> {t.addItem}
+          </button>
+        </div>
+      </div>
+
+      {/* Categories Section */}
+      <div className="mb-4">
+        <h3 className="text-foreground text-xs font-semibold mb-2 flex items-center gap-1.5">
+          <Tag className="w-3.5 h-3.5 text-muted-foreground" /> {lang === 'ku' ? 'کاتەگۆرییەکان' : lang === 'ar' ? 'الفئات' : 'Categories'}
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {currentCategories.map(cat => (
+            <div key={cat.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary border border-border rounded-lg text-xs">
+              <span>{cat.icon}</span>
+              <span className="text-foreground font-medium">{cat.name[lang] || cat.name.en}</span>
+              <button onClick={() => handleDeleteCategory(cat.id)} className="ml-1 text-destructive/60 hover:text-destructive transition-colors">
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex gap-2 mb-5">

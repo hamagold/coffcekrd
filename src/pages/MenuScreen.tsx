@@ -586,8 +586,8 @@ const MenuScreen = () => {
               <div className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase mb-1 font-bold">{t.orderNumLabel}</div>
               <div className="text-4xl font-black" style={{ color: FROOZT_COLORS.banana }}>#{lastOrderNum}</div>
             </div>
-            <div className="bg-white w-40 h-40 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-lg border border-border">
-              <canvas ref={canvasRef} width={140} height={140} className="rounded-md" />
+            <div className="mb-5">
+              <OrderQRCode ref={qrRef} orderNumber={lastOrderNum} cafeName={cafeName} />
             </div>
             <div className="text-muted-foreground text-xs mb-5">{t.qrHint}</div>
             <div className="flex gap-2 justify-center">

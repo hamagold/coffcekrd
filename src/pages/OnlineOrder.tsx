@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import OrderQRCode from '@/components/OrderQRCode';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
@@ -29,7 +30,7 @@ const OnlineOrder = () => {
   const [customerAddress, setCustomerAddress] = useState('');
   const [onlinePaymentConfig, setOnlinePaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
   const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
-  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  
 
   useEffect(() => {
     fetchPaymentConfig().then(setOnlinePaymentConfig);
@@ -94,7 +95,7 @@ const OnlineOrder = () => {
     setOrderNum(num);
     setShowSuccess(true);
     setCart([]);
-    setTimeout(() => generateQR(num), 100);
+    
   };
 
   if (showLangSelect) {
@@ -362,9 +363,9 @@ const OnlineOrder = () => {
               <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-1">{t.orderNumLabel}</div>
               <div className="text-primary text-4xl font-bold">#{orderNum}</div>
             </div>
-            {/* QR Code */}
             <div className="mb-4">
-              <canvas ref={qrCanvasRef} width={140} height={140} className="mx-auto bg-foreground rounded-lg" />
+              <OrderQRCode orderNumber={orderNum} />
+            </div>
             </div>
             <div className="text-muted-foreground text-xs mb-4">{t.qrHint}</div>
             <p className="text-muted-foreground text-sm mb-5">

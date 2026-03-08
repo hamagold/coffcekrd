@@ -157,6 +157,104 @@ const DevPanel = () => {
     setExpandedRows(newExpanded);
   };
 
+  const startEditRow = (idx: number) => {
+    setEditingRow({ idx, data: { ...tableData[idx] } });
+  };
+
+  const handleEditField = (key: string, value: string) => {
+    if (!editingRow) return;
+    const updated = { ...editingRow.data };
+    // Try to parse JSON for object/array fields
+    try {
+      const parsed = JSON.parse(value);
+      updated[key] = parsed;
+    } catch {
+      // Try number
+      if (value !== '' && !isNaN(Number(value)) && typeof editingRow.data[key] === 'number') {
+        updated[key] = Number(value);
+      } else if (value === 'true') {
+        updated[key] = true;
+      } else if (value === 'false') {
+        updated[key] = false;
+      } else {
+        updated[key] = value;
+      }
+    }
+    setEditingRow({ ...editingRow, data: updated });
+  };
+
+  const saveEditRow = async () => {
+    if (!editingRow || !selectedTable) return;
+    setLoading(true);
+    const row = editingRow.data;
+    const id = row.id;
+    
+    // Remove id from update payload
+    const { id: _id, ...updateData } = row;
+    
+    const { error } = await supabase
+      .from(selectedTable as any)
+      .update(updateData)
+      .eq('id', id);
+
+    if (error) {
+      addLog(`❌ Update failed: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
+    } else {
+      addLog(`✅ Updated row ${id} in ${selectedTable}`);
+      toast.success('Row updated successfully');
+      setEditingRow(null);
+      fetchTableData(selectedTable);
+    }
+    setLoading(false);
+  };
+
+  const deleteRow = async (row: any) => {
+    if (!selectedTable) return;
+    if (!confirm('Are you sure you want to delete this row?')) return;
+    setLoading(true);
+
+    const { error } = await supabase
+      .from(selectedTable as any)
+      .delete()
+      .eq('id', row.id);
+
+    if (error) {
+      addLog(`❌ Delete failed: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
+    } else {
+      addLog(`🗑️ Deleted row ${row.id} from ${selectedTable}`);
+      toast.success('Row deleted');
+      fetchTableData(selectedTable);
+    }
+    setLoading(false);
+  };
+
+  const addNewRow = async () => {
+    if (!selectedTable || !newRowJson.trim()) return;
+    setLoading(true);
+    try {
+      const parsed = JSON.parse(newRowJson);
+      const { error } = await supabase
+        .from(selectedTable as any)
+        .insert(parsed);
+
+      if (error) {
+        addLog(`❌ Insert failed: ${error.message}`);
+        toast.error(`Error: ${error.message}`);
+      } else {
+        addLog(`✅ Inserted new row into ${selectedTable}`);
+        toast.success('Row added');
+        setNewRowJson('');
+        setShowAddRow(false);
+        fetchTableData(selectedTable);
+      }
+    } catch {
+      toast.error('Invalid JSON');
+    }
+    setLoading(false);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">

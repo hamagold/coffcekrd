@@ -24,8 +24,12 @@ const OnlineOrder = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [onlinePaymentConfig, setOnlinePaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  useEffect(() => {
+    fetchPaymentConfig().then(setOnlinePaymentConfig);
+  }, []);
   const generateQR = (num: string) => {
     const canvas = qrCanvasRef.current;
     if (!canvas) return;

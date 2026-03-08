@@ -28,7 +28,7 @@ const AdminPLCLogs = ({ lang }: { lang: Language }) => {
       .from('app_settings')
       .select('value')
       .eq('key', 'plc_logs')
-      .single();
+      .maybeSingle();
     setLogs((data?.value as any)?.logs || []);
     setLoading(false);
   };

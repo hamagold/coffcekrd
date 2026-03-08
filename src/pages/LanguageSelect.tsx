@@ -65,7 +65,7 @@ const LanguageSelect = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
       {/* Floating menu images background */}
       <div className="absolute inset-0 pointer-events-none">
-        {allMenuImages.slice(0, floatingPositions.length).map((img, i) => {
+        {bgImages.slice(0, floatingPositions.length).map((img, i) => {
           const pos = floatingPositions[i];
           return (
             <div

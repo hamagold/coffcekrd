@@ -6,8 +6,9 @@ import {
   Settings, Key, Shield, Eye, EyeOff, Terminal, 
   AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight,
   FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History,
-  Upload, ArrowRightLeft, Loader2
+  Upload, ArrowRightLeft, Loader2, HardDrive
 } from 'lucide-react';
+import StorageSettings from '@/components/settings/StorageSettings';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -358,20 +359,23 @@ const DevPanel = () => {
         </div>
 
         <Tabs defaultValue="database" className="w-full">
-          <TabsList className="w-full grid grid-cols-5 h-11">
-            <TabsTrigger value="database" className="gap-1.5 text-xs">
+          <TabsList className="w-full grid grid-cols-6 h-11">
+            <TabsTrigger value="database" className="gap-1 text-[10px] px-2">
               <Database className="w-3.5 h-3.5" /> Database
             </TabsTrigger>
-            <TabsTrigger value="sql" className="gap-1.5 text-xs">
+            <TabsTrigger value="sql" className="gap-1 text-[10px] px-2">
               <Play className="w-3.5 h-3.5" /> SQL
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-1.5 text-xs">
+            <TabsTrigger value="storage" className="gap-1 text-[10px] px-2">
+              <HardDrive className="w-3.5 h-3.5" /> Storage
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-1 text-[10px] px-2">
               <Settings className="w-3.5 h-3.5" /> Settings
             </TabsTrigger>
-            <TabsTrigger value="logs" className="gap-1.5 text-xs">
+            <TabsTrigger value="logs" className="gap-1 text-[10px] px-2">
               <Terminal className="w-3.5 h-3.5" /> Logs
             </TabsTrigger>
-            <TabsTrigger value="tools" className="gap-1.5 text-xs">
+            <TabsTrigger value="tools" className="gap-1 text-[10px] px-2">
               <Shield className="w-3.5 h-3.5" /> Tools
             </TabsTrigger>
           </TabsList>
@@ -703,6 +707,23 @@ const DevPanel = () => {
                     )}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Storage Tab */}
+          <TabsContent value="storage" className="mt-4">
+            <Card>
+              <CardHeader className="py-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <HardDrive className="w-4 h-4 text-primary" /> Storage Configuration
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Configure where images are stored (Lovable Cloud or Cloudflare R2)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StorageSettings lang="en" />
               </CardContent>
             </Card>
           </TabsContent>

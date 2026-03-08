@@ -4,13 +4,14 @@ import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Coffee } from 'lucide-react';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { fetchBackgroundImages } from '@/components/admin/AdminCafeSettings';
 import { menuImages } from '@/data/menuImages';
 const kurdistanFlag = '/lovable-uploads/bb9b46fd-41da-468f-bde5-dbf486a4dd75.webp';
 import iraqFlag from '@/assets/flags/iraq.png';
 import usaFlag from '@/assets/flags/usa.png';
 
-// Get all menu images as an array for the floating background
-const allMenuImages = Object.values(menuImages);
+// Default fallback: menu images
+const defaultMenuImages = Object.values(menuImages);
 
 // Predefined positions for floating items to avoid random repositioning on re-render
 const floatingPositions = [

@@ -3,6 +3,7 @@ import { useStore } from '@/store/StoreContext';
 import { BarChart3, TrendingUp, TrendingDown, DollarSign, ArrowUpRight, ArrowDownRight, Trophy, Lightbulb, Droplets, HardHat, Package, FileText, Calendar, ChevronLeft, ChevronRight, ShoppingCart, PieChart } from 'lucide-react';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const MONTH_NAMES = {
   ku: ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'],

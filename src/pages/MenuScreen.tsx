@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import OrderQRCode, { OrderQRCodeHandle } from '@/components/OrderQRCode';
 import { useNavigate } from 'react-router-dom';
 import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
@@ -38,6 +39,7 @@ const MenuScreen = () => {
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const qrRef = useRef<OrderQRCodeHandle>(null);
 
   useEffect(() => {
     const update = () => {
@@ -74,35 +76,7 @@ const MenuScreen = () => {
     setShowModal(true);
   };
 
-  useEffect(() => {
-    if (showModal && lastOrderNum && canvasRef.current) {
-      generateQR(lastOrderNum, cartTotal);
-    }
-  }, [showModal, lastOrderNum]);
-
-  const generateQR = (orderNum: string, total: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = 140; canvas.height = 140;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, 140, 140);
-    ctx.fillStyle = '#000000';
-    const s = 7;
-    const drawFinder = (x: number, y: number) => {
-      ctx.fillRect(x, y, s*7, s); ctx.fillRect(x, y+s*6, s*7, s);
-      ctx.fillRect(x, y, s, s*7); ctx.fillRect(x+s*6, y, s, s*7);
-      ctx.fillRect(x+s*2, y+s*2, s*3, s*3);
-    };
-    drawFinder(0, 0); drawFinder(140-s*7, 0); drawFinder(0, 140-s*7);
-    let seed = orderNum.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    for (let r = 0; r < 14; r++) for (let c = 0; c < 14; c++) {
-      seed = (seed * 9301 + 49297) % 233280;
-      if (seed / 233280 > 0.5) ctx.fillRect(49 + c * s, 49 + r * s, s - 1, s - 1);
-    }
-    ctx.fillStyle = '#333'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
-    ctx.fillText('#' + orderNum, 70, 135);
-  };
+  // QR is now handled by OrderQRCode component
 
   const [cafeName, setCafeName] = useState('PLC');
 
@@ -111,7 +85,7 @@ const MenuScreen = () => {
   }, []);
 
   const doPrint = (orderNum: string) => {
-    const qrDataUrl = canvasRef.current?.toDataURL('image/png') || '';
+    const qrDataUrl = qrRef.current?.getDataUrl() || '';
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;';
     document.body.appendChild(iframe);
@@ -612,8 +586,8 @@ const MenuScreen = () => {
               <div className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase mb-1 font-bold">{t.orderNumLabel}</div>
               <div className="text-4xl font-black" style={{ color: FROOZT_COLORS.banana }}>#{lastOrderNum}</div>
             </div>
-            <div className="bg-white w-40 h-40 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-lg border border-border">
-              <canvas ref={canvasRef} width={140} height={140} className="rounded-md" />
+            <div className="mb-5">
+              <OrderQRCode ref={qrRef} orderNumber={lastOrderNum} cafeName={cafeName} />
             </div>
             <div className="text-muted-foreground text-xs mb-5">{t.qrHint}</div>
             <div className="flex gap-2 justify-center">

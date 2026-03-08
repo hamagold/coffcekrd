@@ -217,6 +217,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      exec_sql: { Args: { query_text: string }; Returns: Json }
       get_my_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]

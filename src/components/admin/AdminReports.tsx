@@ -91,6 +91,29 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const expByType = (exps: typeof expenses, type: string) =>
     exps.filter(e => e.type === type).reduce((s, e) => s + e.amount, 0);
 
+  // Daily trend data for line chart
+  const trendData = useMemo(() => {
+    const days: { date: string; income: number; expenses: number; profit: number }[] = [];
+    const rangeMs = currentRange.end.getTime() - currentRange.start.getTime();
+    const numDays = Math.max(1, Math.round(rangeMs / 86400000));
+    
+    for (let i = 0; i < numDays; i++) {
+      const dayStart = new Date(currentRange.start.getTime() + i * 86400000);
+      const dayEnd = new Date(dayStart.getTime() + 86400000);
+      const dayOrders = orders.filter(o => { const d = new Date(o.time); return d >= dayStart && d < dayEnd; });
+      const dayExpenses = expenses.filter(e => { const d = new Date(e.date); return d >= dayStart && d < dayEnd; });
+      const dayIncome = dayOrders.reduce((s, o) => s + o.total, 0);
+      const dayExp = dayExpenses.reduce((s, e) => s + e.amount, 0);
+      days.push({
+        date: dayStart.toLocaleDateString(lang === 'ku' ? 'ckb' : lang === 'ar' ? 'ar' : 'en', { month: 'short', day: 'numeric' }),
+        income: dayIncome,
+        expenses: dayExp,
+        profit: dayIncome - dayExp,
+      });
+    }
+    return days;
+  }, [orders, expenses, currentRange.start.getTime(), currentRange.end.getTime(), lang]);
+
   const dateLabel = useMemo(() => {
     if (period === 'daily') {
       return currentRange.start.toLocaleDateString(lang === 'ku' ? 'ckb' : lang === 'ar' ? 'ar' : 'en', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });

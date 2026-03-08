@@ -286,18 +286,20 @@ const MenuScreen = () => {
             >
               <div className="relative overflow-hidden">
                 {menuImages[item.id] ? (
-                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
+                  <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-24 sm:h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
+                ) : item.image ? (
+                  <img src={item.image} alt={item.name[language]} className="w-full h-24 sm:h-36 object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
-                  <div className="w-full h-36 bg-secondary flex items-center justify-center">
-                    <span className="text-4xl opacity-40">{item.emoji}</span>
+                  <div className="w-full h-24 sm:h-36 bg-secondary flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl opacity-40">{item.emoji}</span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <div className="p-3.5">
-                <div className="text-foreground text-sm font-semibold mb-0.5">{item.name[language]}</div>
-                <div className="text-muted-foreground text-[11px] mb-2.5">{item.desc[language]}</div>
-                <div className="text-primary text-base font-bold">{item.price.toLocaleString()} <span className="text-xs font-normal text-primary/60">IQD</span></div>
+              <div className="p-2 sm:p-3.5">
+                <div className="text-foreground text-xs sm:text-sm font-semibold mb-0.5 truncate">{item.name[language]}</div>
+                <div className="text-muted-foreground text-[10px] sm:text-[11px] mb-1.5 sm:mb-2.5 line-clamp-1 sm:line-clamp-2">{item.desc[language]}</div>
+                <div className="text-primary text-sm sm:text-base font-bold">{item.price.toLocaleString()} <span className="text-[10px] sm:text-xs font-normal text-primary/60">IQD</span></div>
               </div>
             </button>
           ))}

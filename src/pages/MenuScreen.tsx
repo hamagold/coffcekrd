@@ -205,35 +205,57 @@ const MenuScreen = () => {
       <div className="flex bg-card border-b border-border shrink-0">
         <button
           onClick={() => setMenuType('robot')}
-          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-transparent hover:bg-secondary'}`}
+          className={`flex-1 py-2.5 sm:py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-2 sm:gap-3 ${menuType === 'robot' ? 'border-info bg-info/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'robot' ? 'bg-info/15 text-info' : 'bg-secondary text-muted-foreground'}`}>
-            <Bot className="w-5 h-5" />
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${menuType === 'robot' ? 'bg-info/15 text-info' : 'bg-secondary text-muted-foreground'}`}>
+            <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="text-left">
-            <div className={`text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</div>
-            <div className="text-[11px] text-muted-foreground">{t.tabRobotSub}</div>
+            <div className={`text-xs sm:text-sm font-semibold ${menuType === 'robot' ? 'text-info' : 'text-muted-foreground'}`}>{t.tabRobot}</div>
+            <div className="text-[9px] sm:text-[11px] text-muted-foreground hidden sm:block">{t.tabRobotSub}</div>
           </div>
         </button>
         <div className="w-px bg-border" />
         <button
           onClick={() => setMenuType('staff')}
-          className={`flex-1 py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-3 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-transparent hover:bg-secondary'}`}
+          className={`flex-1 py-2.5 sm:py-4 text-center cursor-pointer transition-all border-b-2 flex items-center justify-center gap-2 sm:gap-3 ${menuType === 'staff' ? 'border-success bg-success/5' : 'border-transparent hover:bg-secondary'}`}
         >
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${menuType === 'staff' ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground'}`}>
-            <ChefHat className="w-5 h-5" />
+          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${menuType === 'staff' ? 'bg-success/15 text-success' : 'bg-secondary text-muted-foreground'}`}>
+            <ChefHat className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div className="text-left">
-            <div className={`text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</div>
-            <div className="text-[11px] text-muted-foreground">{t.tabStaffSub}</div>
+            <div className={`text-xs sm:text-sm font-semibold ${menuType === 'staff' ? 'text-success' : 'text-muted-foreground'}`}>{t.tabStaff}</div>
+            <div className="text-[9px] sm:text-[11px] text-muted-foreground hidden sm:block">{t.tabStaffSub}</div>
           </div>
         </button>
       </div>
 
+      {/* Mobile Categories (horizontal scroll) */}
+      <div className="md:hidden flex gap-2 overflow-x-auto px-3 py-2 bg-card border-b border-border shrink-0">
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg whitespace-nowrap text-xs font-medium border transition-all ${
+              activeCategory === cat.id
+                ? 'border-primary bg-primary/10 text-primary'
+                : 'border-border bg-secondary text-muted-foreground'
+            }`}
+          >
+            {cat.image ? (
+              <img src={cat.image} alt="" className="w-4 h-4 rounded object-cover" />
+            ) : (
+              <span className="text-sm">{cat.icon}</span>
+            )}
+            {cat.name[language]}
+          </button>
+        ))}
+      </div>
+
       {/* Menu Body */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Categories Sidebar */}
-        <div className="w-44 bg-card border-r border-border overflow-y-auto shrink-0 py-2">
+        {/* Categories Sidebar - hidden on mobile */}
+        <div className="hidden md:block w-44 bg-card border-r border-border overflow-y-auto shrink-0 py-2">
           {categories.map(cat => (
             <button
               key={cat.id}
@@ -255,7 +277,7 @@ const MenuScreen = () => {
         </div>
 
         {/* Items Grid */}
-        <div className="flex-1 overflow-y-auto p-5 grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-4 content-start">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2 sm:gap-4 content-start">
           {items.map(item => (
             <button
               key={item.id}

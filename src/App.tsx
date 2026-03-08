@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/menu" element={<MenuScreen />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/order" element={<OnlineOrder />} />
+            <Route path="/dev" element={<DevPanel />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </HashRouter>

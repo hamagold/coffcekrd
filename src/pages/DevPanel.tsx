@@ -259,6 +259,41 @@ const DevPanel = () => {
     setLoading(false);
   };
 
+  const runSql = async () => {
+    if (!sqlQuery.trim()) return;
+    setLoading(true);
+    setSqlError(null);
+    setSqlResult(null);
+    addLog(`🔍 Running SQL: ${sqlQuery.slice(0, 80)}...`);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('run-sql', {
+        body: { query: sqlQuery, dev_password: DEV_PASSWORD },
+      });
+
+      if (error) {
+        setSqlError(error.message);
+        addLog(`❌ SQL Error: ${error.message}`);
+      } else if (data?.error) {
+        setSqlError(data.error);
+        addLog(`❌ SQL Error: ${data.error}`);
+      } else {
+        const result = data?.data || [];
+        setSqlResult(Array.isArray(result) ? result : [result]);
+        addLog(`✅ SQL returned ${Array.isArray(result) ? result.length : 1} rows`);
+        // Add to history
+        setSqlHistory(prev => {
+          const updated = [sqlQuery, ...prev.filter(q => q !== sqlQuery)].slice(0, 20);
+          return updated;
+        });
+      }
+    } catch (err) {
+      setSqlError(String(err));
+      addLog(`❌ SQL Error: ${String(err)}`);
+    }
+    setLoading(false);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">

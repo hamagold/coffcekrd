@@ -3,6 +3,7 @@ import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 import { supabase } from '@/integrations/supabase/client';
 import { useMenuItems } from '@/hooks/useMenuItems';
+import { getNextDailyOrderNumber } from '@/utils/orderCounter';
 
 interface StoreContextType {
   // Language

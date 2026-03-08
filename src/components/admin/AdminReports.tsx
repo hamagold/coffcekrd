@@ -104,13 +104,16 @@ const AdminReports = ({ lang }: { lang: Language }) => {
   const current = filterByRange(currentRange);
   const previous = filterByRange(previousRange);
 
+  const staffExpenseCurrent = getStaffExpensesForRange(currentRange);
+  const staffExpensePrevious = getStaffExpensesForRange(previousRange);
+
   const income = current.orders.reduce((s, o) => s + o.total, 0);
-  const expenseTotal = current.expenses.reduce((s, e) => s + e.amount, 0);
+  const expenseTotal = current.expenses.reduce((s, e) => s + e.amount, 0) + staffExpenseCurrent;
   const profit = income - expenseTotal;
   const orderCount = current.orders.length;
 
   const prevIncome = previous.orders.reduce((s, o) => s + o.total, 0);
-  const prevExpense = previous.expenses.reduce((s, e) => s + e.amount, 0);
+  const prevExpense = previous.expenses.reduce((s, e) => s + e.amount, 0) + staffExpensePrevious;
   const prevProfit = prevIncome - prevExpense;
 
   const pctChange = (curr: number, prev: number) => {

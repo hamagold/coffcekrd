@@ -14,7 +14,7 @@ import AdminPLC from '@/components/admin/AdminPLC';
 import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import SetupAdmin from '@/components/admin/SetupAdmin';
-import StorageSettings from '@/components/settings/StorageSettings';
+// StorageSettings moved to DevPanel
 import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText } from 'lucide-react';
 import { Language } from '@/types';
 
@@ -94,7 +94,7 @@ const AdminPanel = () => {
     { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: true },
     { id: 'users', icon: Users, label: t.users, section: t.management, superOnly: true },
     { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: true },
-    { id: 'storage', icon: HardDrive, label: t.storage, section: t.management, superOnly: true },
+    // Storage removed - now in DevPanel
     { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: true },
     { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: true },
     { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: true },
@@ -179,7 +179,7 @@ const AdminPanel = () => {
       case 'reports': return <AdminReports lang={lang} />;
       case 'users': return <AdminUsers lang={lang} />;
       case 'expenses': return <AdminExpenses lang={lang} />;
-      case 'storage': return <StorageSettings lang={lang} />;
+      // storage removed - now in DevPanel
       case 'plc': return <AdminPLC lang={lang} />;
       case 'plcLogs': return <AdminPLCLogs lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;

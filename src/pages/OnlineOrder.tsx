@@ -5,7 +5,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { isPaymentConfigured } from '@/components/admin/AdminPayments';
+import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
 import { toast } from 'sonner';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
 
@@ -77,7 +77,7 @@ const OnlineOrder = () => {
   const handleOrder = async () => {
     if (cart.length === 0 || !customerName || !customerPhone) return;
     // Block if online payment selected but not configured
-    if (payment !== 'cash' && !isPaymentConfigured(payment)) {
+    if (payment !== 'cash' && !(await isPaymentConfigured(payment))) {
       toast.error(
         language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
         language === 'ar' ? `⚠️ ${payment.toUpperCase()} غير مُعد - تواصل مع المسؤول` :
@@ -326,7 +326,7 @@ const OnlineOrder = () => {
 
               {/* Online Payments */}
               {(() => {
-                const cfg = (() => { try { const s = localStorage.getItem('plc_payment_config'); if(s) return JSON.parse(s); } catch{} return {fib:true,zain:true,fastpay:true}; })();
+                const cfg = onlinePaymentConfig;
                 const online = [
                   { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-3.5 h-3.5" />, label: t.fibBank, show: cfg.fib },
                   { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-3.5 h-3.5" />, label: t.zainCash, show: cfg.zain },

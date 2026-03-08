@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
-import { robotCategories, staffCategories } from '@/data/menuData';
+import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured } from '@/components/admin/AdminPayments';
@@ -39,6 +39,7 @@ const MenuScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const { robotCategories, staffCategories } = useCategories();
   const categories = menuType === 'robot' ? robotCategories : staffCategories;
   const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
 

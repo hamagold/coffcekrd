@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
-import { robotCategories, staffCategories } from '@/data/menuData';
+import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -52,6 +52,7 @@ const OnlineOrder = () => {
 
   const t = translations[language];
   const direction = language === 'en' ? 'ltr' : 'rtl';
+  const { robotCategories, staffCategories } = useCategories();
   const categories = menuType === 'robot' ? robotCategories : staffCategories;
   const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);

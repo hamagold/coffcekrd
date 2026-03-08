@@ -181,6 +181,12 @@ export const adminT: Record<Language, Record<string, string>> = {
     seconds: 'چرکە',
     inactivityEnabled: 'گەڕانەوەی ئۆتۆماتیکی چالاکە',
 
+    // Background Images
+    backgroundImages: 'وێنەکانی باکگراوند',
+    backgroundImagesDesc: 'وێنەکان لە پشتی لاپەڕەی هەڵبژاردنی زمان نیشان دەدرێن',
+    addImage: 'زیادکردنی وێنە',
+    noBackgroundImages: 'هیچ وێنەیەک زیاد نەکراوە - وێنەکانی مینۆ بەکاردەهێنرێت',
+
     // Reports comparison
     comparedToPrev: 'بەراورد بە پێشووتر',
     change: 'گۆڕانکاری',

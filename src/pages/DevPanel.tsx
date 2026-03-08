@@ -31,6 +31,9 @@ const DevPanel = () => {
   const [appSettings, setAppSettings] = useState<any[]>([]);
   const [logs, setLogs] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [editingRow, setEditingRow] = useState<{ idx: number; data: any } | null>(null);
+  const [newRowJson, setNewRowJson] = useState('');
+  const [showAddRow, setShowAddRow] = useState(false);
 
   const addLog = (message: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 99)]);

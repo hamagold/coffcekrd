@@ -6,12 +6,12 @@ import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
-import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
+import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
-import fibLogo from '@/assets/payments/fib-logo.png';
-import zaincashLogo from '@/assets/payments/zaincash-logo.png';
-import fastpayLogo from '@/assets/payments/fastpay-logo.png';
+import defaultFibLogo from '@/assets/payments/fib-logo.png';
+import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
+import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const FROOZT_COLORS = {
   banana: '#f6f26d',
@@ -152,15 +152,21 @@ const MenuScreen = () => {
   const printLabel = () => doPrint(lastOrderNum);
 
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
 
   useEffect(() => {
     fetchPaymentConfig().then(setPaymentConfig);
+    fetchPaymentLogos().then(setPaymentLogos);
   }, []);
 
+  const getFibLogo = () => paymentLogos.fib || defaultFibLogo;
+  const getZainLogo = () => paymentLogos.zain || defaultZaincashLogo;
+  const getFastpayLogo = () => paymentLogos.fastpay || defaultFastpayLogo;
+
   const onlinePaymentMethods = ([
-    { id: 'fib' as PaymentMethod, icon: <img src={fibLogo} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank },
-    { id: 'zain' as PaymentMethod, icon: <img src={zaincashLogo} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash },
-    { id: 'fastpay' as PaymentMethod, icon: <img src={fastpayLogo} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay },
+    { id: 'fib' as PaymentMethod, icon: <img src={getFibLogo()} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank },
+    { id: 'zain' as PaymentMethod, icon: <img src={getZainLogo()} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash },
+    { id: 'fastpay' as PaymentMethod, icon: <img src={getFastpayLogo()} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay },
   ] as { id: PaymentMethod; icon: React.ReactNode; label: string }[]).filter(m => paymentConfig[m.id] !== false);
 
   return (

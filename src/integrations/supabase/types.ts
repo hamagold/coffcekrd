@@ -176,6 +176,33 @@ export type Database = {
         }
         Relationships: []
       }
+      plc_sessions: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          machine_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          machine_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          machine_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

@@ -13,6 +13,10 @@ import { fetchCafeConfig } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
 import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
+import cash5000 from '@/assets/cash/5000.jpg';
+import cash10000 from '@/assets/cash/10000.jpg';
+import cash25000 from '@/assets/cash/25000.jpg';
+import cash50000 from '@/assets/cash/50000.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const FROOZT_COLORS = {
@@ -658,24 +662,25 @@ const MenuScreen = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-1.5">
-                    {[1000, 5000, 10000, 25000].map((amount, i) => {
-                      const denomColor = [FROOZT_COLORS.banana, FROOZT_COLORS.ice, FROOZT_COLORS.pink, FROOZT_COLORS.lilac][i];
-                      return (
-                        <button
-                          key={amount}
-                          onClick={() => {
-                            setCashBalance(prev => prev + amount);
-                            setLastInserted(amount);
-                          }}
-                          className="group relative flex flex-col items-center gap-0.5 p-2.5 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card hover:scale-[1.03] active:scale-95"
-                          style={{ ['--denom-color' as any]: denomColor }}
-                        >
-                          <Banknote className="w-5 h-5 text-muted-foreground group-hover:text-success transition-colors" />
-                          <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
-                          <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
-                        </button>
-                      );
-                    })}
+                    {([
+                      { amount: 5000, img: cash5000 },
+                      { amount: 10000, img: cash10000 },
+                      { amount: 25000, img: cash25000 },
+                      { amount: 50000, img: cash50000 },
+                    ]).map(({ amount, img }) => (
+                      <button
+                        key={amount}
+                        onClick={() => {
+                          setCashBalance(prev => prev + amount);
+                          setLastInserted(amount);
+                        }}
+                        className="group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card hover:scale-[1.03] active:scale-95 overflow-hidden"
+                      >
+                        <img src={img} alt={`${amount} IQD`} className="w-full h-10 sm:h-12 object-cover rounded-lg mb-0.5" />
+                        <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
+                        <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
+                      </button>
+                    ))}
                   </div>
 
                   {cashBalance > 0 && (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
@@ -13,25 +13,6 @@ import usaFlag from '@/assets/flags/usa.png';
 // Default fallback: menu images
 const defaultMenuImages = Object.values(menuImages);
 
-// Predefined positions for floating items to avoid random repositioning on re-render
-const floatingPositions = [
-  { x: 5, y: 8, size: 70, delay: 0, duration: 18, rotate: 12 },
-  { x: 78, y: 5, size: 65, delay: 2, duration: 22, rotate: -8 },
-  { x: 15, y: 35, size: 55, delay: 4, duration: 20, rotate: 15 },
-  { x: 85, y: 30, size: 60, delay: 1, duration: 19, rotate: -12 },
-  { x: 8, y: 65, size: 58, delay: 3, duration: 21, rotate: 10 },
-  { x: 75, y: 60, size: 68, delay: 5, duration: 17, rotate: -15 },
-  { x: 45, y: 3, size: 52, delay: 2.5, duration: 23, rotate: 20 },
-  { x: 50, y: 85, size: 62, delay: 1.5, duration: 18, rotate: -10 },
-  { x: 25, y: 80, size: 50, delay: 4.5, duration: 20, rotate: 8 },
-  { x: 70, y: 82, size: 56, delay: 3.5, duration: 22, rotate: -18 },
-  { x: 92, y: 50, size: 48, delay: 0.5, duration: 19, rotate: 14 },
-  { x: 3, y: 50, size: 54, delay: 6, duration: 21, rotate: -6 },
-  { x: 35, y: 20, size: 46, delay: 7, duration: 24, rotate: 22 },
-  { x: 60, y: 40, size: 50, delay: 3, duration: 16, rotate: -20 },
-  { x: 40, y: 60, size: 44, delay: 5.5, duration: 25, rotate: 16 },
-];
-
 const LanguageSelect = () => {
   const { setLanguage } = useStore();
   const navigate = useNavigate();
@@ -39,6 +20,7 @@ const LanguageSelect = () => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [hoveredLang, setHoveredLang] = useState<Language | null>(null);
   const [bgImages, setBgImages] = useState<string[]>(defaultMenuImages);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => {
@@ -49,6 +31,15 @@ const LanguageSelect = () => {
       if (images.length > 0) setBgImages(images);
     });
   }, []);
+
+  // Auto-slide every 5 seconds
+  useEffect(() => {
+    if (bgImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % bgImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [bgImages.length]);
 
   const handleSelect = (lang: Language) => {
     setLanguage(lang);
@@ -63,33 +54,22 @@ const LanguageSelect = () => {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
-      {/* Floating menu images background */}
+      {/* Full-size slideshow background */}
       <div className="absolute inset-0 pointer-events-none">
-        {bgImages.slice(0, floatingPositions.length).map((img, i) => {
-          const pos = floatingPositions[i];
-          return (
-            <div
-              key={i}
-              className="absolute rounded-2xl overflow-hidden shadow-lg border border-border/20"
-              style={{
-                left: `${pos.x}%`,
-                top: `${pos.y}%`,
-                width: `${pos.size}px`,
-                height: `${pos.size}px`,
-                opacity: 0.35,
-                transform: `rotate(${pos.rotate}deg)`,
-                animation: `floatItem ${pos.duration}s ease-in-out ${pos.delay}s infinite`,
-              }}
-            >
-              <img
-                src={img}
-                alt=""
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          );
-        })}
+        {bgImages.map((img, i) => (
+          <div
+            key={i}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: currentSlide === i ? 1 : 0 }}
+          >
+            <img
+              src={img}
+              alt=""
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        ))}
       </div>
 
       {/* Gradient overlays for depth */}
@@ -188,23 +168,6 @@ const LanguageSelect = () => {
         </div>
       </div>
 
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes floatItem {
-          0%, 100% {
-            transform: rotate(var(--rotate, 0deg)) translateY(0px) scale(1);
-          }
-          25% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-15px) scale(1.05);
-          }
-          50% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-8px) scale(0.98);
-          }
-          75% {
-            transform: rotate(var(--rotate, 0deg)) translateY(-20px) scale(1.03);
-          }
-        }
-      `}</style>
     </div>
   );
 };

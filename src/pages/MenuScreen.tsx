@@ -26,6 +26,7 @@ const MenuScreen = () => {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
+  const [showMobileCart, setShowMobileCart] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

@@ -1,13 +1,20 @@
-import { useState, useEffect } from 'react';
-import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins, Loader2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { CreditCard, Smartphone, Zap, Building2, Save, ToggleLeft, ToggleRight, Coins, Loader2, Upload, X, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchStorageConfig } from '@/components/settings/StorageSettings';
 
 export interface PaymentConfig {
   plc: boolean;
   fib: boolean;
   zain: boolean;
   fastpay: boolean;
+}
+
+export interface PaymentLogos {
+  fib?: string;
+  zain?: string;
+  fastpay?: string;
 }
 
 export interface PaymentKeys {
@@ -17,6 +24,7 @@ export interface PaymentKeys {
 // Cache
 let cachedPaymentConfig: PaymentConfig | null = null;
 let cachedPaymentKeys: PaymentKeys | null = null;
+let cachedPaymentLogos: PaymentLogos | null = null;
 
 export const fetchPaymentConfig = async (): Promise<PaymentConfig> => {
   if (cachedPaymentConfig) return cachedPaymentConfig;
@@ -40,9 +48,21 @@ export const fetchPaymentKeys = async (): Promise<PaymentKeys> => {
   return cachedPaymentKeys!;
 };
 
+export const fetchPaymentLogos = async (): Promise<PaymentLogos> => {
+  if (cachedPaymentLogos) return cachedPaymentLogos;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'payment_logos')
+    .single();
+  cachedPaymentLogos = (data?.value as any) || {};
+  return cachedPaymentLogos!;
+};
+
 export const invalidatePaymentCache = () => {
   cachedPaymentConfig = null;
   cachedPaymentKeys = null;
+  cachedPaymentLogos = null;
 };
 
 // Check if a payment provider has API keys configured
@@ -63,6 +83,7 @@ const providers = [
     bgColor: 'bg-primary/10',
     fields: [],
     description: { ku: 'سیستەمی وەرگرتنی کاش بە ئامێری PLC (وێندینگ مەشین)', ar: 'نظام استلام النقود عبر جهاز PLC', en: 'PLC vending machine cash acceptor system' },
+    hasLogo: false,
   },
   {
     id: 'fib' as const,
@@ -74,6 +95,7 @@ const providers = [
       { label: { ku: 'کلیلی API', ar: 'مفتاح API', en: 'API KEY' }, type: 'password', placeholder: 'fib_live_xxxx' },
       { label: { ku: 'ناسنامەی بازرگان', ar: 'معرف التاجر', en: 'MERCHANT ID' }, type: 'text', placeholder: 'FIB-MERCHANT-ID' },
     ],
+    hasLogo: true,
   },
   {
     id: 'zain' as const,
@@ -86,6 +108,7 @@ const providers = [
       { label: { ku: 'ژمارەی مۆبایل', ar: 'رقم الهاتف', en: 'MSISDN (Phone)' }, type: 'text', placeholder: '07801234567' },
       { label: { ku: 'کلیلی نهێنی', ar: 'المفتاح السري', en: 'SECRET KEY' }, type: 'password', placeholder: 'secret_xxxx' },
     ],
+    hasLogo: true,
   },
   {
     id: 'fastpay' as const,
@@ -98,6 +121,7 @@ const providers = [
       { label: { ku: 'ناسنامەی جزدان', ar: 'معرف المحفظة', en: 'WALLET ID' }, type: 'text', placeholder: 'FP-WALLET-XXXXX' },
       { label: { ku: 'نهێنی Webhook', ar: 'سر Webhook', en: 'WEBHOOK SECRET' }, type: 'password', placeholder: 'whsec_xxxx' },
     ],
+    hasLogo: true,
   },
 ];
 
@@ -105,17 +129,21 @@ const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
   const [config, setConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
   const [fieldValues, setFieldValues] = useState<PaymentKeys>({});
+  const [logos, setLogos] = useState<PaymentLogos>({});
   const [loading, setLoading] = useState(true);
   const [savingKeys, setSavingKeys] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState<string | null>(null);
+  const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
     const savedLang = localStorage.getItem('plc_admin_lang') as 'ku' | 'ar' | 'en' | null;
     if (savedLang) setLang(savedLang);
 
     const load = async () => {
-      const [cfg, keys] = await Promise.all([fetchPaymentConfig(), fetchPaymentKeys()]);
+      const [cfg, keys, lgos] = await Promise.all([fetchPaymentConfig(), fetchPaymentKeys(), fetchPaymentLogos()]);
       setConfig(cfg);
       setFieldValues(keys);
+      setLogos(lgos);
       setLoading(false);
     };
     load();
@@ -132,7 +160,7 @@ const AdminPayments = () => {
 
     if (error) {
       toast.error(error.message);
-      setConfig(config); // revert
+      setConfig(config);
       return;
     }
 
@@ -174,6 +202,88 @@ const AdminPayments = () => {
     );
   };
 
+  const handleLogoUpload = async (providerId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error(lang === 'ku' ? 'تەنها فایلی وێنە قبوڵ دەکرێت' : lang === 'ar' ? 'فقط ملفات الصور مقبولة' : 'Only image files accepted');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(lang === 'ku' ? 'قەبارە دەبێت کەمتر لە 2MB بێت' : lang === 'ar' ? 'الحجم يجب أن يكون أقل من 2MB' : 'Size must be under 2MB');
+      return;
+    }
+
+    setUploadingLogo(providerId);
+    try {
+      const storageConfig = await fetchStorageConfig();
+      let url: string;
+
+      const ext = file.name.split('.').pop();
+      const fileName = `payment-logos/${providerId}_${Date.now()}.${ext}`;
+
+      if (storageConfig.storageType === 'cloudflare-r2') {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('accountId', storageConfig.r2Config.accountId);
+        formData.append('accessKeyId', storageConfig.r2Config.accessKeyId);
+        formData.append('secretAccessKey', storageConfig.r2Config.secretAccessKey);
+        formData.append('bucketName', storageConfig.r2Config.bucketName);
+        formData.append('publicDomain', storageConfig.r2Config.publicDomain || '');
+        formData.append('folder', 'payment-logos');
+        const { data, error } = await supabase.functions.invoke('upload-to-r2', { body: formData });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        url = data.url;
+      } else {
+        const { error } = await supabase.storage.from('menu-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
+        if (error) throw error;
+        const { data } = supabase.storage.from('menu-images').getPublicUrl(fileName);
+        url = data.publicUrl;
+      }
+
+      const updatedLogos = { ...logos, [providerId]: url };
+      setLogos(updatedLogos);
+
+      // Save to database
+      const { data: existing } = await supabase
+        .from('app_settings')
+        .select('id')
+        .eq('key', 'payment_logos')
+        .single();
+
+      if (existing) {
+        await supabase
+          .from('app_settings')
+          .update({ value: updatedLogos as any, updated_at: new Date().toISOString() })
+          .eq('key', 'payment_logos');
+      } else {
+        await supabase
+          .from('app_settings')
+          .insert({ key: 'payment_logos', value: updatedLogos as any });
+      }
+
+      invalidatePaymentCache();
+      toast.success(lang === 'ku' ? 'لۆگۆ پاشکەوت کرا ✓' : lang === 'ar' ? 'تم حفظ الشعار ✓' : 'Logo saved ✓');
+    } catch (err: any) {
+      toast.error(err.message || 'Error uploading logo');
+    } finally {
+      setUploadingLogo(null);
+    }
+  };
+
+  const removeLogo = async (providerId: string) => {
+    const updatedLogos = { ...logos };
+    delete updatedLogos[providerId as keyof PaymentLogos];
+    setLogos(updatedLogos);
+
+    await supabase
+      .from('app_settings')
+      .update({ value: updatedLogos as any, updated_at: new Date().toISOString() })
+      .eq('key', 'payment_logos');
+
+    invalidatePaymentCache();
+    toast.success(lang === 'ku' ? 'لۆگۆ لابرا' : lang === 'ar' ? 'تم إزالة الشعار' : 'Logo removed');
+  };
+
   const direction = lang === 'en' ? 'ltr' : 'rtl';
   const labels = {
     title: { ku: '💳 ڕێکخستنی پارەدان', ar: '💳 إعدادات الدفع', en: '💳 Payment Settings' },
@@ -186,6 +296,9 @@ const AdminPayments = () => {
     alwaysOn: { ku: 'هەمیشە چالاک', ar: 'مفعل دائماً', en: 'Always On' },
     save: { ku: 'پاشکەوتکردن', ar: 'حفظ', en: 'Save' },
     showInMenu: { ku: 'نیشاندانی لە مینۆ', ar: 'إظهار في القائمة', en: 'Show in Menu' },
+    logo: { ku: 'لۆگۆ', ar: 'الشعار', en: 'Logo' },
+    uploadLogo: { ku: 'ئەپلۆدی لۆگۆ', ar: 'رفع الشعار', en: 'Upload Logo' },
+    changeLogo: { ku: 'گۆڕینی لۆگۆ', ar: 'تغيير الشعار', en: 'Change Logo' },
   };
 
   if (loading) {
@@ -237,12 +350,19 @@ const AdminPayments = () => {
         {providers.map(p => {
           const Icon = p.icon;
           const enabled = config[p.id];
+          const logoUrl = logos[p.id as keyof PaymentLogos];
           return (
             <div key={p.id} className={`bg-card rounded-xl border transition-all ${enabled ? 'border-primary/30' : 'border-border opacity-70'} p-5`}>
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-10 h-10 rounded-xl ${p.bgColor} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${p.color}`} />
-                </div>
+                {logoUrl ? (
+                  <div className="w-10 h-10 rounded-xl bg-secondary border border-border flex items-center justify-center overflow-hidden">
+                    <img src={logoUrl} alt={p.name[lang]} className="w-8 h-8 object-contain" />
+                  </div>
+                ) : (
+                  <div className={`w-10 h-10 rounded-xl ${p.bgColor} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${p.color}`} />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="text-foreground font-bold text-sm">{p.name[lang]}</div>
                   <div className={`text-[10px] font-semibold ${enabled ? 'text-success' : 'text-muted-foreground'}`}>
@@ -260,6 +380,52 @@ const AdminPayments = () => {
               {'description' in p && p.description && (
                 <div className="text-muted-foreground text-xs mb-3 bg-secondary/50 rounded-lg p-3 border border-border">
                   {(p as any).description[lang]}
+                </div>
+              )}
+
+              {/* Logo Upload Section */}
+              {p.hasLogo && (
+                <div className="mb-3 bg-secondary/50 rounded-lg p-3 border border-border">
+                  <div className="text-muted-foreground text-[10px] tracking-widest uppercase mb-2 font-semibold flex items-center gap-1.5">
+                    <ImageIcon className="w-3 h-3" />
+                    {labels.logo[lang]}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {logoUrl ? (
+                      <div className="relative w-14 h-14 rounded-xl border border-border bg-white flex items-center justify-center overflow-hidden">
+                        <img src={logoUrl} alt="" className="w-12 h-12 object-contain" />
+                        <button
+                          onClick={() => removeLogo(p.id)}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-[10px]"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-card">
+                        <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <button
+                      disabled={uploadingLogo === p.id}
+                      onClick={() => fileRefs.current[p.id]?.click()}
+                      className="flex items-center gap-1.5 px-3 py-2 bg-card border border-border rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all disabled:opacity-50"
+                    >
+                      {uploadingLogo === p.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                      {logoUrl ? labels.changeLogo[lang] : labels.uploadLogo[lang]}
+                    </button>
+                    <input
+                      ref={el => { fileRefs.current[p.id] = el; }}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleLogoUpload(p.id, file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </div>
                 </div>
               )}
 

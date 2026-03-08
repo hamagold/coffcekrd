@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import AdminPayments from '@/components/admin/AdminPayments';
 import { toast } from 'sonner';
 import { 
   Lock, Database, Table2, RefreshCw, Trash2, Download, 
   Settings, Key, Shield, Eye, EyeOff, Terminal, 
-  AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight,
+  AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight, CreditCard,
   FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History,
   Upload, ArrowRightLeft, Loader2, HardDrive
 } from 'lucide-react';
@@ -359,12 +360,15 @@ const DevPanel = () => {
         </div>
 
         <Tabs defaultValue="database" className="w-full">
-          <TabsList className="w-full grid grid-cols-6 h-11">
+          <TabsList className="w-full grid grid-cols-7 h-11">
             <TabsTrigger value="database" className="gap-1 text-[10px] px-2">
               <Database className="w-3.5 h-3.5" /> Database
             </TabsTrigger>
             <TabsTrigger value="sql" className="gap-1 text-[10px] px-2">
               <Play className="w-3.5 h-3.5" /> SQL
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="gap-1 text-[10px] px-2">
+              <CreditCard className="w-3.5 h-3.5" /> Payments
             </TabsTrigger>
             <TabsTrigger value="storage" className="gap-1 text-[10px] px-2">
               <HardDrive className="w-3.5 h-3.5" /> Storage
@@ -707,6 +711,23 @@ const DevPanel = () => {
                     )}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Payments Tab */}
+          <TabsContent value="payments" className="mt-4">
+            <Card>
+              <CardHeader className="py-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-primary" /> Payments & API Configuration
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Configure payment methods and API keys
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminPayments />
               </CardContent>
             </Card>
           </TabsContent>

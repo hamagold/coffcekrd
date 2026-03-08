@@ -207,8 +207,8 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
-          <div className="bg-card border border-border rounded-xl p-6 min-w-[420px] max-h-[90vh] overflow-y-auto animate-modal-in">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6 w-full max-w-[420px] max-h-[90vh] overflow-y-auto animate-modal-in">
             <h3 className="text-foreground text-base font-bold mb-5 flex items-center gap-2">
               <Plus className="w-4 h-4 text-primary" /> {t.addItem}
             </h3>

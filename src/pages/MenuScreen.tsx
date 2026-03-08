@@ -839,9 +839,16 @@ const MenuScreen = () => {
             </div>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 handlePlaceOrder();
                 setCashBalance(0);
+                if (payment === 'plc') {
+                  try {
+                    await supabase.functions.invoke('plc-cash-insert', {
+                      body: { machine_id: plcMachineId || 'machine-01', action: 'reset' },
+                    });
+                  } catch {}
+                }
               }}
               disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal) || paymentLoading}
               className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider flex items-center justify-center gap-2"

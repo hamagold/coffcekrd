@@ -751,11 +751,12 @@ const MenuScreen = () => {
                 handlePlaceOrder();
                 setCashBalance(0);
               }}
-              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal)}
-              className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider"
+              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal) || paymentLoading}
+              className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider flex items-center justify-center gap-2"
               style={{ background: FROOZT_COLORS.banana, color: '#1a1a1a' }}
             >
-              {t.placeOrder}
+              {paymentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {paymentLoading ? (language === 'ku' ? 'چاوەڕوان بە...' : language === 'ar' ? 'يرجى الانتظار...' : 'Processing...') : t.placeOrder}
             </button>
           </div>
         </div>

@@ -5,12 +5,12 @@ import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { Language, MenuType, PaymentMethod, OrderType, CartItem, MenuItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
+import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { toast } from 'sonner';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ChevronRight, User, Phone, MapPin } from 'lucide-react';
-import fibLogo from '@/assets/payments/fib-logo.png';
-import zaincashLogo from '@/assets/payments/zaincash-logo.png';
-import fastpayLogo from '@/assets/payments/fastpay-logo.png';
+import defaultFibLogo from '@/assets/payments/fib-logo.png';
+import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
+import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const OnlineOrder = () => {
   const { robotItems, staffItems } = useStore();
@@ -28,10 +28,12 @@ const OnlineOrder = () => {
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [onlinePaymentConfig, setOnlinePaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     fetchPaymentConfig().then(setOnlinePaymentConfig);
+    fetchPaymentLogos().then(setPaymentLogos);
   }, []);
   const generateQR = (num: string) => {
     const canvas = qrCanvasRef.current;
@@ -335,9 +337,9 @@ const OnlineOrder = () => {
               {(() => {
                 const cfg = onlinePaymentConfig;
                 const online = [
-                  { id: 'fib' as PaymentMethod, icon: <img src={fibLogo} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank, show: cfg.fib },
-                  { id: 'zain' as PaymentMethod, icon: <img src={zaincashLogo} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash, show: cfg.zain },
-                  { id: 'fastpay' as PaymentMethod, icon: <img src={fastpayLogo} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay, show: cfg.fastpay },
+                  { id: 'fib' as PaymentMethod, icon: <img src={paymentLogos.fib || defaultFibLogo} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank, show: cfg.fib },
+                  { id: 'zain' as PaymentMethod, icon: <img src={paymentLogos.zain || defaultZaincashLogo} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash, show: cfg.zain },
+                  { id: 'fastpay' as PaymentMethod, icon: <img src={paymentLogos.fastpay || defaultFastpayLogo} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay, show: cfg.fastpay },
                 ].filter(m => m.show !== false);
                 if (online.length === 0) return null;
                 return (

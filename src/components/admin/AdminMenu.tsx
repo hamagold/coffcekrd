@@ -232,7 +232,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               </div>
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.menuType}</label>
-                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.type} onChange={e => setNewItem(p => ({ ...p, type: e.target.value as MenuType }))}>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.type} onChange={e => { const type = e.target.value as MenuType; const cats = type === 'robot' ? robotCategories : staffCategories; setNewItem(p => ({ ...p, type, cat: cats[0]?.id || '' })); }}>
                   <option value="robot">{t.robotMenu}</option>
                   <option value="staff">{t.staffMenu}</option>
                 </select>

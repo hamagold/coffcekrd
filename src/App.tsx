@@ -10,6 +10,7 @@ import MenuScreen from "./pages/MenuScreen";
 import AdminPanel from "./pages/AdminPanel";
 import OnlineOrder from "./pages/OnlineOrder";
 import NotFound from "./pages/NotFound";
+import DevPanel from "./pages/DevPanel";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/menu" element={<MenuScreen />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/order" element={<OnlineOrder />} />
+            <Route path="/dev" element={<DevPanel />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </HashRouter>

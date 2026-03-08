@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useAdminLang = () => {
   const [lang, setLangState] = useState<Language>(() => {
@@ -18,10 +19,43 @@ export const useAdminLang = () => {
   return { lang, setLang, t, dir };
 };
 
-export const getCafeName = (): string => {
-  return localStorage.getItem('plc_cafe_name') || 'PLC';
+// Cache for cafe config
+export interface CafeConfig {
+  name: string;
+  logoUrl: string | null;
+  inactivity: { enabled: boolean; timeout: number };
+}
+
+let cachedCafeConfig: CafeConfig | null = null;
+
+export const fetchCafeConfig = async (): Promise<CafeConfig> => {
+  if (cachedCafeConfig) return cachedCafeConfig;
+  const { data } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'cafe_config')
+    .single();
+  cachedCafeConfig = (data?.value as any) || { name: 'PLC', logoUrl: null, inactivity: { enabled: true, timeout: 30 } };
+  return cachedCafeConfig!;
 };
 
-export const setCafeName = (name: string) => {
-  localStorage.setItem('plc_cafe_name', name);
+export const invalidateCafeCache = () => {
+  cachedCafeConfig = null;
+};
+
+export const getCafeName = (): string => {
+  return cachedCafeConfig?.name || 'PLC';
+};
+
+export const getCafeLogoUrl = (): string | null => {
+  return cachedCafeConfig?.logoUrl || null;
+};
+
+export const saveCafeConfig = async (config: CafeConfig): Promise<void> => {
+  const { error } = await supabase
+    .from('app_settings')
+    .update({ value: config as any, updated_at: new Date().toISOString() })
+    .eq('key', 'cafe_config');
+  if (error) throw error;
+  cachedCafeConfig = config;
 };

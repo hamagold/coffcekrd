@@ -7,7 +7,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
-import { getCafeName } from '@/hooks/useAdminLang';
+import { fetchCafeConfig } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, Home, ArrowLeft, Coins, Menu as MenuIcon } from 'lucide-react';
 
 const MenuScreen = () => {
@@ -96,7 +96,11 @@ const MenuScreen = () => {
     ctx.fillText('#' + orderNum, 70, 135);
   };
 
-  const cafeName = getCafeName();
+  const [cafeName, setCafeName] = useState('PLC');
+
+  useEffect(() => {
+    fetchCafeConfig().then(cfg => setCafeName(cfg.name));
+  }, []);
 
   const doPrint = (orderNum: string) => {
     // Get QR as data URL

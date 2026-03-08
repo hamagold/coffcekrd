@@ -1,28 +1,40 @@
-import { useState } from 'react';
-import { Coffee, Save, Image, Trash2, Timer } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Coffee, Save, Image, Trash2, Timer, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
-import { getCafeName, setCafeName } from '@/hooks/useAdminLang';
-import { getInactivityConfig, setInactivityConfig } from '@/hooks/useInactivityRedirect';
+import { fetchCafeConfig, saveCafeConfig, invalidateCafeCache, CafeConfig } from '@/hooks/useAdminLang';
 
 const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
-  const [name, setName] = useState(getCafeName);
-  const [logoUrl, setLogoUrl] = useState<string | null>(() => localStorage.getItem('plc_cafe_logo'));
-  const [inactivity, setInactivity] = useState(getInactivityConfig);
+  const [name, setName] = useState('PLC');
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [inactivity, setInactivity] = useState({ enabled: true, timeout: 30 });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    setCafeName(name);
-    setInactivityConfig(inactivity);
-    if (logoUrl) {
-      localStorage.setItem('plc_cafe_logo', logoUrl);
-    } else {
-      localStorage.removeItem('plc_cafe_logo');
+  useEffect(() => {
+    fetchCafeConfig().then(config => {
+      setName(config.name);
+      setLogoUrl(config.logoUrl);
+      setInactivity(config.inactivity);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await saveCafeConfig({ name, logoUrl, inactivity });
+      invalidateCafeCache();
+      toast.success(t.saved);
+      window.dispatchEvent(new Event('cafe-config-updated'));
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
     }
-    toast.success(t.saved);
-    window.dispatchEvent(new Event('storage'));
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +47,14 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
     reader.readAsDataURL(file);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div dir={dir}>
       <h2 className="text-foreground text-lg font-bold mb-2 flex items-center gap-2">
@@ -43,7 +63,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       </h2>
       <p className="text-muted-foreground text-sm mb-6">{t.cafeSettingsSub}</p>
 
-      <div className="grid grid-cols-2 gap-4 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         {/* Cafe Name */}
         <div className="bg-card rounded-xl border border-border p-6">
           <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-2 font-semibold">{t.cafeName}</label>
@@ -118,8 +138,8 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
         </div>
       </div>
 
-      <button onClick={handleSave} className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center gap-2">
-        <Save className="w-4 h-4" />
+      <button onClick={handleSave} disabled={saving} className="px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50">
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
         {t.save}
       </button>
     </div>

@@ -330,6 +330,56 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
           </div>
         </div>
       )}
+
+      {showCatModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000]">
+          <div className="bg-card border border-border rounded-xl p-6 min-w-[400px] animate-modal-in">
+            <h3 className="text-foreground text-base font-bold mb-5 flex items-center gap-2">
+              <FolderPlus className="w-4 h-4 text-primary" /> {lang === 'ku' ? 'زیادکردنی کاتەگۆری' : lang === 'ar' ? 'إضافة فئة' : 'Add Category'}
+            </h3>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">ID</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.catId} onChange={e => setNewCat(p => ({ ...p, catId: e.target.value.toLowerCase().replace(/\s/g, '_') }))} placeholder="pasta" />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.emoji}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.icon} onChange={e => setNewCat(p => ({ ...p, icon: e.target.value }))} placeholder="🍝" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameKu}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.nameKu} onChange={e => setNewCat(p => ({ ...p, nameKu: e.target.value }))} placeholder="پاستا" />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameEn}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.nameEn} onChange={e => setNewCat(p => ({ ...p, nameEn: e.target.value }))} placeholder="Pasta" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameAr}</label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newCat.nameAr} onChange={e => setNewCat(p => ({ ...p, nameAr: e.target.value }))} placeholder="معكرونة" />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.menuType}</label>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newCat.menuType} onChange={e => setNewCat(p => ({ ...p, menuType: e.target.value }))}>
+                  <option value="robot">{t.robotMenu}</option>
+                  <option value="staff">{t.staffMenu}</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setShowCatModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
+              <button onClick={handleAddCategory} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">
+                {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {lang === 'ku' ? 'زیادکردن' : lang === 'ar' ? 'إضافة' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

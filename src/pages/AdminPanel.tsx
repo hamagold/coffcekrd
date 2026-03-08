@@ -22,6 +22,7 @@ const AdminPanel = () => {
   const { user, loading, signIn, signOut } = useAuth();
   const { lang, setLang, t, dir } = useAdminLang();
   const [page, setPage] = useState('dashboard');
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [loginEmail, setLoginEmail] = useState('');

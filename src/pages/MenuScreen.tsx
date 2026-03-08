@@ -105,8 +105,120 @@ const MenuScreen = () => {
     }
   };
 
+  // Cleanup payment polling on unmount
+  useEffect(() => {
+    return () => {
+      if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    };
+  }, []);
+
+  const startPaymentPolling = (pId: string) => {
+    if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    let attempts = 0;
+    const maxAttempts = 120; // 5 min (every 2.5s)
+
+    paymentPollRef.current = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+        setPaymentStatus('expired');
+        return;
+      }
+
+      try {
+        const resp = await supabase.functions.invoke('check-payment', {
+          body: { paymentId: pId },
+        });
+
+        if (resp.data?.status === 'paid') {
+          if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+          setPaymentStatus('paid');
+          // Show success modal
+          setTimeout(() => {
+            setShowPaymentModal(false);
+            setShowModal(true);
+          }, 1500);
+        } else if (resp.data?.status === 'failed' || resp.data?.status === 'cancelled') {
+          if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+          setPaymentStatus('failed');
+        }
+      } catch (err) {
+        console.error('Payment poll error:', err);
+      }
+    }, 2500);
+  };
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
+
+    const isOnlinePayment = payment !== 'cash' && payment !== 'plc';
+
+    // For online payments, first check if configured
+    if (isOnlinePayment) {
+      if (!(await isPaymentConfigured(payment))) {
+        const { toast } = await import('sonner');
+        toast.error(t.paymentNotConfigured);
+        return;
+      }
+
+      // Create payment first, then order after payment confirmed
+      setPaymentLoading(true);
+      const currentCart = [...cart];
+      const currentTotal = cartTotal;
+
+      try {
+        // Create a pending order first
+        const { getNextDailyOrderNumber } = await import('@/utils/orderCounter');
+        const orderNum = getNextDailyOrderNumber();
+
+        await supabase.from('orders').insert({
+          order_number: orderNum,
+          items: currentCart as any,
+          total: currentTotal,
+          payment,
+          order_type: orderType,
+          lang: language,
+          status: 'pending_payment',
+          is_online: false,
+        });
+
+        // Create payment
+        const resp = await supabase.functions.invoke('create-payment', {
+          body: {
+            provider: payment,
+            amount: currentTotal,
+            orderNumber: orderNum,
+            lang: language,
+          },
+        });
+
+        setPaymentLoading(false);
+
+        if (resp.data?.success) {
+          setLastOrderNum(orderNum);
+          setPaymentData(resp.data);
+          setPaymentStatus('pending');
+          setShowPaymentModal(true);
+          clearCart();
+
+          // Start polling for payment status
+          startPaymentPolling(resp.data.paymentId);
+        } else {
+          const { toast } = await import('sonner');
+          toast.error(resp.data?.error || 'Payment creation failed');
+
+          // Remove the pending order
+          await supabase.from('orders').delete().eq('order_number', orderNum).eq('status', 'pending_payment');
+        }
+      } catch (err: any) {
+        setPaymentLoading(false);
+        const { toast } = await import('sonner');
+        toast.error(err.message || 'Payment error');
+      }
+      return;
+    }
+
+    // Regular cash/PLC flow
     if (payment !== 'cash' && payment !== 'plc' && !(await isPaymentConfigured(payment))) {
       const { toast } = await import('sonner');
       toast.error(
@@ -128,7 +240,6 @@ const MenuScreen = () => {
 
     // Auto-send to PLC for robot orders
     if (isRobotOrder) {
-      // Use stored cart data since cart is cleared after placeOrder
       try {
         await supabase.functions.invoke('send-to-plc', {
           body: {
@@ -153,6 +264,17 @@ const MenuScreen = () => {
         console.error('PLC auto-send error:', err);
       }
     }
+  };
+
+  const cancelPayment = async () => {
+    if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    // Delete the pending order
+    if (lastOrderNum) {
+      await supabase.from('orders').delete().eq('order_number', lastOrderNum).eq('status', 'pending_payment');
+    }
+    setShowPaymentModal(false);
+    setPaymentData(null);
+    setPaymentStatus('pending');
   };
 
   // QR is now handled by OrderQRCode component

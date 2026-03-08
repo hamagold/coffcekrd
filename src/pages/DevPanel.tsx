@@ -5,7 +5,8 @@ import {
   Lock, Database, Table2, RefreshCw, Trash2, Download, 
   Settings, Key, Shield, Eye, EyeOff, Terminal, 
   AlertTriangle, CheckCircle2, XCircle, ChevronDown, ChevronRight,
-  FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History
+  FileJson, Copy, Code, Save, Pencil, Plus, X, Play, History,
+  Upload, ArrowRightLeft, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,9 @@ const DevPanel = () => {
   const [sqlResult, setSqlResult] = useState<any[] | null>(null);
   const [sqlError, setSqlError] = useState<string | null>(null);
   const [sqlHistory, setSqlHistory] = useState<string[]>([]);
+  const [importJson, setImportJson] = useState('');
+  const [migrationStatus, setMigrationStatus] = useState<{ table: string; status: string; count: number }[]>([]);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   const addLog = (message: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 99)]);
@@ -774,6 +778,180 @@ const DevPanel = () => {
 
           {/* Tools Tab */}
           <TabsContent value="tools" className="space-y-4 mt-4">
+           {/* === Migration Section === */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <ArrowRightLeft className="w-4 h-4 text-primary" /> Data Migration / Transfer
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Export all data to migrate to another project, or import data from a backup
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Export Full Backup */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-foreground flex items-center gap-2">
+                    <Download className="w-3.5 h-3.5 text-success" /> Export Full Backup
+                  </h4>
+                  <p className="text-[10px] text-muted-foreground">
+                    Downloads all tables with their data as a single JSON file. Use this to migrate to another database.
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      setIsMigrating(true);
+                      addLog('📦 Creating full backup...');
+                      const tableNames = ['app_settings', 'menu_categories', 'menu_items', 'orders', 'profiles', 'user_roles'];
+                      const backup: Record<string, any> = { _meta: { exported_at: new Date().toISOString(), source: 'lovable-cloud', tables: tableNames } };
+                      const statuses: typeof migrationStatus = [];
+                      
+                      for (const name of tableNames) {
+                        const { data, error } = await supabase.from(name as any).select('*');
+                        if (error) {
+                          statuses.push({ table: name, status: 'error', count: 0 });
+                          addLog(`❌ Failed to export ${name}: ${error.message}`);
+                        } else {
+                          backup[name] = data;
+                          statuses.push({ table: name, status: 'ok', count: data?.length || 0 });
+                          addLog(`✅ Exported ${name}: ${data?.length} rows`);
+                        }
+                      }
+
+                      setMigrationStatus(statuses);
+                      
+                      const json = JSON.stringify(backup, null, 2);
+                      const blob = new Blob([json], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `full_backup_${new Date().toISOString().split('T')[0]}.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      addLog('📥 Full backup downloaded');
+                      toast.success('Full backup created!');
+                      setIsMigrating(false);
+                    }}
+                    disabled={isMigrating}
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
+                    {isMigrating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+                    Export All Tables
+                  </Button>
+                </div>
+
+                {/* Migration Status */}
+                {migrationStatus.length > 0 && (
+                  <div className="bg-secondary rounded-lg p-3 space-y-1.5">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Export Results</span>
+                    {migrationStatus.map(s => (
+                      <div key={s.table} className="flex items-center justify-between text-xs">
+                        <span className="font-mono text-foreground">{s.table}</span>
+                        <span className={`flex items-center gap-1 ${s.status === 'ok' ? 'text-success' : 'text-destructive'}`}>
+                          {s.status === 'ok' ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                          {s.count} rows
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="border-t border-border pt-4" />
+
+                {/* Import Data */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-foreground flex items-center gap-2">
+                    <Upload className="w-3.5 h-3.5 text-primary" /> Import Data
+                  </h4>
+                  <p className="text-[10px] text-muted-foreground">
+                    Paste a backup JSON or upload a file to import data into the current database. 
+                    <span className="text-warning font-semibold"> ⚠️ This will add/overwrite data!</span>
+                  </p>
+                  
+                  {/* File Upload */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = async (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (!file) return;
+                          const text = await file.text();
+                          setImportJson(text);
+                          addLog(`📂 Loaded file: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
+                          toast.success('File loaded — review and click Import');
+                        };
+                        input.click();
+                      }}
+                    >
+                      <Upload className="w-4 h-4 mr-2" /> Upload JSON File
+                    </Button>
+                  </div>
+
+                  <textarea
+                    value={importJson}
+                    onChange={(e) => setImportJson(e.target.value)}
+                    className="w-full h-40 bg-secondary text-foreground font-mono text-xs p-3 rounded-lg border border-border resize-y focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder='Paste backup JSON here or upload a file above...'
+                  />
+                  
+                  <Button 
+                    onClick={async () => {
+                      if (!importJson.trim()) { toast.error('No data to import'); return; }
+                      if (!confirm('⚠️ This will insert/overwrite data in the current database. Are you sure?')) return;
+                      
+                      setIsMigrating(true);
+                      addLog('📥 Starting data import...');
+                      
+                      try {
+                        const backup = JSON.parse(importJson);
+                        const tableNames = ['app_settings', 'menu_categories', 'menu_items', 'orders', 'profiles', 'user_roles'];
+                        const statuses: typeof migrationStatus = [];
+
+                        for (const name of tableNames) {
+                          if (!backup[name] || !Array.isArray(backup[name]) || backup[name].length === 0) {
+                            statuses.push({ table: name, status: 'skipped', count: 0 });
+                            continue;
+                          }
+
+                          const rows = backup[name];
+                          const { error } = await supabase.from(name as any).upsert(rows, { onConflict: 'id' });
+                          
+                          if (error) {
+                            statuses.push({ table: name, status: 'error', count: 0 });
+                            addLog(`❌ Import ${name} failed: ${error.message}`);
+                          } else {
+                            statuses.push({ table: name, status: 'ok', count: rows.length });
+                            addLog(`✅ Imported ${rows.length} rows into ${name}`);
+                          }
+                        }
+
+                        setMigrationStatus(statuses);
+                        toast.success('Import completed!');
+                      } catch (err) {
+                        toast.error('Invalid JSON format');
+                        addLog(`❌ Import error: ${String(err)}`);
+                      }
+                      setIsMigrating(false);
+                    }}
+                    disabled={isMigrating || !importJson.trim()}
+                    variant="default"
+                    size="sm"
+                    className="w-full"
+                  >
+                    {isMigrating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+                    Import Data
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* === Other Tools === */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
@@ -794,45 +972,16 @@ const DevPanel = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm flex items-center gap-2">
-                    <Download className="w-4 h-4 text-primary" /> Backup All Data
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Export all tables as JSON backup
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button 
-                    onClick={async () => {
-                      const allData: Record<string, any> = {};
-                      for (const t of tables) {
-                        const { data } = await supabase.from(t.name as any).select('*');
-                        allData[t.name] = data;
-                      }
-                      exportData([allData], 'full_backup');
-                    }} 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    disabled={tables.length === 0}
-                  >
-                    Create Full Backup
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 text-warning" /> System Info
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    View current system configuration
+                    Current database connection
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Project ID:</span>
-                    <span className="font-mono text-foreground">sojigwzhoqk...</span>
+                    <span className="text-muted-foreground">Platform:</span>
+                    <span className="text-primary font-semibold">Lovable Cloud</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Environment:</span>
@@ -840,8 +989,42 @@ const DevPanel = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Tables:</span>
-                    <span>{tables.length}</span>
+                    <span>6 (app_settings, menu_categories, menu_items, orders, profiles, user_roles)</span>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Database className="w-4 h-4 text-primary" /> Clear Table Data
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Delete all rows from a specific table
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {['orders', 'menu_items', 'menu_categories', 'app_settings'].map(tbl => (
+                    <Button
+                      key={tbl}
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs justify-start"
+                      onClick={async () => {
+                        if (!confirm(`⚠️ Delete ALL rows from ${tbl}?`)) return;
+                        const { error } = await supabase.from(tbl as any).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        if (error) {
+                          toast.error(error.message);
+                          addLog(`❌ Clear ${tbl} failed: ${error.message}`);
+                        } else {
+                          toast.success(`${tbl} cleared`);
+                          addLog(`🗑️ Cleared all rows from ${tbl}`);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 mr-2 text-destructive" /> {tbl}
+                    </Button>
+                  ))}
                 </CardContent>
               </Card>
             </div>

@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      menu_items: {
+        Row: {
+          cat: string
+          created_at: string
+          desc_ar: string
+          desc_en: string
+          desc_ku: string
+          emoji: string
+          id: string
+          image: string | null
+          item_id: string
+          menu_type: string
+          name_ar: string
+          name_en: string
+          name_ku: string
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          cat?: string
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          desc_ku?: string
+          emoji?: string
+          id?: string
+          image?: string | null
+          item_id: string
+          menu_type?: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          price?: number
+          sort_order?: number
+        }
+        Update: {
+          cat?: string
+          created_at?: string
+          desc_ar?: string
+          desc_en?: string
+          desc_ku?: string
+          emoji?: string
+          id?: string
+          image?: string | null
+          item_id?: string
+          menu_type?: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string

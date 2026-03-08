@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser } from '@/types';
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 import { supabase } from '@/integrations/supabase/client';
+import { useMenuItems } from '@/hooks/useMenuItems';
 
 interface StoreContextType {
   // Language
@@ -53,14 +54,9 @@ export const useStore = () => {
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en');
-  const [robotItems, setRobotItems] = useState<MenuItem[]>(() => {
-    const saved = localStorage.getItem('plc_robot_items');
-    return saved ? JSON.parse(saved) : defaultRobotItems;
-  });
-  const [staffItems, setStaffItems] = useState<MenuItem[]>(() => {
-    const saved = localStorage.getItem('plc_staff_items');
-    return saved ? JSON.parse(saved) : defaultStaffItems;
-  });
+  const { robotItems, staffItems } = useMenuItems();
+  const setRobotItems = (() => {}) as any;
+  const setStaffItems = (() => {}) as any;
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>(() => {
     const saved = localStorage.getItem('plc_orders');
@@ -89,8 +85,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => { localStorage.setItem('plc_orders', JSON.stringify(orders)); }, [orders]);
   useEffect(() => { localStorage.setItem('plc_expenses', JSON.stringify(expenses)); }, [expenses]);
   useEffect(() => { localStorage.setItem('plc_users', JSON.stringify(users)); }, [users]);
-  useEffect(() => { localStorage.setItem('plc_robot_items', JSON.stringify(robotItems)); }, [robotItems]);
-  useEffect(() => { localStorage.setItem('plc_staff_items', JSON.stringify(staffItems)); }, [staffItems]);
+  // Menu items are now synced via database, no localStorage needed
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);

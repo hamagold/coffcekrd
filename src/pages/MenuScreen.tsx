@@ -10,6 +10,7 @@ import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { fetchPLCConfig } from '@/components/admin/AdminPLC';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
 import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
@@ -42,6 +43,7 @@ const MenuScreen = () => {
   const [lastInserted, setLastInserted] = useState<number | null>(null);
   const [insertingAmount, setInsertingAmount] = useState<number | null>(null);
   const [balanceBump, setBalanceBump] = useState(false);
+  const [plcMachineId, setPlcMachineId] = useState<string | null>(null);
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);
@@ -62,6 +64,61 @@ const MenuScreen = () => {
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Load PLC machine ID and subscribe to realtime balance updates
+  useEffect(() => {
+    let channel: any;
+    const setup = async () => {
+      try {
+        const plcConfig = await fetchPLCConfig();
+        const machineId = plcConfig.machineId || 'machine-01';
+        setPlcMachineId(machineId);
+
+        // Subscribe to realtime changes on plc_sessions for this machine
+        channel = supabase
+          .channel(`plc-session-${machineId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'plc_sessions',
+              filter: `machine_id=eq.${machineId}`,
+            },
+            (payload: any) => {
+              const newBalance = payload.new?.balance;
+              if (typeof newBalance === 'number') {
+                setCashBalance(prev => {
+                  if (newBalance !== prev) {
+                    setBalanceBump(true);
+                    setLastInserted(newBalance - prev > 0 ? newBalance - prev : null);
+                  }
+                  return newBalance;
+                });
+              }
+            }
+          )
+          .subscribe();
+
+        // Also fetch current session balance
+        const { data } = await supabase
+          .from('plc_sessions')
+          .select('balance')
+          .eq('machine_id', machineId)
+          .eq('status', 'active')
+          .single();
+        if (data) {
+          setCashBalance(data.balance);
+        }
+      } catch (err) {
+        console.log('PLC config load error:', err);
+      }
+    };
+    setup();
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const { robotCategories, staffCategories } = useCategories();
@@ -677,14 +734,22 @@ const MenuScreen = () => {
                         <button
                           key={amount}
                           disabled={!!insertingAmount}
-                          onClick={() => {
+                          onClick={async () => {
                             setInsertingAmount(amount);
-                            setTimeout(() => {
-                              setCashBalance(prev => prev + amount);
-                              setLastInserted(amount);
-                              setBalanceBump(true);
-                              setInsertingAmount(null);
-                            }, 550);
+                            // Send to edge function (simulates PLC cash insert)
+                            try {
+                              await supabase.functions.invoke('plc-cash-insert', {
+                                body: { machine_id: plcMachineId || 'machine-01', amount, action: 'insert' },
+                              });
+                            } catch (err) {
+                              // Fallback: update locally if edge function fails
+                              setTimeout(() => {
+                                setCashBalance(prev => prev + amount);
+                                setLastInserted(amount);
+                                setBalanceBump(true);
+                              }, 500);
+                            }
+                            setTimeout(() => setInsertingAmount(null), 550);
                           }}
                           className={`group relative flex flex-col items-center gap-0.5 p-2 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-black transition-all duration-200 bg-card overflow-hidden ${insertingAmount ? 'opacity-70' : 'hover:scale-[1.03] active:scale-95'}`}
                         >
@@ -700,7 +765,14 @@ const MenuScreen = () => {
 
                   {cashBalance > 0 && (
                     <button
-                      onClick={() => { setCashBalance(0); setLastInserted(null); }}
+                      onClick={async () => {
+                        setCashBalance(0); setLastInserted(null);
+                        try {
+                          await supabase.functions.invoke('plc-cash-insert', {
+                            body: { machine_id: plcMachineId || 'machine-01', action: 'reset' },
+                          });
+                        } catch {}
+                      }}
                       className="w-full mt-2 text-[10px] text-destructive hover:text-destructive/80 transition-colors font-bold"
                     >
                       {language === 'ku' ? '✕ باڵانس بسڕەوە' : language === 'ar' ? '✕ مسح الرصيد' : '✕ Clear Balance'}
@@ -767,9 +839,16 @@ const MenuScreen = () => {
             </div>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 handlePlaceOrder();
                 setCashBalance(0);
+                if (payment === 'plc') {
+                  try {
+                    await supabase.functions.invoke('plc-cash-insert', {
+                      body: { machine_id: plcMachineId || 'machine-01', action: 'reset' },
+                    });
+                  } catch {}
+                }
               }}
               disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal) || paymentLoading}
               className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider flex items-center justify-center gap-2"

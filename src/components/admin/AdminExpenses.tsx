@@ -54,7 +54,23 @@ const AdminExpenses = ({ lang }: { lang: Language }) => {
         .eq('key', 'staff_salaries')
         .single();
       if (data?.value) {
-        setStaff((data.value as any).staff || []);
+        const loadedStaff: StaffMember[] = (data.value as any).staff || [];
+        setStaff(loadedStaff);
+        
+        // Check for unpaid salaries notification
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        const key = `${currentYear}-${currentMonth}`;
+        const unpaid = loadedStaff.filter(s => !s.payments[key]);
+        if (unpaid.length > 0) {
+          const monthName = MONTH_NAMES[lang][currentMonth - 1];
+          toast.warning(
+            lang === 'ku' ? `⚠️ ${unpaid.length} ستاف مووچەی ${monthName} نەدراوە` :
+            lang === 'ar' ? `⚠️ ${unpaid.length} موظف لم يتم دفع راتب ${monthName}` :
+            `⚠️ ${unpaid.length} staff unpaid for ${monthName}`,
+            { duration: 8000 }
+          );
+        }
       }
       setLoadingStaff(false);
     };

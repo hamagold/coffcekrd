@@ -711,6 +711,23 @@ const DevPanel = () => {
             </Card>
           </TabsContent>
 
+          {/* Storage Tab */}
+          <TabsContent value="storage" className="mt-4">
+            <Card>
+              <CardHeader className="py-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <HardDrive className="w-4 h-4 text-primary" /> Storage Configuration
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Configure where images are stored (Lovable Cloud or Cloudflare R2)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StorageSettings lang="en" />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-4 mt-4">
             <div className="flex items-center gap-3">

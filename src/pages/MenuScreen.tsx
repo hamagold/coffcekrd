@@ -49,7 +49,7 @@ const MenuScreen = () => {
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
     // Block if online payment selected but not configured
-    if (payment !== 'cash' && !isPaymentConfigured(payment)) {
+    if (payment !== 'cash' && payment !== 'plc' && !isPaymentConfigured(payment)) {
       const { toast } = await import('sonner');
       toast.error(
         language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
@@ -319,85 +319,114 @@ const MenuScreen = () => {
               <span className="text-primary text-base font-bold">{cartTotal.toLocaleString()} IQD</span>
             </div>
 
-            {/* PLC Cash Vending Machine Section */}
-            {paymentConfig.plc !== false && (
-              <div className="mb-3">
-                <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
-                  <Coins className="w-3 h-3" />
-                  {language === 'ku' ? 'پارەدانی PLC' : language === 'ar' ? 'دفع PLC' : 'PLC Payment'}
-                </div>
-                
-                {/* Balance Display */}
-                <div className={`relative overflow-hidden rounded-xl border-2 p-3 mb-2.5 text-center transition-all duration-500 ${
-                  cashBalance >= cartTotal && cartTotal > 0
-                    ? 'border-success bg-success/10'
-                    : cashBalance > 0
-                      ? 'border-warning bg-warning/10'
-                      : 'border-border bg-secondary'
-                }`}>
-                  {lastInserted && (
-                    <div className="absolute inset-0 bg-success/20 animate-ping pointer-events-none rounded-xl" 
-                      onAnimationEnd={() => setLastInserted(null)} />
-                  )}
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">
-                    {language === 'ku' ? 'باڵانس' : language === 'ar' ? 'الرصيد' : 'Balance'}
-                  </div>
-                  <div className={`text-2xl font-bold tabular-nums transition-all duration-300 ${
-                    cashBalance >= cartTotal && cartTotal > 0 ? 'text-success' : cashBalance > 0 ? 'text-warning' : 'text-muted-foreground'
-                  }`}>
-                    {cashBalance.toLocaleString()} <span className="text-xs font-normal opacity-60">IQD</span>
-                  </div>
-                  {cartTotal > 0 && cashBalance < cartTotal && (
-                    <div className="text-[10px] text-destructive mt-1 font-medium">
-                      {language === 'ku' ? `${(cartTotal - cashBalance).toLocaleString()} IQD پێویستە` : 
-                       language === 'ar' ? `مطلوب ${(cartTotal - cashBalance).toLocaleString()} IQD` :
-                       `${(cartTotal - cashBalance).toLocaleString()} IQD needed`}
-                    </div>
-                  )}
-                  {cartTotal > 0 && cashBalance >= cartTotal && cashBalance - cartTotal > 0 && (
-                    <div className="text-[10px] text-success mt-1 font-medium">
-                      {language === 'ku' ? `گەڕانەوە: ${(cashBalance - cartTotal).toLocaleString()} IQD` :
-                       language === 'ar' ? `الباقي: ${(cashBalance - cartTotal).toLocaleString()} IQD` :
-                       `Change: ${(cashBalance - cartTotal).toLocaleString()} IQD`}
-                    </div>
-                  )}
-                </div>
-
-                {/* Denomination Buttons */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  {[1000, 5000, 10000, 25000].map(amount => (
-                    <button
-                      key={amount}
-                      onClick={() => {
-                        setCashBalance(prev => prev + amount);
-                        setLastInserted(amount);
-                        setPayment('cash');
-                      }}
-                      className="group relative flex flex-col items-center gap-0.5 p-2.5 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-bold transition-all duration-200 bg-muted hover:border-success hover:bg-success/10 hover:scale-[1.03] active:scale-95 active:bg-success/20"
-                    >
-                      <Banknote className="w-5 h-5 text-muted-foreground group-hover:text-success transition-colors" />
-                      <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
-                      <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
-                    </button>
-                  ))}
-                </div>
-
-                {cashBalance > 0 && (
+            {/* === CASH PAYMENT SECTION === */}
+            <div className="mb-3">
+              <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium flex items-center gap-1.5">
+                💵 {language === 'ku' ? 'پارەدانی کاش' : language === 'ar' ? 'الدفع النقدي' : 'Cash Payment'}
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 mb-2">
+                {/* Manual Cash */}
+                <button
+                  onClick={() => { setPayment('cash'); setCashBalance(0); setLastInserted(null); }}
+                  className={`flex items-center gap-1.5 p-2.5 border rounded-xl cursor-pointer text-[11px] font-medium transition-all ${
+                    payment === 'cash'
+                      ? 'border-success bg-success/10 text-success'
+                      : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Banknote className="w-4 h-4" />
+                  {language === 'ku' ? 'کاش بەدەست' : language === 'ar' ? 'نقد يدوي' : 'Manual Cash'}
+                </button>
+                {/* PLC Vending */}
+                {paymentConfig.plc !== false && (
                   <button
-                    onClick={() => { setCashBalance(0); setLastInserted(null); }}
-                    className="w-full mt-2 text-[10px] text-destructive hover:text-destructive/80 transition-colors font-medium"
+                    onClick={() => { setPayment('plc'); }}
+                    className={`flex items-center gap-1.5 p-2.5 border rounded-xl cursor-pointer text-[11px] font-medium transition-all ${
+                      payment === 'plc'
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'bg-muted border-border text-muted-foreground hover:text-foreground'
+                    }`}
                   >
-                    {language === 'ku' ? '✕ باڵانس بسڕەوە' : language === 'ar' ? '✕ مسح الرصيد' : '✕ Clear Balance'}
+                    <Coins className="w-4 h-4" />
+                    {language === 'ku' ? 'کاش بە PLC' : language === 'ar' ? 'نقد PLC' : 'PLC Cash'}
                   </button>
                 )}
               </div>
-            )}
 
-            {/* Online Payments */}
+              {/* PLC Vending Machine UI - only when PLC selected */}
+              {payment === 'plc' && (
+                <div className="bg-secondary/50 rounded-xl border border-border p-3 mt-1">
+                  {/* Balance Display */}
+                  <div className={`relative overflow-hidden rounded-xl border-2 p-3 mb-2.5 text-center transition-all duration-500 ${
+                    cashBalance >= cartTotal && cartTotal > 0
+                      ? 'border-success bg-success/10'
+                      : cashBalance > 0
+                        ? 'border-warning bg-warning/10'
+                        : 'border-border bg-secondary'
+                  }`}>
+                    {lastInserted && (
+                      <div className="absolute inset-0 bg-success/20 animate-ping pointer-events-none rounded-xl" 
+                        onAnimationEnd={() => setLastInserted(null)} />
+                    )}
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">
+                      {language === 'ku' ? 'باڵانس' : language === 'ar' ? 'الرصيد' : 'Balance'}
+                    </div>
+                    <div className={`text-2xl font-bold tabular-nums transition-all duration-300 ${
+                      cashBalance >= cartTotal && cartTotal > 0 ? 'text-success' : cashBalance > 0 ? 'text-warning' : 'text-muted-foreground'
+                    }`}>
+                      {cashBalance.toLocaleString()} <span className="text-xs font-normal opacity-60">IQD</span>
+                    </div>
+                    {cartTotal > 0 && cashBalance < cartTotal && (
+                      <div className="text-[10px] text-destructive mt-1 font-medium">
+                        {language === 'ku' ? `${(cartTotal - cashBalance).toLocaleString()} IQD پێویستە` : 
+                         language === 'ar' ? `مطلوب ${(cartTotal - cashBalance).toLocaleString()} IQD` :
+                         `${(cartTotal - cashBalance).toLocaleString()} IQD needed`}
+                      </div>
+                    )}
+                    {cartTotal > 0 && cashBalance >= cartTotal && cashBalance - cartTotal > 0 && (
+                      <div className="text-[10px] text-success mt-1 font-medium">
+                        {language === 'ku' ? `گەڕانەوە: ${(cashBalance - cartTotal).toLocaleString()} IQD` :
+                         language === 'ar' ? `الباقي: ${(cashBalance - cartTotal).toLocaleString()} IQD` :
+                         `Change: ${(cashBalance - cartTotal).toLocaleString()} IQD`}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Denomination Buttons */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[1000, 5000, 10000, 25000].map(amount => (
+                      <button
+                        key={amount}
+                        onClick={() => {
+                          setCashBalance(prev => prev + amount);
+                          setLastInserted(amount);
+                        }}
+                        className="group relative flex flex-col items-center gap-0.5 p-2.5 border-2 border-dashed border-border rounded-xl cursor-pointer text-xs font-bold transition-all duration-200 bg-muted hover:border-success hover:bg-success/10 hover:scale-[1.03] active:scale-95 active:bg-success/20"
+                      >
+                        <Banknote className="w-5 h-5 text-muted-foreground group-hover:text-success transition-colors" />
+                        <span className="text-foreground group-hover:text-success transition-colors">{amount.toLocaleString()}</span>
+                        <span className="text-[9px] text-muted-foreground font-normal">IQD</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {cashBalance > 0 && (
+                    <button
+                      onClick={() => { setCashBalance(0); setLastInserted(null); }}
+                      className="w-full mt-2 text-[10px] text-destructive hover:text-destructive/80 transition-colors font-medium"
+                    >
+                      {language === 'ku' ? '✕ باڵانس بسڕەوە' : language === 'ar' ? '✕ مسح الرصيد' : '✕ Clear Balance'}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* === ONLINE PAYMENT SECTION === */}
             {onlinePaymentMethods.length > 0 && (
               <div className="mb-3">
                 <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-medium">
-                  {language === 'ku' ? '🌐 ئۆنلاین' : language === 'ar' ? '🌐 إلكتروني' : '🌐 Online'}
+                  🌐 {language === 'ku' ? 'پارەدانی ئۆنلاین' : language === 'ar' ? 'الدفع الإلكتروني' : 'Online Payment'}
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
                   {onlinePaymentMethods.map(m => (
@@ -451,7 +480,7 @@ const MenuScreen = () => {
                 handlePlaceOrder();
                 setCashBalance(0);
               }}
-              disabled={cart.length === 0 || (payment === 'cash' && cashBalance < cartTotal)}
+              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal)}
               className="w-full py-3 bg-primary text-primary-foreground rounded-lg text-sm font-bold cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {t.placeOrder}

@@ -1,7 +1,7 @@
 export type Language = 'ku' | 'ar' | 'en';
 export type Direction = 'rtl' | 'ltr';
 export type MenuType = 'robot' | 'staff';
-export type PaymentMethod = 'cash' | 'fib' | 'zain' | 'fastpay';
+export type PaymentMethod = 'cash' | 'plc' | 'fib' | 'zain' | 'fastpay';
 export type OrderType = 'dine' | 'delivery';
 export type UserRole = 'super' | 'staff';
 

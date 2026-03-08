@@ -75,23 +75,23 @@ const LanguageSelect = () => {
       {/* Lighter gradient - only darken bottom for readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/90 pointer-events-none" />
 
-      <div className="text-center relative z-10 w-full max-w-[460px] px-6 pb-8 mx-auto">
+      <div className="relative z-10 w-full max-w-[460px] px-6 pb-10 pt-6 mx-auto text-center">
         {/* Logo & Brand */}
-        <div className="mb-12 animate-fade-up">
+        <div className="mb-6 animate-fade-up">
           {logoUrl ? (
-            <img src={logoUrl} alt={cafeName} className="w-24 h-24 rounded-3xl object-cover mx-auto mb-6 border-2 border-border shadow-2xl" />
+            <img src={logoUrl} alt={cafeName} className="w-20 h-20 rounded-3xl object-cover mx-auto mb-4 border-2 border-border shadow-2xl" />
           ) : (
-            <div className="w-20 h-20 rounded-3xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-6 shadow-xl">
-              <Coffee className="w-10 h-10 text-primary" />
+            <div className="w-16 h-16 rounded-3xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 shadow-xl backdrop-blur-md">
+              <Coffee className="w-8 h-8 text-primary" />
             </div>
           )}
-          <h1 className="text-5xl sm:text-6xl font-black text-foreground tracking-tighter mb-2 uppercase">
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-1 uppercase drop-shadow-lg">
             {cafeName}
           </h1>
           <div className="flex items-center justify-center gap-3">
-            <div className="h-[1px] w-8 bg-primary/40" />
-            <p className="text-primary text-xs font-bold tracking-[0.3em] uppercase">Robotic Café</p>
-            <div className="h-[1px] w-8 bg-primary/40" />
+            <div className="h-[1px] w-8 bg-white/40" />
+            <p className="text-white/80 text-xs font-bold tracking-[0.3em] uppercase drop-shadow">Robotic Café</p>
+            <div className="h-[1px] w-8 bg-white/40" />
           </div>
         </div>
 

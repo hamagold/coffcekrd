@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           icon: string
           id: string
+          image: string | null
           menu_type: string
           name_ar: string
           name_en: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           icon?: string
           id?: string
+          image?: string | null
           menu_type?: string
           name_ar?: string
           name_en?: string
@@ -42,6 +44,7 @@ export type Database = {
           created_at?: string
           icon?: string
           id?: string
+          image?: string | null
           menu_type?: string
           name_ar?: string
           name_en?: string

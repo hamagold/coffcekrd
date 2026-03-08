@@ -48,6 +48,33 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     }
   };
 
+  const openEdit = (item: MenuItem) => {
+    setEditItem(item);
+    setEditData({
+      emoji: item.emoji, nameKu: item.name.ku, nameAr: item.name.ar, nameEn: item.name.en,
+      price: String(item.price), cat: item.cat, image: item.image || '',
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editItem) return;
+    setSaving(true);
+    try {
+      await updateItem(editItem.id, {
+        emoji: editData.emoji, cat: editData.cat,
+        name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
+        desc: editItem.desc, price: parseInt(editData.price) || 0,
+        image: editData.image || undefined,
+      });
+      setEditItem(null);
+      toast.success(lang === 'ku' ? 'ئایتم نوێکرایەوە' : lang === 'ar' ? 'تم التحديث' : 'Item updated');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const catLabels: Record<string, string> = {
     hot: t.hotDrinks, cold: t.coldDrinks, shake: t.shakes, juice: t.juices,
     sandwich: t.sandwiches, food: t.food, dessert: t.desserts, salad: t.salads,

@@ -4,13 +4,14 @@ import { useStore } from '@/store/StoreContext';
 import { Language } from '@/types';
 import { Coffee } from 'lucide-react';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { fetchBackgroundImages } from '@/components/admin/AdminCafeSettings';
 import { menuImages } from '@/data/menuImages';
 const kurdistanFlag = '/lovable-uploads/bb9b46fd-41da-468f-bde5-dbf486a4dd75.webp';
 import iraqFlag from '@/assets/flags/iraq.png';
 import usaFlag from '@/assets/flags/usa.png';
 
-// Get all menu images as an array for the floating background
-const allMenuImages = Object.values(menuImages);
+// Default fallback: menu images
+const defaultMenuImages = Object.values(menuImages);
 
 // Predefined positions for floating items to avoid random repositioning on re-render
 const floatingPositions = [
@@ -37,11 +38,15 @@ const LanguageSelect = () => {
   const [cafeName, setCafeNameState] = useState('PLC');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [hoveredLang, setHoveredLang] = useState<Language | null>(null);
+  const [bgImages, setBgImages] = useState<string[]>(defaultMenuImages);
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => {
       setCafeNameState(cfg.name);
       setLogoUrl(cfg.logoUrl);
+    });
+    fetchBackgroundImages().then(images => {
+      if (images.length > 0) setBgImages(images);
     });
   }, []);
 
@@ -60,7 +65,7 @@ const LanguageSelect = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background relative overflow-hidden">
       {/* Floating menu images background */}
       <div className="absolute inset-0 pointer-events-none">
-        {allMenuImages.slice(0, floatingPositions.length).map((img, i) => {
+        {bgImages.slice(0, floatingPositions.length).map((img, i) => {
           const pos = floatingPositions[i];
           return (
             <div

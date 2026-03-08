@@ -8,7 +8,10 @@ import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, PaymentConfig } from '@/components/admin/AdminPayments';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, CreditCard, Smartphone, Zap, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
+import fibLogo from '@/assets/payments/fib-logo.png';
+import zaincashLogo from '@/assets/payments/zaincash-logo.png';
+import fastpayLogo from '@/assets/payments/fastpay-logo.png';
 
 const FROOZT_COLORS = {
   banana: '#f6f26d',
@@ -155,9 +158,9 @@ const MenuScreen = () => {
   }, []);
 
   const onlinePaymentMethods = ([
-    { id: 'fib' as PaymentMethod, icon: <CreditCard className="w-4 h-4" />, label: t.fibBank },
-    { id: 'zain' as PaymentMethod, icon: <Smartphone className="w-4 h-4" />, label: t.zainCash },
-    { id: 'fastpay' as PaymentMethod, icon: <Zap className="w-4 h-4" />, label: t.fastPay },
+    { id: 'fib' as PaymentMethod, icon: <img src={fibLogo} alt="FIB" className="w-5 h-5 object-contain" />, label: t.fibBank },
+    { id: 'zain' as PaymentMethod, icon: <img src={zaincashLogo} alt="ZainCash" className="w-5 h-5 object-contain" />, label: t.zainCash },
+    { id: 'fastpay' as PaymentMethod, icon: <img src={fastpayLogo} alt="FastPay" className="w-5 h-5 object-contain" />, label: t.fastPay },
   ] as { id: PaymentMethod; icon: React.ReactNode; label: string }[]).filter(m => paymentConfig[m.id] !== false);
 
   return (

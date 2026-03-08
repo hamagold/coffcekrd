@@ -10,7 +10,7 @@ import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
 import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
@@ -39,8 +39,13 @@ const MenuScreen = () => {
   const [clock, setClock] = useState('');
   const [dateStr, setDateStr] = useState('');
   const [showMobileCart, setShowMobileCart] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'failed' | 'expired'>('pending');
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrRef = useRef<OrderQRCodeHandle>(null);
+  const paymentPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const update = () => {
@@ -100,17 +105,120 @@ const MenuScreen = () => {
     }
   };
 
+  // Cleanup payment polling on unmount
+  useEffect(() => {
+    return () => {
+      if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    };
+  }, []);
+
+  const startPaymentPolling = (pId: string) => {
+    if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    let attempts = 0;
+    const maxAttempts = 120; // 5 min (every 2.5s)
+
+    paymentPollRef.current = setInterval(async () => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+        setPaymentStatus('expired');
+        return;
+      }
+
+      try {
+        const resp = await supabase.functions.invoke('check-payment', {
+          body: { paymentId: pId },
+        });
+
+        if (resp.data?.status === 'paid') {
+          if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+          setPaymentStatus('paid');
+          // Show success modal
+          setTimeout(() => {
+            setShowPaymentModal(false);
+            setShowModal(true);
+          }, 1500);
+        } else if (resp.data?.status === 'failed' || resp.data?.status === 'cancelled') {
+          if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+          setPaymentStatus('failed');
+        }
+      } catch (err) {
+        console.error('Payment poll error:', err);
+      }
+    }, 2500);
+  };
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
-    if (payment !== 'cash' && payment !== 'plc' && !(await isPaymentConfigured(payment))) {
-      const { toast } = await import('sonner');
-      toast.error(
-        language === 'ku' ? `⚠️ ${payment.toUpperCase()} ئامادە نییە - تکایە پەیوەندی بکە بە ئەدمین` :
-        language === 'ar' ? `⚠️ ${payment.toUpperCase()} غير مُعد - تواصل مع المسؤول` :
-        `⚠️ ${payment.toUpperCase()} is not configured - contact admin`
-      );
+
+    const isOnlinePayment = payment !== 'cash' && payment !== 'plc';
+
+    // For online payments, first check if configured
+    if (isOnlinePayment) {
+      if (!(await isPaymentConfigured(payment))) {
+        const { toast } = await import('sonner');
+        toast.error(t.paymentNotConfigured);
+        return;
+      }
+
+      // Create payment first, then order after payment confirmed
+      setPaymentLoading(true);
+      const currentCart = [...cart];
+      const currentTotal = cartTotal;
+
+      try {
+        // Create a pending order first
+        const { getNextDailyOrderNumber } = await import('@/utils/orderCounter');
+        const orderNum = getNextDailyOrderNumber();
+
+        await supabase.from('orders').insert({
+          order_number: orderNum,
+          items: currentCart as any,
+          total: currentTotal,
+          payment,
+          order_type: orderType,
+          lang: language,
+          status: 'pending_payment',
+          is_online: false,
+        });
+
+        // Create payment
+        const resp = await supabase.functions.invoke('create-payment', {
+          body: {
+            provider: payment,
+            amount: currentTotal,
+            orderNumber: orderNum,
+            lang: language,
+          },
+        });
+
+        setPaymentLoading(false);
+
+        if (resp.data?.success) {
+          setLastOrderNum(orderNum);
+          setPaymentData(resp.data);
+          setPaymentStatus('pending');
+          setShowPaymentModal(true);
+          clearCart();
+
+          // Start polling for payment status
+          startPaymentPolling(resp.data.paymentId);
+        } else {
+          const { toast } = await import('sonner');
+          toast.error(resp.data?.error || 'Payment creation failed');
+
+          // Remove the pending order
+          await supabase.from('orders').delete().eq('order_number', orderNum).eq('status', 'pending_payment');
+        }
+      } catch (err: any) {
+        setPaymentLoading(false);
+        const { toast } = await import('sonner');
+        toast.error(err.message || 'Payment error');
+      }
       return;
     }
+
+    // Regular cash/PLC flow (online payments handled above)
 
     // Store current cart info before placing order (cart gets cleared)
     const isRobotOrder = menuType === 'robot';
@@ -123,7 +231,6 @@ const MenuScreen = () => {
 
     // Auto-send to PLC for robot orders
     if (isRobotOrder) {
-      // Use stored cart data since cart is cleared after placeOrder
       try {
         await supabase.functions.invoke('send-to-plc', {
           body: {
@@ -148,6 +255,17 @@ const MenuScreen = () => {
         console.error('PLC auto-send error:', err);
       }
     }
+  };
+
+  const cancelPayment = async () => {
+    if (paymentPollRef.current) clearInterval(paymentPollRef.current);
+    // Delete the pending order
+    if (lastOrderNum) {
+      await supabase.from('orders').delete().eq('order_number', lastOrderNum).eq('status', 'pending_payment');
+    }
+    setShowPaymentModal(false);
+    setPaymentData(null);
+    setPaymentStatus('pending');
   };
 
   // QR is now handled by OrderQRCode component
@@ -633,21 +751,125 @@ const MenuScreen = () => {
                 handlePlaceOrder();
                 setCashBalance(0);
               }}
-              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal)}
-              className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider"
+              disabled={cart.length === 0 || (payment === 'plc' && cashBalance < cartTotal) || paymentLoading}
+              className="w-full py-3.5 rounded-xl text-sm font-black cursor-pointer transition-all hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider flex items-center justify-center gap-2"
               style={{ background: FROOZT_COLORS.banana, color: '#1a1a1a' }}
             >
-              {t.placeOrder}
+              {paymentLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {paymentLoading ? (language === 'ku' ? 'چاوەڕوان بە...' : language === 'ar' ? 'يرجى الانتظار...' : 'Processing...') : t.placeOrder}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Payment Pending Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center z-[1000] p-4">
+          <div className="bg-card border border-border rounded-3xl p-5 sm:p-8 w-full max-w-[480px] text-center animate-modal-in relative overflow-hidden">
+            <div className="absolute top-[-30px] right-[-30px] w-[100px] h-[100px] rounded-full opacity-[0.08]" style={{ background: FROOZT_COLORS.lilac }} />
+            <div className="absolute bottom-[-20px] left-[-20px] w-[80px] h-[80px] rounded-full opacity-[0.08]" style={{ background: FROOZT_COLORS.ice }} />
+
+            {paymentStatus === 'pending' && (
+              <>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: `${FROOZT_COLORS.lilac}20` }}>
+                  <Loader2 className="w-8 h-8 animate-spin" style={{ color: FROOZT_COLORS.lilac }} />
+                </div>
+                <div className="text-foreground text-xl font-black mb-1">{t.paymentPending}</div>
+                <div className="text-muted-foreground text-sm mb-6">{t.paymentPendingDesc}</div>
+
+                <div className="bg-secondary border border-border rounded-2xl py-4 px-8 mb-5 inline-block">
+                  <div className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase mb-1 font-bold">{t.orderNumLabel}</div>
+                  <div className="text-3xl font-black" style={{ color: FROOZT_COLORS.banana }}>#{lastOrderNum}</div>
+                  <div className="text-primary text-sm font-bold mt-1">{cartTotal.toLocaleString() || paymentData?.amount?.toLocaleString()} IQD</div>
+                </div>
+
+                {/* QR Code from provider */}
+                {paymentData?.qrCode && (
+                  <div className="mb-4">
+                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-2 font-bold flex items-center justify-center gap-1">
+                      <QrCode className="w-3 h-3" />
+                      {t.paymentScanQR}
+                    </div>
+                    <div className="bg-white rounded-2xl p-4 inline-block border border-border">
+                      <img src={paymentData.qrCode} alt="Payment QR" className="w-48 h-48 mx-auto" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment Link */}
+                {paymentData?.paymentLink && (
+                  <div className="mb-4">
+                    <a
+                      href={paymentData.paymentLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 border border-primary/30"
+                      style={{ background: `${FROOZT_COLORS.ice}15`, color: FROOZT_COLORS.ice }}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      {t.paymentOpenLink}
+                    </a>
+                  </div>
+                )}
+
+                {paymentData?.readableCode && (
+                  <div className="mb-4 bg-secondary rounded-xl p-3 border border-border">
+                    <div className="text-muted-foreground text-[10px] uppercase tracking-wider mb-1 font-bold">
+                      {language === 'ku' ? 'کۆدی پارەدان' : language === 'ar' ? 'رمز الدفع' : 'Payment Code'}
+                    </div>
+                    <div className="text-foreground text-2xl font-black tracking-widest">{paymentData.readableCode}</div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs mb-5">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  {t.paymentWaiting}
+                </div>
+
+                <button
+                  onClick={cancelPayment}
+                  className="px-6 py-3 rounded-xl bg-secondary text-foreground border border-border font-bold text-sm cursor-pointer transition-all hover:bg-muted"
+                >
+                  {t.paymentCancel}
+                </button>
+              </>
+            )}
+
+            {paymentStatus === 'paid' && (
+              <>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-success/20">
+                  <Check className="w-8 h-8 text-success" />
+                </div>
+                <div className="text-foreground text-xl font-black mb-1">{t.paymentSuccess}</div>
+                <div className="text-success text-sm font-bold">{t.modalSub}</div>
+              </>
+            )}
+
+            {(paymentStatus === 'failed' || paymentStatus === 'expired') && (
+              <>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-destructive/20">
+                  <X className="w-8 h-8 text-destructive" />
+                </div>
+                <div className="text-foreground text-xl font-black mb-1">
+                  {paymentStatus === 'expired' ? t.paymentExpired : t.paymentFailed}
+                </div>
+                <button
+                  onClick={() => { setShowPaymentModal(false); setPaymentData(null); }}
+                  className="mt-5 px-6 py-3 rounded-xl font-black text-sm cursor-pointer transition-all hover:opacity-90 uppercase tracking-wider"
+                  style={{ background: FROOZT_COLORS.banana, color: '#1a1a1a' }}
+                >
+                  {t.modalOk}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Order Success Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center z-[1000] p-4">
           <div className="bg-card border border-border rounded-3xl p-5 sm:p-8 w-full max-w-[480px] text-center animate-modal-in relative overflow-hidden">
-            {/* Decorative circles */}
             <div className="absolute top-[-30px] right-[-30px] w-[100px] h-[100px] rounded-full opacity-[0.08]" style={{ background: FROOZT_COLORS.banana }} />
             <div className="absolute bottom-[-20px] left-[-20px] w-[80px] h-[80px] rounded-full opacity-[0.08]" style={{ background: FROOZT_COLORS.ice }} />
             

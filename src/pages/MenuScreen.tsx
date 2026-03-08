@@ -10,7 +10,7 @@ import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
-import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
+import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
 import defaultZaincashLogo from '@/assets/payments/zaincash-logo.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';

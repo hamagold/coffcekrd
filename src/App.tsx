@@ -10,6 +10,7 @@ import MenuScreen from "./pages/MenuScreen";
 import AdminPanel from "./pages/AdminPanel";
 import OnlineOrder from "./pages/OnlineOrder";
 import NotFound from "./pages/NotFound";
+import DevPanel from "./pages/DevPanel";
 
 const queryClient = new QueryClient();
 

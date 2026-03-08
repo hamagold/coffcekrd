@@ -174,7 +174,7 @@ const AdminPanel = () => {
       case 'reports': return <AdminReports lang={lang} />;
       case 'users': return <AdminUsers lang={lang} />;
       case 'expenses': return <AdminExpenses lang={lang} />;
-      case 'storage': return <StorageSettings />;
+      case 'storage': return <StorageSettings lang={lang} />;
       case 'plc': return <AdminPLC lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;
       default: return <AdminDashboard lang={lang} />;

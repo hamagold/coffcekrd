@@ -354,18 +354,21 @@ const DevPanel = () => {
         </div>
 
         <Tabs defaultValue="database" className="w-full">
-          <TabsList className="w-full grid grid-cols-4 h-11">
-            <TabsTrigger value="database" className="gap-2 text-xs">
-              <Database className="w-4 h-4" /> Database
+          <TabsList className="w-full grid grid-cols-5 h-11">
+            <TabsTrigger value="database" className="gap-1.5 text-xs">
+              <Database className="w-3.5 h-3.5" /> Database
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2 text-xs">
-              <Settings className="w-4 h-4" /> Settings
+            <TabsTrigger value="sql" className="gap-1.5 text-xs">
+              <Play className="w-3.5 h-3.5" /> SQL
             </TabsTrigger>
-            <TabsTrigger value="logs" className="gap-2 text-xs">
-              <Terminal className="w-4 h-4" /> Logs
+            <TabsTrigger value="settings" className="gap-1.5 text-xs">
+              <Settings className="w-3.5 h-3.5" /> Settings
             </TabsTrigger>
-            <TabsTrigger value="tools" className="gap-2 text-xs">
-              <Shield className="w-4 h-4" /> Tools
+            <TabsTrigger value="logs" className="gap-1.5 text-xs">
+              <Terminal className="w-3.5 h-3.5" /> Logs
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="gap-1.5 text-xs">
+              <Shield className="w-3.5 h-3.5" /> Tools
             </TabsTrigger>
           </TabsList>
 

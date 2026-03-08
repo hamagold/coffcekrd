@@ -112,7 +112,7 @@ const AdminPanel = () => {
     return (
       <div className="fixed inset-0 z-[9999] bg-background flex items-center justify-center" dir={dir}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,hsl(var(--primary)/0.05)_0%,transparent_70%)]" />
-        <div className="bg-card border border-border rounded-2xl p-8 w-[380px] text-center relative z-10 animate-fade-up">
+        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 w-full max-w-[380px] mx-4 text-center relative z-10 animate-fade-up">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
             <Lock className="w-7 h-7 text-primary" />
           </div>

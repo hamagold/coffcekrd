@@ -8,6 +8,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
+import { supabase } from '@/integrations/supabase/client';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
@@ -60,6 +61,45 @@ const MenuScreen = () => {
     setActiveCategory(categories[0]?.id || '');
   }, [menuType]);
 
+  const sendToPLC = async (orderNum: string) => {
+    try {
+      const response = await supabase.functions.invoke('send-to-plc', {
+        body: {
+          orderNumber: orderNum,
+          items: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            qty: item.qty,
+            cat: item.cat,
+          })),
+          total: cartTotal,
+          payment,
+        },
+      });
+
+      const { toast } = await import('sonner');
+      if (response.data?.success) {
+        toast.success(
+          language === 'ku' ? `✅ ئۆردەر #${orderNum} بۆ PLC نێردرا` :
+          language === 'ar' ? `✅ تم إرسال الطلب #${orderNum} إلى PLC` :
+          `✅ Order #${orderNum} sent to PLC`
+        );
+      } else {
+        console.log('PLC response:', response.data?.message);
+        // Don't show error toast if auto-send is just disabled
+        if (response.data?.message !== 'Auto-send is disabled in PLC settings') {
+          toast.warning(
+            language === 'ku' ? `⚠️ PLC: ${response.data?.message}` :
+            language === 'ar' ? `⚠️ PLC: ${response.data?.message}` :
+            `⚠️ PLC: ${response.data?.message}`
+          );
+        }
+      }
+    } catch (err) {
+      console.error('PLC send error:', err);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
     if (payment !== 'cash' && payment !== 'plc' && !(await isPaymentConfigured(payment))) {
@@ -71,9 +111,43 @@ const MenuScreen = () => {
       );
       return;
     }
+
+    // Store current cart info before placing order (cart gets cleared)
+    const isRobotOrder = menuType === 'robot';
+    const currentCart = [...cart];
+    const currentTotal = cartTotal;
+
     const num = await placeOrder(payment, orderType);
     setLastOrderNum(num);
     setShowModal(true);
+
+    // Auto-send to PLC for robot orders
+    if (isRobotOrder) {
+      // Use stored cart data since cart is cleared after placeOrder
+      try {
+        await supabase.functions.invoke('send-to-plc', {
+          body: {
+            orderNumber: num,
+            items: currentCart.map(item => ({
+              id: item.id,
+              name: item.name,
+              qty: item.qty,
+              cat: item.cat,
+            })),
+            total: currentTotal,
+            payment,
+          },
+        });
+        const { toast } = await import('sonner');
+        toast.success(
+          language === 'ku' ? `🤖 ئۆردەر #${num} بۆ سیستەمی PLC نێردرا` :
+          language === 'ar' ? `🤖 تم إرسال الطلب #${num} إلى نظام PLC` :
+          `🤖 Order #${num} sent to PLC system`
+        );
+      } catch (err) {
+        console.error('PLC auto-send error:', err);
+      }
+    }
   };
 
   // QR is now handled by OrderQRCode component

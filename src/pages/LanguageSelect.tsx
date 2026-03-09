@@ -111,32 +111,48 @@ const LanguageSelect = () => {
                   boxShadow: isHovered ? `0 8px 40px -12px ${lang.accent}40` : 'none',
                 }}
               >
-                {/* Flag background */}
-                <div className="absolute inset-0">
-                  <img
-                    src={lang.flag}
-                    alt={lang.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div
-                    className="absolute inset-0 transition-all duration-500"
-                    style={{
-                      background: isHovered
-                        ? `linear-gradient(135deg, ${lang.accent}cc 0%, ${lang.accent}88 100%)`
-                        : 'linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 100%)',
-                    }}
-                  />
-                </div>
+                {/* Glassmorphism background */}
+                <div
+                  className="absolute inset-0 transition-all duration-500"
+                  style={{
+                    background: isHovered
+                      ? `linear-gradient(135deg, ${lang.accent}dd 0%, ${lang.accent}99 100%)`
+                      : 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%)',
+                    backdropFilter: 'blur(12px)',
+                  }}
+                />
 
                 {/* Content */}
-                <div className="relative z-10 flex items-center justify-between h-[88px] sm:h-[96px] px-6 sm:px-8" dir={lang.dir}>
+                <div className="relative z-10 flex items-center justify-between h-[88px] sm:h-[96px] px-5 sm:px-7" dir={lang.dir}>
                   <div className={`flex items-center gap-4 ${lang.dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                    <span
-                      className="text-3xl sm:text-4xl font-black tracking-tight transition-colors duration-500 drop-shadow-md"
-                      style={{ color: isHovered ? 'hsl(var(--background))' : '#ffffff' }}
+                    {/* Flag circle */}
+                    <div
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-[3px] transition-all duration-500 shadow-lg flex-shrink-0"
+                      style={{
+                        borderColor: isHovered ? 'hsl(var(--background) / 0.5)' : 'rgba(255,255,255,0.4)',
+                        transform: isHovered ? 'scale(1.08)' : 'scale(1)',
+                      }}
                     >
-                      {lang.name}
-                    </span>
+                      <img
+                        src={lang.flag}
+                        alt={lang.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className={`flex flex-col ${lang.dir === 'rtl' ? 'items-end' : 'items-start'}`}>
+                      <span
+                        className="text-2xl sm:text-3xl font-black tracking-tight transition-colors duration-500 drop-shadow-md"
+                        style={{ color: isHovered ? 'hsl(var(--background))' : '#ffffff' }}
+                      >
+                        {lang.name}
+                      </span>
+                      <span
+                        className="text-[11px] font-semibold tracking-wider uppercase transition-colors duration-500 drop-shadow"
+                        style={{ color: isHovered ? 'hsl(var(--background) / 0.7)' : 'rgba(255,255,255,0.6)' }}
+                      >
+                        {lang.sub}
+                      </span>
+                    </div>
                   </div>
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 backdrop-blur-sm"

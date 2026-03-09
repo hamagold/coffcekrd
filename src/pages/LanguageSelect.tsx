@@ -152,8 +152,6 @@ const LanguageSelect = () => {
                       {lang.sub}
                     </span>
                   </div>
-                    </svg>
-                  </div>
                 </div>
               </button>
             );

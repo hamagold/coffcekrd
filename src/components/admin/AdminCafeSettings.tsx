@@ -311,7 +311,6 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
                   </button>
                 ))}
             </div>
-            </div>
           </div>
 
           {/* Inactivity Timeout */}

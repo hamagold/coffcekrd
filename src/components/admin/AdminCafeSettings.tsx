@@ -46,6 +46,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       setName(config.name);
       setLogoUrl(config.logoUrl);
       setInactivity(config.inactivity);
+      setMenuDesignState(config.menuDesign || 'froozt');
       setBgImages(images);
       setLoading(false);
     });

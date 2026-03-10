@@ -85,7 +85,9 @@ const MenuScreen = () => {
 
   const { robotCategories, staffCategories } = useCategories();
   const categories = menuType === 'robot' ? robotCategories : staffCategories;
-  const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
+  const allCatItems = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
+  const subCats = [...new Set(allCatItems.map(i => i.subCat).filter(Boolean))] as string[];
+  const items = activeSubCat ? allCatItems.filter(i => i.subCat === activeSubCat) : allCatItems;
 
   useEffect(() => {
     setActiveCategory('');

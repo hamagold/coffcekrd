@@ -97,6 +97,7 @@ const MenuScreen = () => {
 
   const selectCategory = (catId: string) => {
     setActiveCategory(catId);
+    setActiveSubCat(null);
     setView('items');
   };
 

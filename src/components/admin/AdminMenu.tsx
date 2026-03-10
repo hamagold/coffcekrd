@@ -26,7 +26,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
 
   const handleAdd = async () => {
     const item: MenuItem = {
-      id: 'custom_' + Date.now(), cat: newItem.cat, emoji: newItem.emoji || '☕',
+      id: 'custom_' + Date.now(), cat: newItem.cat, subCat: newItem.subCat, emoji: newItem.emoji || '☕',
       name: { ku: newItem.nameKu || 'نو', ar: newItem.nameAr || 'جديد', en: newItem.nameEn || 'New Item' },
       desc: { ku: '', ar: '', en: '' }, price: parseInt(newItem.price) || 0,
       image: newItem.image || undefined,

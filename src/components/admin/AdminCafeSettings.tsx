@@ -55,7 +55,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await saveCafeConfig({ name, logoUrl, inactivity });
+      await saveCafeConfig({ name, logoUrl, inactivity, menuDesign: menuDesignState });
       invalidateCafeCache();
       toast.success(t.saved);
       window.dispatchEvent(new Event('cafe-config-updated'));

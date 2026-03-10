@@ -273,13 +273,21 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={newItem.price} onChange={e => setNewItem(p => ({ ...p, price: e.target.value }))} placeholder="3500" />
               </div>
             </div>
-            <div className="mb-4">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
-              <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.cat} onChange={e => setNewItem(p => ({ ...p, cat: e.target.value }))}>
-                {(newItem.type === 'robot' ? robotCategories : staffCategories).map(c => (
-                  <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
-                ))}
-              </select>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
+                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.cat} onChange={e => setNewItem(p => ({ ...p, cat: e.target.value }))}>
+                  {(newItem.type === 'robot' ? robotCategories : staffCategories).map(c => (
+                    <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                  {lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Category'}
+                </label>
+                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newItem.subCat} onChange={e => setNewItem(p => ({ ...p, subCat: e.target.value }))} placeholder={lang === 'ku' ? 'نمونە: ئیسپرێسۆ' : 'e.g. Espresso'} />
+              </div>
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>

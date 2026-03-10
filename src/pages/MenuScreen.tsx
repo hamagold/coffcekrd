@@ -37,6 +37,7 @@ const MenuScreen = () => {
   const [orderType, setOrderType] = useState<OrderType>('dine');
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
+  const [activeSubCat, setActiveSubCat] = useState<string | null>(null);
   const [cashBalance, setCashBalance] = useState(0);
   const [view, setView] = useState<ViewState>('categories');
 
@@ -84,15 +85,19 @@ const MenuScreen = () => {
 
   const { robotCategories, staffCategories } = useCategories();
   const categories = menuType === 'robot' ? robotCategories : staffCategories;
-  const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
+  const allCatItems = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
+  const subCats = [...new Set(allCatItems.map(i => i.subCat).filter(Boolean))] as string[];
+  const items = activeSubCat ? allCatItems.filter(i => i.subCat === activeSubCat) : allCatItems;
 
   useEffect(() => {
     setActiveCategory('');
+    setActiveSubCat(null);
     setView('categories');
   }, [menuType]);
 
   const selectCategory = (catId: string) => {
     setActiveCategory(catId);
+    setActiveSubCat(null);
     setView('items');
   };
 
@@ -340,14 +345,45 @@ const MenuScreen = () => {
 
             {/* Items Grid */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-5 pb-24">
+              {/* Sub-category tabs */}
+              {subCats.length > 0 && (
+                <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                  <button
+                    onClick={() => setActiveSubCat(null)}
+                    className="shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-all"
+                    style={{
+                      background: !activeSubCat ? FROOZT_YELLOW : '#f0f0f0',
+                      color: !activeSubCat ? '#1a1a1a' : '#999',
+                      fontFamily: "'Courier New', monospace",
+                    }}
+                  >
+                    {language === 'ku' ? 'هەمووی' : language === 'ar' ? 'الكل' : 'ALL'}
+                  </button>
+                  {subCats.map(sc => (
+                    <button
+                      key={sc}
+                      onClick={() => setActiveSubCat(sc)}
+                      className="shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider cursor-pointer transition-all"
+                      style={{
+                        background: activeSubCat === sc ? FROOZT_YELLOW : '#f0f0f0',
+                        color: activeSubCat === sc ? '#1a1a1a' : '#999',
+                        fontFamily: "'Courier New', monospace",
+                      }}
+                    >
+                      {sc}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 {items.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => addToCart(item)}
-                    className="group bg-white rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-black/20 active:scale-[0.97] text-left"
+                    onClick={() => !item.outOfStock && addToCart(item)}
+                    disabled={item.outOfStock}
+                    className={`group bg-white rounded-2xl border-2 border-black/8 overflow-hidden transition-all text-left ${item.outOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg hover:border-black/20 active:scale-[0.97]'}`}
                   >
-                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-2">
+                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-2 relative">
                       {menuImages[item.id] ? (
                         <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
                       ) : item.image ? (
@@ -355,12 +391,19 @@ const MenuScreen = () => {
                       ) : (
                         <span className="text-4xl opacity-40">{item.emoji}</span>
                       )}
+                      {item.outOfStock && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-t-2xl">
+                          <span className="text-white text-xs font-black uppercase tracking-wider px-3 py-1 bg-red-500 rounded-full" style={{ fontFamily: "'Courier New', monospace" }}>
+                            {language === 'ku' ? 'نەماوە' : language === 'ar' ? 'نفذ' : 'OUT OF STOCK'}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="px-3 py-2.5 text-center border-t border-black/5">
                       <div className="text-xs sm:text-sm font-bold text-black truncate" style={{ fontFamily: "'Courier New', monospace" }}>
                         {item.name[language]}
                       </div>
-                      <div className="text-xs sm:text-sm font-bold mt-0.5" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
+                      <div className="text-xs sm:text-sm font-bold mt-0.5" style={{ color: item.outOfStock ? '#ccc' : FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
                         IQD {item.price.toLocaleString()}
                       </div>
                     </div>

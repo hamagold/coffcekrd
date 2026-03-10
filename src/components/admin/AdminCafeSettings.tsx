@@ -36,6 +36,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [inactivity, setInactivity] = useState({ enabled: true, timeout: 30 });
   const [bgImages, setBgImages] = useState<string[]>([]);
+  const [menuDesignState, setMenuDesignState] = useState<'classic' | 'froozt'>('froozt');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingBg, setUploadingBg] = useState(false);
@@ -45,6 +46,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       setName(config.name);
       setLogoUrl(config.logoUrl);
       setInactivity(config.inactivity);
+      setMenuDesignState(config.menuDesign || 'froozt');
       setBgImages(images);
       setLoading(false);
     });
@@ -53,7 +55,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await saveCafeConfig({ name, logoUrl, inactivity });
+      await saveCafeConfig({ name, logoUrl, inactivity, menuDesign: menuDesignState });
       invalidateCafeCache();
       toast.success(t.saved);
       window.dispatchEvent(new Event('cafe-config-updated'));
@@ -278,6 +280,39 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       {/* Behavior Tab */}
       {activeTab === 'behavior' && (
         <div className="space-y-4 animate-fade-up">
+          {/* Menu Design Switcher */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Coffee className="w-4 h-4 text-muted-foreground" />
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">
+                {lang === 'ku' ? 'دیزاینی مینۆ' : lang === 'ar' ? 'تصميم القائمة' : 'Menu Design'}
+              </label>
+            </div>
+            <p className="text-muted-foreground text-xs mb-4">
+              {lang === 'ku' ? 'دیزاینی مینۆ هەڵبژێرە بۆ بەکارهێنەرەکان' : lang === 'ar' ? 'اختر تصميم القائمة للعملاء' : 'Choose menu design for customers'}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                { id: 'classic' as const, label: lang === 'ku' ? 'کلاسیک' : lang === 'ar' ? 'كلاسيكي' : 'Classic', desc: lang === 'ku' ? 'دیزاینی ئاسایی' : lang === 'ar' ? 'التصميم العادي' : 'Standard design', icon: '☕' },
+                { id: 'froozt' as const, label: 'FROOZT', desc: lang === 'ku' ? 'دیزاینی زەرد و مۆدێرن' : lang === 'ar' ? 'تصميم أصفر حديث' : 'Yellow modern design', icon: '🍌' },
+              ]).map(design => (
+                  <button
+                    key={design.id}
+                    onClick={() => setMenuDesignState(design.id)}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left ${
+                      menuDesignState === design.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/30'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{design.icon}</div>
+                    <div className="text-foreground font-bold text-sm">{design.label}</div>
+                    <div className="text-muted-foreground text-xs mt-0.5">{design.desc}</div>
+                  </button>
+                ))}
+            </div>
+          </div>
+
           {/* Inactivity Timeout */}
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-center gap-2 mb-3">

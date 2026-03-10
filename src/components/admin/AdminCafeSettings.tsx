@@ -295,18 +295,12 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
               {([
                 { id: 'classic' as const, label: lang === 'ku' ? 'کلاسیک' : lang === 'ar' ? 'كلاسيكي' : 'Classic', desc: lang === 'ku' ? 'دیزاینی ئاسایی' : lang === 'ar' ? 'التصميم العادي' : 'Standard design', icon: '☕' },
                 { id: 'froozt' as const, label: 'FROOZT', desc: lang === 'ku' ? 'دیزاینی زەرد و مۆدێرن' : lang === 'ar' ? 'تصميم أصفر حديث' : 'Yellow modern design', icon: '🍌' },
-              ]).map(design => {
-                const menuDesign = (name === 'PLC' ? 'froozt' : 'froozt'); // default
-                const currentDesign = (() => {
-                  // Read from a local state
-                  return menuDesignState;
-                })();
-                return (
+              ]).map(design => (
                   <button
                     key={design.id}
                     onClick={() => setMenuDesignState(design.id)}
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left ${
-                      currentDesign === design.id
+                      menuDesignState === design.id
                         ? 'border-primary bg-primary/5'
                         : 'border-border hover:border-primary/30'
                     }`}

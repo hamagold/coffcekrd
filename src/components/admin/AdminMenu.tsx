@@ -171,14 +171,14 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, t.priceIqd, t.menuType, t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Cat', t.priceIqd, lang === 'ku' ? 'بار' : lang === 'ar' ? 'الحالة' : 'Status', t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {items.map(item => (
-              <tr key={item.id} className="hover:bg-secondary/50 border-b border-border transition-colors">
+              <tr key={item.id} className={`hover:bg-secondary/50 border-b border-border transition-colors ${item.outOfStock ? 'opacity-50' : ''}`}>
                 <td className="p-3">
                   {item.image ? (
                     <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
@@ -188,9 +188,24 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 </td>
                 <td className="p-3 text-foreground text-xs font-medium">{item.name[lang] || item.name.en}</td>
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
+                <td className="p-3 text-muted-foreground text-xs">{item.subCat || '—'}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
                 <td className="p-3">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await updateItem(item.id, { outOfStock: !item.outOfStock });
+                        toast.success(item.outOfStock
+                          ? (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Available')
+                          : (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out of stock'));
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-all ${item.outOfStock ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}
+                  >
+                    {item.outOfStock
+                      ? (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out of Stock')
+                      : (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Available')}
+                  </button>
                 </td>
                 <td className="p-3 flex gap-1.5">
                   <button onClick={() => openEdit(item)} className="p-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md cursor-pointer hover:bg-primary/20 transition-all">

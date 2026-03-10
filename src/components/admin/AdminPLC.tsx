@@ -219,9 +219,10 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
                     </div>
                     <div>
                       <label className={labelCls}>{t.plcModel}</label>
-                      <select className={inputCls} value={machine.model} onChange={e => updateMachine(idx, 'model', e.target.value)}>
+                    <select className={inputCls} value={machine.model} onChange={e => updateMachine(idx, 'model', e.target.value)}>
                         <option>Siemens S7-1200</option>
                         <option>Siemens S7-1500</option>
+                        <option>SIMATIC S7-200 Smart CPU SR60</option>
                         <option>Allen Bradley</option>
                         <option>Mitsubishi FX</option>
                         <option>Omron CP1</option>

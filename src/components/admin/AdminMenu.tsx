@@ -66,7 +66,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     setSaving(true);
     try {
       await updateItem(editItem.id, {
-        emoji: editData.emoji, cat: editData.cat,
+        emoji: editData.emoji, cat: editData.cat, subCat: editData.subCat,
         name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
         desc: editItem.desc, price: parseInt(editData.price) || 0,
         image: editData.image || undefined,

@@ -36,6 +36,7 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [inactivity, setInactivity] = useState({ enabled: true, timeout: 30 });
   const [bgImages, setBgImages] = useState<string[]>([]);
+  const [menuDesignState, setMenuDesignState] = useState<'classic' | 'froozt'>('froozt');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingBg, setUploadingBg] = useState(false);

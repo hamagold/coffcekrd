@@ -35,7 +35,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     try {
       await addItem(item, newItem.type);
       setShowModal(false);
-      setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot', image: '' });
+      setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot', image: '', subCat: '' });
       toast.success(lang === 'ku' ? 'ئایتم زیادکرا' : lang === 'ar' ? 'تمت الإضافة' : 'Item added');
     } catch (err: any) {
       toast.error(err.message || 'Error');

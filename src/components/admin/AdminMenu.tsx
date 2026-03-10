@@ -332,6 +332,12 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 </select>
               </div>
             </div>
+            <div className="mb-3">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
+                {lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Category'}
+              </label>
+              <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.subCat} onChange={e => setEditData(p => ({ ...p, subCat: e.target.value }))} placeholder={lang === 'ku' ? 'نمونە: ئیسپرێسۆ' : 'e.g. Espresso'} />
+            </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.nameKu}</label>

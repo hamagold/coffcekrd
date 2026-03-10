@@ -91,6 +91,7 @@ const MenuScreen = () => {
 
   useEffect(() => {
     setActiveCategory('');
+    setActiveSubCat(null);
     setView('categories');
   }, [menuType]);
 

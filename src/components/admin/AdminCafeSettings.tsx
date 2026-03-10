@@ -309,8 +309,8 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
                     <div className="text-foreground font-bold text-sm">{design.label}</div>
                     <div className="text-muted-foreground text-xs mt-0.5">{design.desc}</div>
                   </button>
-                );
-              })}
+                ))}
+            </div>
             </div>
           </div>
 

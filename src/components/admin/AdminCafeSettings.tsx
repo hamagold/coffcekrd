@@ -278,6 +278,46 @@ const AdminCafeSettings = ({ lang }: { lang: Language }) => {
       {/* Behavior Tab */}
       {activeTab === 'behavior' && (
         <div className="space-y-4 animate-fade-up">
+          {/* Menu Design Switcher */}
+          <div className="bg-card rounded-xl border border-border p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Coffee className="w-4 h-4 text-muted-foreground" />
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">
+                {lang === 'ku' ? 'دیزاینی مینۆ' : lang === 'ar' ? 'تصميم القائمة' : 'Menu Design'}
+              </label>
+            </div>
+            <p className="text-muted-foreground text-xs mb-4">
+              {lang === 'ku' ? 'دیزاینی مینۆ هەڵبژێرە بۆ بەکارهێنەرەکان' : lang === 'ar' ? 'اختر تصميم القائمة للعملاء' : 'Choose menu design for customers'}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                { id: 'classic' as const, label: lang === 'ku' ? 'کلاسیک' : lang === 'ar' ? 'كلاسيكي' : 'Classic', desc: lang === 'ku' ? 'دیزاینی ئاسایی' : lang === 'ar' ? 'التصميم العادي' : 'Standard design', icon: '☕' },
+                { id: 'froozt' as const, label: 'FROOZT', desc: lang === 'ku' ? 'دیزاینی زەرد و مۆدێرن' : lang === 'ar' ? 'تصميم أصفر حديث' : 'Yellow modern design', icon: '🍌' },
+              ]).map(design => {
+                const menuDesign = (name === 'PLC' ? 'froozt' : 'froozt'); // default
+                const currentDesign = (() => {
+                  // Read from a local state
+                  return menuDesignState;
+                })();
+                return (
+                  <button
+                    key={design.id}
+                    onClick={() => setMenuDesignState(design.id)}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-left ${
+                      currentDesign === design.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/30'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{design.icon}</div>
+                    <div className="text-foreground font-bold text-sm">{design.label}</div>
+                    <div className="text-muted-foreground text-xs mt-0.5">{design.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Inactivity Timeout */}
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-center gap-2 mb-3">

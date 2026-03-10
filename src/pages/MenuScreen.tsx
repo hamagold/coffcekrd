@@ -37,6 +37,7 @@ const MenuScreen = () => {
   const [orderType, setOrderType] = useState<OrderType>('dine');
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
+  const [activeSubCat, setActiveSubCat] = useState<string | null>(null);
   const [cashBalance, setCashBalance] = useState(0);
   const [view, setView] = useState<ViewState>('categories');
 

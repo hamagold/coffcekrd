@@ -6,16 +6,19 @@ import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 const dbToMenuItem = (row: any): MenuItem => ({
   id: row.item_id,
   cat: row.cat,
+  subCat: row.sub_cat || '',
   emoji: row.emoji,
   name: { ku: row.name_ku, ar: row.name_ar, en: row.name_en },
   desc: { ku: row.desc_ku, ar: row.desc_ar, en: row.desc_en },
   price: row.price,
   image: row.image || undefined,
+  outOfStock: row.out_of_stock || false,
 });
 
 const menuItemToDb = (item: MenuItem, menuType: 'robot' | 'staff', sortOrder: number) => ({
   item_id: item.id,
   cat: item.cat,
+  sub_cat: item.subCat || '',
   emoji: item.emoji,
   name_ku: item.name.ku,
   name_ar: item.name.ar,
@@ -25,6 +28,7 @@ const menuItemToDb = (item: MenuItem, menuType: 'robot' | 'staff', sortOrder: nu
   desc_en: item.desc.en,
   price: item.price,
   image: item.image || null,
+  out_of_stock: item.outOfStock || false,
   menu_type: menuType,
   sort_order: sortOrder,
 });

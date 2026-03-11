@@ -9,7 +9,7 @@ import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { fetchCafeConfig, invalidateCafeCache } from '@/hooks/useAdminLang';
 import { fetchPLCConfig } from '@/components/admin/AdminPLC';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode, ChevronLeft } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';

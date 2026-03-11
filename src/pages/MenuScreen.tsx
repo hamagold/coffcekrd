@@ -20,12 +20,14 @@ import cash25000 from '@/assets/cash/25000.jpg';
 import cash50000 from '@/assets/cash/50000.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
+import ClassicMenu from '@/components/menu/ClassicMenu';
+
 const FROOZT_YELLOW = '#f6f26d';
 const FROOZT_PINK = '#ffb0be';
 const FROOZT_ICE = '#9eecff';
 const FROOZT_LILAC = '#e2bdff';
 
-type ViewState = 'categories' | 'items' | 'cart' | 'checkout';
+type ViewState = 'categories' | 'items' | 'subcats' | 'cart' | 'checkout';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ const MenuScreen = () => {
   const [activeSubCat, setActiveSubCat] = useState<string | null>(null);
   const [cashBalance, setCashBalance] = useState(0);
   const [view, setView] = useState<ViewState>('categories');
+  const [menuDesign, setMenuDesign] = useState<'classic' | 'froozt'>('froozt');
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);

@@ -688,7 +688,7 @@ const MenuScreen = () => {
       {/* ===== BOTTOM BAR ===== */}
       <div className="shrink-0 relative z-20 border-t-2 border-black/10">
         {/* Category view: show YOUR ORDER bar */}
-        {(view === 'categories' || view === 'items') && (
+        {(view === 'categories' || view === 'items' || view === 'subcats') && (
           <div className="flex" style={{ fontFamily: "'Courier New', monospace" }}>
             <button
               onClick={() => setView('cart')}

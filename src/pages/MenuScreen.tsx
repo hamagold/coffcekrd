@@ -343,6 +343,52 @@ const MenuScreen = () => {
           </div>
         )}
 
+        {/* ===== SUB-CATEGORIES VIEW ===== */}
+        {view === 'subcats' && (
+          <div className="flex-1 overflow-y-auto bg-white p-4 sm:p-6 pb-24">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {/* All items option */}
+              <button
+                onClick={() => { setActiveSubCat(null); setView('items'); }}
+                className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
+              >
+                <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
+                  <span className="text-4xl sm:text-5xl">📋</span>
+                </div>
+                <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
+                  <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {language === 'ku' ? 'هەمووی' : language === 'ar' ? 'الكل' : 'ALL'}
+                  </span>
+                </div>
+              </button>
+              {subCats.map((sc) => {
+                const scItem = allCatItems.find(i => i.subCat === sc);
+                const scImg = scItem ? (menuImages[scItem.id] || scItem.image) : null;
+                return (
+                  <button
+                    key={sc}
+                    onClick={() => selectSubCat(sc)}
+                    className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
+                  >
+                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
+                      {scImg ? (
+                        <img src={scImg} alt={sc} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
+                      ) : (
+                        <span className="text-4xl sm:text-5xl">📦</span>
+                      )}
+                    </div>
+                    <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
+                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {sc}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ===== ITEMS VIEW ===== */}
         {view === 'items' && (
           <div className="flex-1 overflow-hidden flex">

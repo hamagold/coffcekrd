@@ -98,9 +98,31 @@ const MenuScreen = () => {
     setView('categories');
   }, [menuType]);
 
+  // Load menu design setting
+  useEffect(() => {
+    fetchCafeConfig().then(cfg => {
+      if (cfg.menuDesign) setMenuDesign(cfg.menuDesign);
+    });
+    const handler = () => { invalidateCafeCache(); fetchCafeConfig().then(cfg => { if (cfg.menuDesign) setMenuDesign(cfg.menuDesign); }); };
+    window.addEventListener('cafe-config-updated', handler);
+    return () => window.removeEventListener('cafe-config-updated', handler);
+  }, []);
+
   const selectCategory = (catId: string) => {
     setActiveCategory(catId);
     setActiveSubCat(null);
+    // Check if this category has sub-categories
+    const catItems = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === catId);
+    const subs = [...new Set(catItems.map(i => i.subCat).filter(Boolean))];
+    if (subs.length > 0) {
+      setView('subcats');
+    } else {
+      setView('items');
+    }
+  };
+
+  const selectSubCat = (sc: string | null) => {
+    setActiveSubCat(sc);
     setView('items');
   };
 

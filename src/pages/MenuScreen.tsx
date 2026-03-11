@@ -240,6 +240,8 @@ const MenuScreen = () => {
               onClick={() => {
                 if (view === 'checkout') setView('cart');
                 else if (view === 'cart') setView('items');
+                else if (view === 'items' && activeSubCat) { setActiveSubCat(null); setView('subcats'); }
+                else if (view === 'items' || view === 'subcats') setView('categories');
                 else setView('categories');
               }}
               className="w-10 h-10 rounded-full border-2 border-black/80 flex items-center justify-center cursor-pointer hover:bg-black/10 transition-all"

@@ -9,7 +9,7 @@ import { menuImages } from '@/data/menuImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchCafeConfig } from '@/hooks/useAdminLang';
+import { fetchCafeConfig, invalidateCafeCache } from '@/hooks/useAdminLang';
 import { fetchPLCConfig } from '@/components/admin/AdminPLC';
 import { Coffee, Globe, ShoppingCart, Minus, Plus, Printer, X, Check, Truck, UtensilsCrossed, Banknote, Bot, ChefHat, ArrowLeft, Coins, Loader2, ExternalLink, QrCode, ChevronLeft } from 'lucide-react';
 import defaultFibLogo from '@/assets/payments/fib-logo.png';
@@ -20,12 +20,14 @@ import cash25000 from '@/assets/cash/25000.jpg';
 import cash50000 from '@/assets/cash/50000.png';
 import defaultFastpayLogo from '@/assets/payments/fastpay-logo.png';
 
+import ClassicMenu from '@/components/menu/ClassicMenu';
+
 const FROOZT_YELLOW = '#f6f26d';
 const FROOZT_PINK = '#ffb0be';
 const FROOZT_ICE = '#9eecff';
 const FROOZT_LILAC = '#e2bdff';
 
-type ViewState = 'categories' | 'items' | 'cart' | 'checkout';
+type ViewState = 'categories' | 'items' | 'subcats' | 'cart' | 'checkout';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ const MenuScreen = () => {
   const [activeSubCat, setActiveSubCat] = useState<string | null>(null);
   const [cashBalance, setCashBalance] = useState(0);
   const [view, setView] = useState<ViewState>('categories');
+  const [menuDesign, setMenuDesign] = useState<'classic' | 'froozt'>('froozt');
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
@@ -95,9 +98,31 @@ const MenuScreen = () => {
     setView('categories');
   }, [menuType]);
 
+  // Load menu design setting
+  useEffect(() => {
+    fetchCafeConfig().then(cfg => {
+      if (cfg.menuDesign) setMenuDesign(cfg.menuDesign);
+    });
+    const handler = () => { invalidateCafeCache(); fetchCafeConfig().then(cfg => { if (cfg.menuDesign) setMenuDesign(cfg.menuDesign); }); };
+    window.addEventListener('cafe-config-updated', handler);
+    return () => window.removeEventListener('cafe-config-updated', handler);
+  }, []);
+
   const selectCategory = (catId: string) => {
     setActiveCategory(catId);
     setActiveSubCat(null);
+    // Check if this category has sub-categories
+    const catItems = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === catId);
+    const subs = [...new Set(catItems.map(i => i.subCat).filter(Boolean))];
+    if (subs.length > 0) {
+      setView('subcats');
+    } else {
+      setView('items');
+    }
+  };
+
+  const selectSubCat = (sc: string | null) => {
+    setActiveSubCat(sc);
     setView('items');
   };
 
@@ -198,14 +223,26 @@ const MenuScreen = () => {
 
   const headerTitle = view === 'categories'
     ? (language === 'ku' ? 'ئۆردەرەکەت دەست پێ بکە' : language === 'ar' ? 'ابدأ طلبك' : 'Start your order')
-    : view === 'items'
-      ? (language === 'ku' ? `${categories.find(c => c.id === activeCategory)?.name[language] || ''} هەڵبژێرە` : language === 'ar' ? `اختر ${categories.find(c => c.id === activeCategory)?.name[language] || ''}` : `Select ${categories.find(c => c.id === activeCategory)?.name[language] || ''}`)
-      : view === 'cart'
-        ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
-        : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
+    : view === 'subcats'
+      ? (categories.find(c => c.id === activeCategory)?.name[language] || '')
+      : view === 'items'
+        ? (activeSubCat ? activeSubCat : (language === 'ku' ? `${categories.find(c => c.id === activeCategory)?.name[language] || ''} هەڵبژێرە` : language === 'ar' ? `اختر ${categories.find(c => c.id === activeCategory)?.name[language] || ''}` : `Select ${categories.find(c => c.id === activeCategory)?.name[language] || ''}`))
+        : view === 'cart'
+          ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
+          : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
+
+  const isClassicBrowsing = menuDesign === 'classic' && view !== 'checkout' && !showModal && !showPaymentModal;
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden relative" style={{ background: '#f8f8f8' }} dir={direction}>
+
+      {/* ===== CLASSIC MENU ===== */}
+      {isClassicBrowsing && (
+        <ClassicMenu onCheckout={() => setView('checkout')} />
+      )}
+
+      {!isClassicBrowsing && (<>
+
 
       {/* ===== YELLOW HEADER BAR ===== */}
       <div className="shrink-0 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between relative z-20" style={{ background: FROOZT_YELLOW }}>
@@ -215,6 +252,8 @@ const MenuScreen = () => {
               onClick={() => {
                 if (view === 'checkout') setView('cart');
                 else if (view === 'cart') setView('items');
+                else if (view === 'items' && activeSubCat) { setActiveSubCat(null); setView('subcats'); }
+                else if (view === 'items' || view === 'subcats') setView('categories');
                 else setView('categories');
               }}
               className="w-10 h-10 rounded-full border-2 border-black/80 flex items-center justify-center cursor-pointer hover:bg-black/10 transition-all"
@@ -305,6 +344,52 @@ const MenuScreen = () => {
                     <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
                       <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
                         {cat.name[language]}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ===== SUB-CATEGORIES VIEW ===== */}
+        {view === 'subcats' && (
+          <div className="flex-1 overflow-y-auto bg-white p-4 sm:p-6 pb-24">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {/* All items option */}
+              <button
+                onClick={() => { setActiveSubCat(null); setView('items'); }}
+                className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
+              >
+                <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
+                  <span className="text-4xl sm:text-5xl">📋</span>
+                </div>
+                <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
+                  <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {language === 'ku' ? 'هەمووی' : language === 'ar' ? 'الكل' : 'ALL'}
+                  </span>
+                </div>
+              </button>
+              {subCats.map((sc) => {
+                const scItem = allCatItems.find(i => i.subCat === sc);
+                const scImg = scItem ? (menuImages[scItem.id] || scItem.image) : null;
+                return (
+                  <button
+                    key={sc}
+                    onClick={() => selectSubCat(sc)}
+                    className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
+                  >
+                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
+                      {scImg ? (
+                        <img src={scImg} alt={sc} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
+                      ) : (
+                        <span className="text-4xl sm:text-5xl">📦</span>
+                      )}
+                    </div>
+                    <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
+                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {sc}
                       </span>
                     </div>
                   </button>
@@ -613,7 +698,7 @@ const MenuScreen = () => {
       {/* ===== BOTTOM BAR ===== */}
       <div className="shrink-0 relative z-20 border-t-2 border-black/10">
         {/* Category view: show YOUR ORDER bar */}
-        {(view === 'categories' || view === 'items') && (
+        {(view === 'categories' || view === 'items' || view === 'subcats') && (
           <div className="flex" style={{ fontFamily: "'Courier New', monospace" }}>
             <button
               onClick={() => setView('cart')}
@@ -768,6 +853,8 @@ const MenuScreen = () => {
           </div>
         </div>
       )}
+
+      </>)}
     </div>
   );
 };

@@ -231,20 +231,18 @@ const MenuScreen = () => {
           ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
           : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
 
-  // If classic design, render ClassicMenu for browsing, but handle checkout in FROOZT flow
-  if (menuDesign === 'classic' && view !== 'checkout' && !showModal && !showPaymentModal) {
-    return (
-      <div className="w-full h-screen" dir={direction}>
-        <ClassicMenu onCheckout={() => { setView('checkout'); setMenuDesign('__checkout__' as any); }} />
-      </div>
-    );
-  }
-
-  // Reset design back after checkout completes
-  const actualDesign = (menuDesign as string) === '__checkout__' ? 'classic' : menuDesign;
+  const isClassicBrowsing = menuDesign === 'classic' && view !== 'checkout' && !showModal && !showPaymentModal;
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden relative" style={{ background: '#f8f8f8' }} dir={direction}>
+
+      {/* ===== CLASSIC MENU ===== */}
+      {isClassicBrowsing && (
+        <ClassicMenu onCheckout={() => setView('checkout')} />
+      )}
+
+      {!isClassicBrowsing && (<>
+
 
       {/* ===== YELLOW HEADER BAR ===== */}
       <div className="shrink-0 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between relative z-20" style={{ background: FROOZT_YELLOW }}>

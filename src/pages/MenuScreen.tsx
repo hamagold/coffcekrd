@@ -473,7 +473,7 @@ const MenuScreen = () => {
                         fontFamily: "'Courier New', monospace",
                       }}
                     >
-                      {sc}
+                      {subCatNames[sc]?.[language] || sc}
                     </button>
                   ))}
                 </div>

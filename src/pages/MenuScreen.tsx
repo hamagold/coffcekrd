@@ -6,6 +6,7 @@ import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
+import { subCategoryImages } from '@/data/subCategoryImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
@@ -372,8 +373,7 @@ const MenuScreen = () => {
                 </div>
               </button>
               {subCats.map((sc) => {
-                const scItem = allCatItems.find(i => i.subCat === sc);
-                const scImg = scItem ? (menuImages[scItem.id] || scItem.image) : null;
+                const scImg = subCategoryImages[sc] || (() => { const scItem = allCatItems.find(i => i.subCat === sc); return scItem ? (menuImages[scItem.id] || scItem.image) : null; })();
                 return (
                   <button
                     key={sc}

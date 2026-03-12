@@ -27,6 +27,18 @@ const FROOZT_PINK = '#ffb0be';
 const FROOZT_ICE = '#9eecff';
 const FROOZT_LILAC = '#e2bdff';
 
+const subCatNames: Record<string, { ku: string; ar: string; en: string }> = {
+  coffee: { ku: 'قاوە', ar: 'قهوة', en: 'Coffee' },
+  tea: { ku: 'چای', ar: 'شاي', en: 'Tea' },
+  chocolate: { ku: 'شکلاتە', ar: 'شوكولاتة', en: 'Chocolate' },
+  fruit: { ku: 'میوە', ar: 'فواكه', en: 'Fruit' },
+  cream: { ku: 'کریم', ar: 'كريم', en: 'Cream' },
+  chicken: { ku: 'مریشک', ar: 'دجاج', en: 'Chicken' },
+  beef: { ku: 'گۆشت', ar: 'لحم', en: 'Beef' },
+  cake: { ku: 'کێک', ar: 'كيك', en: 'Cake' },
+  pastry: { ku: 'پەستری', ar: 'معجنات', en: 'Pastry' },
+};
+
 type ViewState = 'categories' | 'items' | 'subcats' | 'cart' | 'checkout';
 
 const MenuScreen = () => {

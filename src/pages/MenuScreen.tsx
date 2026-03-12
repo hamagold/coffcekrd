@@ -373,8 +373,7 @@ const MenuScreen = () => {
                 </div>
               </button>
               {subCats.map((sc) => {
-                const scItem = allCatItems.find(i => i.subCat === sc);
-                const scImg = scItem ? (menuImages[scItem.id] || scItem.image) : null;
+                const scImg = subCategoryImages[sc] || (() => { const scItem = allCatItems.find(i => i.subCat === sc); return scItem ? (menuImages[scItem.id] || scItem.image) : null; })();
                 return (
                   <button
                     key={sc}

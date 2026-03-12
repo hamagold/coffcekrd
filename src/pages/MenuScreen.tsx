@@ -384,8 +384,11 @@ const MenuScreen = () => {
                 </div>
               </button>
               {subCats.map((sc) => {
-                const scItem = allCatItems.find(i => i.subCat === sc);
+                const scItems = allCatItems.filter(i => i.subCat === sc);
+                const scItem = scItems[0];
                 const scImg = scItem ? (menuImages[scItem.id] || scItem.image) : null;
+                const scName = subCatNames[sc]?.[language] || sc;
+                const itemCount = scItems.length;
                 return (
                   <button
                     key={sc}
@@ -394,14 +397,17 @@ const MenuScreen = () => {
                   >
                     <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
                       {scImg ? (
-                        <img src={scImg} alt={sc} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
+                        <img src={scImg} alt={scName} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
                       ) : (
                         <span className="text-4xl sm:text-5xl">📦</span>
                       )}
                     </div>
                     <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
-                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {sc}
+                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider block" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {scName}
+                      </span>
+                      <span className="text-[9px] text-black/40 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {itemCount} {language === 'ku' ? 'جۆر' : language === 'ar' ? 'نوع' : 'items'}
                       </span>
                     </div>
                   </button>

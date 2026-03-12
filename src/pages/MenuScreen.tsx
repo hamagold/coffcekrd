@@ -389,7 +389,7 @@ const MenuScreen = () => {
                     </div>
                     <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
                       <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {sc}
+                        {subCategoryNames[sc]?.[language] || sc}
                       </span>
                     </div>
                   </button>

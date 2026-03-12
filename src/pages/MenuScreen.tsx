@@ -6,7 +6,7 @@ import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
-import { subCategoryImages } from '@/data/subCategoryImages';
+import { subCategoryImages, subCategoryNames } from '@/data/subCategoryImages';
 import { MenuType, PaymentMethod, OrderType } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
@@ -389,7 +389,7 @@ const MenuScreen = () => {
                     </div>
                     <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
                       <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {sc}
+                        {subCategoryNames[sc]?.[language] || sc}
                       </span>
                     </div>
                   </button>

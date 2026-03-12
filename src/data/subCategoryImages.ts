@@ -19,3 +19,15 @@ export const subCategoryImages: Record<string, string> = {
   cake,
   pastry,
 };
+
+export const subCategoryNames: Record<string, { ku: string; ar: string; en: string }> = {
+  coffee: { ku: 'قاوە', ar: 'قهوة', en: 'Coffee' },
+  tea: { ku: 'چای', ar: 'شاي', en: 'Tea' },
+  chocolate: { ku: 'شکلاتە', ar: 'شوكولاتة', en: 'Chocolate' },
+  fruit: { ku: 'میوە', ar: 'فواكه', en: 'Fruit' },
+  cream: { ku: 'کریم', ar: 'كريم', en: 'Cream' },
+  chicken: { ku: 'مریشک', ar: 'دجاج', en: 'Chicken' },
+  beef: { ku: 'گۆشت', ar: 'لحم', en: 'Beef' },
+  cake: { ku: 'کێک', ar: 'كيك', en: 'Cake' },
+  pastry: { ku: 'پاستری', ar: 'معجنات', en: 'Pastry' },
+};

@@ -7,6 +7,7 @@ import chicken from '@/assets/subcategories/chicken.jpg';
 import beef from '@/assets/subcategories/beef.jpg';
 import cake from '@/assets/subcategories/cake.jpg';
 import pastry from '@/assets/subcategories/pastry.jpg';
+import icecream from '@/assets/subcategories/icecream.jpg';
 
 export const subCategoryImages: Record<string, string> = {
   coffee,
@@ -18,6 +19,7 @@ export const subCategoryImages: Record<string, string> = {
   beef,
   cake,
   pastry,
+  icecream,
 };
 
 export const subCategoryNames: Record<string, { ku: string; ar: string; en: string }> = {

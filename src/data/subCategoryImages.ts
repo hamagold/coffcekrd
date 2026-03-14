@@ -7,7 +7,6 @@ import chicken from '@/assets/subcategories/chicken.jpg';
 import beef from '@/assets/subcategories/beef.jpg';
 import cake from '@/assets/subcategories/cake.jpg';
 import pastry from '@/assets/subcategories/pastry.jpg';
-import icecream from '@/assets/subcategories/icecream.jpg';
 
 export const subCategoryImages: Record<string, string> = {
   coffee,
@@ -19,7 +18,6 @@ export const subCategoryImages: Record<string, string> = {
   beef,
   cake,
   pastry,
-  icecream,
 };
 
 export const subCategoryNames: Record<string, { ku: string; ar: string; en: string }> = {
@@ -32,5 +30,4 @@ export const subCategoryNames: Record<string, { ku: string; ar: string; en: stri
   beef: { ku: 'گۆشت', ar: 'لحم', en: 'Beef' },
   cake: { ku: 'کێک', ar: 'كيك', en: 'Cake' },
   pastry: { ku: 'پاستری', ar: 'معجنات', en: 'Pastry' },
-  icecream: { ku: 'ئایسکریم', ar: 'آيسكريم', en: 'Ice Cream' },
 };

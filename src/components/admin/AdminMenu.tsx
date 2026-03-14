@@ -16,9 +16,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [showModal, setShowModal] = useState(false);
   const [showCatModal, setShowCatModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '', subCat: '' });
+  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
-  const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '', subCat: '' });
+  const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
   const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
 
@@ -26,7 +26,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
 
   const handleAdd = async () => {
     const item: MenuItem = {
-      id: 'custom_' + Date.now(), cat: newItem.cat, subCat: newItem.subCat, emoji: newItem.emoji || '☕',
+      id: 'custom_' + Date.now(), cat: newItem.cat, emoji: newItem.emoji || '☕',
       name: { ku: newItem.nameKu || 'نو', ar: newItem.nameAr || 'جديد', en: newItem.nameEn || 'New Item' },
       desc: { ku: '', ar: '', en: '' }, price: parseInt(newItem.price) || 0,
       image: newItem.image || undefined,
@@ -35,7 +35,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     try {
       await addItem(item, newItem.type);
       setShowModal(false);
-      setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot', image: '', subCat: '' });
+      setNewItem({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot', image: '' });
       toast.success(lang === 'ku' ? 'ئایتم زیادکرا' : lang === 'ar' ? 'تمت الإضافة' : 'Item added');
     } catch (err: any) {
       toast.error(err.message || 'Error');
@@ -57,7 +57,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     setEditItem(item);
     setEditData({
       emoji: item.emoji, nameKu: item.name.ku, nameAr: item.name.ar, nameEn: item.name.en,
-      price: String(item.price), cat: item.cat, image: item.image || '', subCat: item.subCat || '',
+      price: String(item.price), cat: item.cat, image: item.image || '',
     });
   };
 
@@ -66,7 +66,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     setSaving(true);
     try {
       await updateItem(editItem.id, {
-        emoji: editData.emoji, cat: editData.cat, subCat: editData.subCat,
+        emoji: editData.emoji, cat: editData.cat,
         name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
         desc: editItem.desc, price: parseInt(editData.price) || 0,
         image: editData.image || undefined,
@@ -171,14 +171,14 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Cat', t.priceIqd, lang === 'ku' ? 'بار' : lang === 'ar' ? 'الحالة' : 'Status', t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, t.priceIqd, t.menuType, t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {items.map(item => (
-              <tr key={item.id} className={`hover:bg-secondary/50 border-b border-border transition-colors ${item.outOfStock ? 'opacity-50' : ''}`}>
+              <tr key={item.id} className="hover:bg-secondary/50 border-b border-border transition-colors">
                 <td className="p-3">
                   {item.image ? (
                     <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
@@ -188,24 +188,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 </td>
                 <td className="p-3 text-foreground text-xs font-medium">{item.name[lang] || item.name.en}</td>
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
-                <td className="p-3 text-muted-foreground text-xs">{item.subCat || '—'}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
                 <td className="p-3">
-                  <button
-                    onClick={async () => {
-                      try {
-                        await updateItem(item.id, { outOfStock: !item.outOfStock });
-                        toast.success(item.outOfStock
-                          ? (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Available')
-                          : (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out of stock'));
-                      } catch (err: any) { toast.error(err.message); }
-                    }}
-                    className={`text-[10px] font-semibold px-2 py-0.5 rounded cursor-pointer transition-all ${item.outOfStock ? 'bg-destructive/10 text-destructive' : 'bg-success/10 text-success'}`}
-                  >
-                    {item.outOfStock
-                      ? (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out of Stock')
-                      : (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Available')}
-                  </button>
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
                 </td>
                 <td className="p-3 flex gap-1.5">
                   <button onClick={() => openEdit(item)} className="p-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md cursor-pointer hover:bg-primary/20 transition-all">
@@ -273,21 +258,13 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={newItem.price} onChange={e => setNewItem(p => ({ ...p, price: e.target.value }))} placeholder="3500" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div>
-                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
-                <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.cat} onChange={e => setNewItem(p => ({ ...p, cat: e.target.value }))}>
-                  {(newItem.type === 'robot' ? robotCategories : staffCategories).map(c => (
-                    <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
-                  {lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Category'}
-                </label>
-                <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={newItem.subCat} onChange={e => setNewItem(p => ({ ...p, subCat: e.target.value }))} placeholder={lang === 'ku' ? 'نمونە: ئیسپرێسۆ' : 'e.g. Espresso'} />
-              </div>
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.category}</label>
+              <select className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm" value={newItem.cat} onChange={e => setNewItem(p => ({ ...p, cat: e.target.value }))}>
+                {(newItem.type === 'robot' ? robotCategories : staffCategories).map(c => (
+                  <option key={c.id} value={c.id}>{c.name[lang] || c.name.en}</option>
+                ))}
+              </select>
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
@@ -331,12 +308,6 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   ))}
                 </select>
               </div>
-            </div>
-            <div className="mb-3">
-              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">
-                {lang === 'ku' ? 'ژێر-کاتەگۆری' : lang === 'ar' ? 'فئة فرعية' : 'Sub-Category'}
-              </label>
-              <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" value={editData.subCat} onChange={e => setEditData(p => ({ ...p, subCat: e.target.value }))} placeholder={lang === 'ku' ? 'نمونە: ئیسپرێسۆ' : 'e.g. Espresso'} />
             </div>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>

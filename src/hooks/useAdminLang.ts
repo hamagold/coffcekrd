@@ -24,7 +24,6 @@ export interface CafeConfig {
   name: string;
   logoUrl: string | null;
   inactivity: { enabled: boolean; timeout: number };
-  menuDesign?: 'classic' | 'froozt';
 }
 
 let cachedCafeConfig: CafeConfig | null = null;

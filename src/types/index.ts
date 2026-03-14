@@ -14,13 +14,11 @@ export interface MultiLangText {
 export interface MenuItem {
   id: string;
   cat: string;
-  subCat?: string;
   emoji: string;
   name: MultiLangText;
   desc: MultiLangText;
   price: number;
   image?: string;
-  outOfStock?: boolean;
 }
 
 export interface Category {

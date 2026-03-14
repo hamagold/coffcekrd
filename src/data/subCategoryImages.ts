@@ -32,4 +32,5 @@ export const subCategoryNames: Record<string, { ku: string; ar: string; en: stri
   beef: { ku: 'گۆشت', ar: 'لحم', en: 'Beef' },
   cake: { ku: 'کێک', ar: 'كيك', en: 'Cake' },
   pastry: { ku: 'پاستری', ar: 'معجنات', en: 'Pastry' },
+  icecream: { ku: 'ئایسکریم', ar: 'آيسكريم', en: 'Ice Cream' },
 };

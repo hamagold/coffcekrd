@@ -89,8 +89,11 @@ export type Database = {
           name_ar: string
           name_en: string
           name_ku: string
+          out_of_stock: boolean
+          plc_code: number
           price: number
           sort_order: number
+          sub_cat: string
         }
         Insert: {
           cat?: string
@@ -106,8 +109,11 @@ export type Database = {
           name_ar?: string
           name_en?: string
           name_ku?: string
+          out_of_stock?: boolean
+          plc_code?: number
           price?: number
           sort_order?: number
+          sub_cat?: string
         }
         Update: {
           cat?: string
@@ -123,8 +129,11 @@ export type Database = {
           name_ar?: string
           name_en?: string
           name_ku?: string
+          out_of_stock?: boolean
+          plc_code?: number
           price?: number
           sort_order?: number
+          sub_cat?: string
         }
         Relationships: []
       }

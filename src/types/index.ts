@@ -19,6 +19,7 @@ export interface MenuItem {
   desc: MultiLangText;
   price: number;
   image?: string;
+  plc_code?: number;
 }
 
 export interface Category {

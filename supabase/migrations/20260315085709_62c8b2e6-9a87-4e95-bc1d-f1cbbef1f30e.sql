@@ -1,0 +1,1 @@
+UPDATE public.menu_items SET plc_code = sub.rn FROM (SELECT id, ROW_NUMBER() OVER (ORDER BY menu_type, sort_order) AS rn FROM public.menu_items) sub WHERE menu_items.id = sub.id;

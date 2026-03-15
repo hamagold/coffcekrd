@@ -42,16 +42,22 @@ serve(async (req) => {
 
     const { orderNumber, items, total, payment } = await req.json();
 
-    // Build PLC command payload
+    // Build PLC command payload with unique item identification
+    // Each item has: plc_code (unique numeric ID), id (string ID), name (multilingual), qty, category
     const plcPayload = {
       command: "PREPARE_ORDER",
       order_number: orderNumber,
-      items: items.map((item: any) => ({
-        id: item.id,
-        name: item.name?.en || item.id,
+      items: items.map((item: any, index: number) => ({
+        plc_code: item.plc_code || (index + 1),  // Unique numeric code for PLC machine
+        item_id: item.id,                          // String ID like "r1", "r2"
+        name_en: item.name?.en || item.id,         // English name for logging
+        name_ku: item.name?.ku || "",              // Kurdish name
+        name_ar: item.name?.ar || "",              // Arabic name
         qty: item.qty,
         category: item.cat,
       })),
+      item_count: items.length,
+      total_qty: items.reduce((sum: number, item: any) => sum + (item.qty || 1), 0),
       total,
       payment,
       timestamp: new Date().toISOString(),
@@ -92,10 +98,16 @@ serve(async (req) => {
 
     const anySuccess = results.some((r: any) => r.success);
 
-    // Log the attempt
+    // Log the attempt with full item details
     const logEntry = {
       orderNumber,
       itemCount: items.length,
+      items: items.map((item: any) => ({
+        plc_code: item.plc_code,
+        id: item.id,
+        name: item.name?.en || item.id,
+        qty: item.qty,
+      })),
       total,
       machines: results,
       success: anySuccess,
@@ -127,6 +139,7 @@ serve(async (req) => {
       JSON.stringify({
         success: anySuccess,
         message: anySuccess ? "Order sent to PLC machines" : "Failed to send to all machines",
+        payload: plcPayload,  // Return payload for debugging
         results,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }

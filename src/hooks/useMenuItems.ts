@@ -11,6 +11,7 @@ const dbToMenuItem = (row: any): MenuItem => ({
   desc: { ku: row.desc_ku, ar: row.desc_ar, en: row.desc_en },
   price: row.price,
   image: row.image || undefined,
+  plc_code: row.plc_code || 0,
 });
 
 const menuItemToDb = (item: MenuItem, menuType: 'robot' | 'staff', sortOrder: number) => ({

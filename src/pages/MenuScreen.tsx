@@ -136,7 +136,7 @@ const MenuScreen = () => {
     setLastOrderNum(num); setShowModal(true);
     if (isRobotOrder) {
       try {
-        await supabase.functions.invoke('send-to-plc', { body: { orderNumber: num, items: currentCart.map(item => ({ id: item.id, name: item.name, qty: item.qty, cat: item.cat })), total: currentTotal, payment } });
+        await supabase.functions.invoke('send-to-plc', { body: { orderNumber: num, items: currentCart.map(item => ({ id: item.id, plc_code: item.plc_code || 0, name: item.name, qty: item.qty, cat: item.cat })), total: currentTotal, payment } });
         const { toast } = await import('sonner');
         toast.success(language === 'ku' ? `🤖 ئۆردەر #${num} بۆ سیستەمی PLC نێردرا` : language === 'ar' ? `🤖 تم إرسال الطلب #${num} إلى نظام PLC` : `🤖 Order #${num} sent to PLC system`);
       } catch (err) { console.error('PLC auto-send error:', err); }

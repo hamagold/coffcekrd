@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2, Hash } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
@@ -17,12 +17,21 @@ interface PLCMachine {
 interface PLCConfig {
   autoSend: boolean;
   machines: PLCMachine[];
-  // Legacy single-machine fields (for backward compat)
   ip?: string;
   port?: string;
   model?: string;
   protocol?: string;
   machineId?: string;
+}
+
+interface PLCItem {
+  id: string;
+  item_id: string;
+  name_en: string;
+  name_ku: string;
+  cat: string;
+  menu_type: string;
+  plc_code: number;
 }
 
 const DEFAULT_MACHINE: PLCMachine = {
@@ -43,13 +52,10 @@ const DEFAULT_CONFIG: PLCConfig = {
   ],
 };
 
-// Cache
 let cachedPLCConfig: PLCConfig | null = null;
 
-// Migrate old single-machine config to multi-machine
 const migrateConfig = (raw: any): PLCConfig => {
   if (raw?.machines) return raw as PLCConfig;
-  // Old format: single machine
   return {
     autoSend: raw?.autoSend || false,
     machines: [{
@@ -78,6 +84,95 @@ export const invalidatePLCCache = () => {
   cachedPLCConfig = null;
 };
 
+/* ─── PLC Item Codes Sub-Component ─── */
+const PLCItemCodes = ({ lang }: { lang: Language }) => {
+  const [items, setItems] = useState<PLCItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const fetchItems = useCallback(async () => {
+    const { data } = await supabase
+      .from('menu_items')
+      .select('id, item_id, name_en, name_ku, cat, menu_type, plc_code')
+      .eq('menu_type', 'robot')
+      .order('sort_order', { ascending: true });
+    if (data) setItems(data as PLCItem[]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  const updateCode = (idx: number, code: number) => {
+    setItems(prev => {
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], plc_code: code };
+      return updated;
+    });
+  };
+
+  const saveAllCodes = async () => {
+    setSaving(true);
+    try {
+      for (const item of items) {
+        await supabase.from('menu_items').update({ plc_code: item.plc_code } as any).eq('id', item.id);
+      }
+      toast.success(lang === 'ku' ? 'کۆدەکان پاشکەوت کران' : lang === 'ar' ? 'تم حفظ الأكواد' : 'PLC codes saved');
+    } catch (err: any) {
+      toast.error(err.message || 'Error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="flex justify-center py-4"><Loader2 className="w-5 h-5 animate-spin text-primary" /></div>;
+
+  return (
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
+      <div className="p-4 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Hash className="w-4 h-4 text-primary" />
+          <span className="text-foreground font-bold text-sm">
+            {lang === 'ku' ? 'کۆدی PLC بۆ ئایتمەکان (ڕۆبۆت)' : lang === 'ar' ? 'أكواد PLC للعناصر (روبوت)' : 'PLC Codes for Items (Robot)'}
+          </span>
+        </div>
+        <button
+          onClick={saveAllCodes}
+          disabled={saving}
+          className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold flex items-center gap-1.5 hover:opacity-90 transition-all disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+          {lang === 'ku' ? 'پاشکەوت' : lang === 'ar' ? 'حفظ' : 'Save'}
+        </button>
+      </div>
+      <div className="divide-y divide-border">
+        {items.map((item, idx) => (
+          <div key={item.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-secondary/50 transition-colors">
+            <div className="w-12 h-8 bg-primary/10 rounded-md flex items-center justify-center">
+              <input
+                type="number"
+                min={0}
+                value={item.plc_code}
+                onChange={e => updateCode(idx, parseInt(e.target.value) || 0)}
+                className="w-full h-full text-center bg-transparent text-primary font-bold text-sm focus:outline-none"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-foreground text-sm font-semibold truncate">{lang === 'ku' ? item.name_ku : item.name_en}</div>
+              <div className="text-muted-foreground text-[10px] font-mono">{item.item_id} · {item.cat}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="p-3 bg-secondary/30 text-center">
+        <span className="text-muted-foreground text-[10px] tracking-wider uppercase">
+          {lang === 'ku' ? 'ئەم کۆدانە بۆ ناسینەوەی ئایتمەکان لە لایەن ئامێری PLC بەکاردێن' : lang === 'ar' ? 'هذه الأكواد تستخدم لتعريف العناصر في جهاز PLC' : 'These codes identify items for PLC machines'}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Main AdminPLC Component ─── */
 const AdminPLC = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
@@ -170,13 +265,17 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
       </h2>
       <p className="text-muted-foreground text-sm mb-6">{t.plcDesc}</p>
 
+      {/* PLC Item Codes */}
+      <div className="mb-5">
+        <PLCItemCodes lang={lang} />
+      </div>
+
       {/* Machines List */}
       <div className="space-y-3 mb-5">
         {config.machines.map((machine, idx) => {
           const isExpanded = expandedIdx === idx;
           return (
             <div key={idx} className="bg-card rounded-xl border border-border overflow-hidden">
-              {/* Machine Header */}
               <button
                 onClick={() => setExpandedIdx(isExpanded ? null : idx)}
                 className="w-full p-4 flex items-center gap-3 hover:bg-secondary/50 transition-all"
@@ -193,7 +292,6 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
                 </div>
               </button>
 
-              {/* Machine Details (expanded) */}
               {isExpanded && (
                 <div className="px-4 pb-4 border-t border-border pt-4 space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

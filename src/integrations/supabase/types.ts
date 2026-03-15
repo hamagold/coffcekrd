@@ -90,6 +90,7 @@ export type Database = {
           name_en: string
           name_ku: string
           out_of_stock: boolean
+          plc_code: number
           price: number
           sort_order: number
           sub_cat: string
@@ -109,6 +110,7 @@ export type Database = {
           name_en?: string
           name_ku?: string
           out_of_stock?: boolean
+          plc_code?: number
           price?: number
           sort_order?: number
           sub_cat?: string
@@ -128,6 +130,7 @@ export type Database = {
           name_en?: string
           name_ku?: string
           out_of_stock?: boolean
+          plc_code?: number
           price?: number
           sort_order?: number
           sub_cat?: string

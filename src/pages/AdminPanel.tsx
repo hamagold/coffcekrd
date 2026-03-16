@@ -13,6 +13,7 @@ import AdminExpenses from '@/components/admin/AdminExpenses';
 import AdminPLC from '@/components/admin/AdminPLC';
 import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
+import AdminPermissions, { fetchPermissions, PermissionsConfig } from '@/components/admin/AdminPermissions';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 // StorageSettings moved to DevPanel
 import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText } from 'lucide-react';

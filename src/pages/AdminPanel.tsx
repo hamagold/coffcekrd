@@ -90,18 +90,27 @@ const AdminPanel = () => {
     permissions: [lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', lang === 'ku' ? 'دەسەڵاتی ستاف و ئەدمین' : lang === 'ar' ? 'صلاحيات الموظفين والمدراء' : 'Staff & admin permissions'],
   };
 
+  // Helper to check if staff can access a section
+  const canAccess = (sectionId: string) => {
+    if (!user) return false;
+    if (user.role === 'super') return true;
+    if (!permissions) return sectionId === 'dashboard' || sectionId === 'orders';
+    return permissions.staffPermissions[sectionId] === true;
+  };
+
   const navItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: t.dashboard, section: t.overview },
     { id: 'orders', icon: ClipboardList, label: t.orders, section: t.overview },
-    { id: 'menu', icon: UtensilsCrossed, label: t.menuItems, section: t.management, superOnly: true },
+    { id: 'menu', icon: UtensilsCrossed, label: t.menuItems, section: t.management, superOnly: false },
     // payments moved to DevPanel
-    { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: true },
+    { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: false },
     { id: 'users', icon: Users, label: t.users, section: t.management, superOnly: true },
-    { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: true },
+    { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: false },
     // Storage removed - now in DevPanel
-    { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: true },
-    { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: true },
-    { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: true },
+    { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: false },
+    { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: false },
+    { id: 'permissions', icon: Shield, label: lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', section: t.management, superOnly: true },
+    { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: false },
   ];
 
   if (loading || needsSetup === null) {

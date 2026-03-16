@@ -87,6 +87,7 @@ const AdminPanel = () => {
     plc: [t.plcTitle, t.plcSub],
     plcLogs: [t.plcLogsTitle, t.plcLogsSub],
     cafeSettings: [t.cafeSettingsTitle, t.cafeSettingsSub],
+    permissions: [lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', lang === 'ku' ? 'دەسەڵاتی ستاف و ئەدمین' : lang === 'ar' ? 'صلاحيات الموظفين والمدراء' : 'Staff & admin permissions'],
   };
 
   const navItems = [

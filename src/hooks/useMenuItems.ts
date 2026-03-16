@@ -88,7 +88,15 @@ export const useMenuItems = () => {
 
   const addItem = useCallback(async (item: MenuItem, menuType: 'robot' | 'staff') => {
     const currentItems = menuType === 'robot' ? robotItems : staffItems;
-    const row = menuItemToDb(item, menuType, currentItems.length);
+    // Auto-generate unique plc_code: find max existing and add 1
+    const { data: maxData } = await supabase
+      .from('menu_items')
+      .select('plc_code')
+      .order('plc_code', { ascending: false })
+      .limit(1);
+    const nextCode = (maxData && maxData.length > 0 ? (maxData[0] as any).plc_code : 0) + 1;
+    const itemWithCode = { ...item, plc_code: nextCode };
+    const row = { ...menuItemToDb(itemWithCode, menuType, currentItems.length), plc_code: nextCode };
     const { error } = await supabase.from('menu_items').insert(row);
     if (error) throw error;
   }, [robotItems, staffItems]);

@@ -317,24 +317,46 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
                     </div>
                     <div>
                       <label className={labelCls}>{t.plcModel}</label>
-                      <select className={inputCls} value={machine.model} onChange={e => updateMachine(idx, 'model', e.target.value)}>
+                      <select className={inputCls} value={machine.model} onChange={e => {
+                        updateMachine(idx, 'model', e.target.value);
+                        // Auto-set protocol based on model
+                        if (e.target.value === 'Siemens S7-200 Smart') {
+                          updateMachine(idx, 'protocol', 'S7comm (Ethernet)');
+                          updateMachine(idx, 'port', '102');
+                        }
+                      }}>
+                        <option>Siemens S7-200 Smart</option>
                         <option>Siemens S7-1200</option>
                         <option>Siemens S7-1500</option>
                         <option>Allen Bradley</option>
                         <option>Mitsubishi FX</option>
                         <option>Omron CP1</option>
+                        <option>Generic HTTP</option>
                       </select>
                     </div>
                     <div>
                       <label className={labelCls}>{t.protocol}</label>
                       <select className={inputCls} value={machine.protocol} onChange={e => updateMachine(idx, 'protocol', e.target.value)}>
+                        <option>S7comm (Ethernet)</option>
                         <option>Modbus TCP</option>
                         <option>Modbus RTU</option>
                         <option>OPC UA</option>
                         <option>Profinet</option>
                         <option>EtherNet/IP</option>
+                        <option>HTTP REST</option>
                       </select>
                     </div>
+                    {machine.model === 'Siemens S7-200 Smart' && (
+                      <div className="col-span-2">
+                        <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+                          <div className="text-primary font-bold text-[11px] mb-1">Siemens S7-200 Smart</div>
+                          <div>• <span className="text-foreground font-medium">S7comm (Ethernet)</span> — {lang === 'ku' ? 'پۆرت 102، پەیوەندی ڕاستەوخۆ بە CPU' : lang === 'ar' ? 'المنفذ 102، اتصال مباشر بالمعالج' : 'Port 102, direct CPU connection'}</div>
+                          <div>• <span className="text-foreground font-medium">Modbus TCP</span> — {lang === 'ku' ? 'پۆرت 502، پشتگیری لە نۆدی Master/Slave' : lang === 'ar' ? 'المنفذ 502، دعم Master/Slave' : 'Port 502, Master/Slave support'}</div>
+                          <div>• <span className="text-foreground font-medium">EtherNet/IP</span> — {lang === 'ku' ? 'پۆرت 44818، بۆ پەیوەندی CIP' : lang === 'ar' ? 'المنفذ 44818، لاتصال CIP' : 'Port 44818, for CIP communication'}</div>
+                          <div>• <span className="text-foreground font-medium">HTTP REST</span> — {lang === 'ku' ? 'ئەگەر Smart بە وێبسێرڤەر بەکاربهێنیت' : lang === 'ar' ? 'إذا كان Smart يستخدم خادم ويب' : 'If Smart uses built-in web server'}</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2 pt-1">

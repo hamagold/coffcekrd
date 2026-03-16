@@ -37,6 +37,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
+    fetchPermissions().then(p => setPermissions(p));
     const handler = () => fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
     window.addEventListener('cafe-config-updated', handler);
     return () => window.removeEventListener('cafe-config-updated', handler);

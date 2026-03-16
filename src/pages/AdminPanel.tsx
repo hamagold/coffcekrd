@@ -33,6 +33,7 @@ const AdminPanel = () => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
   const [cafeName, setCafeNameState] = useState('PLC');
+  const [permissions, setPermissions] = useState<PermissionsConfig | null>(null);
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));

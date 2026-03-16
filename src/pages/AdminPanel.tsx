@@ -13,6 +13,7 @@ import AdminExpenses from '@/components/admin/AdminExpenses';
 import AdminPLC from '@/components/admin/AdminPLC';
 import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
+import AdminPermissions, { fetchPermissions, PermissionsConfig } from '@/components/admin/AdminPermissions';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 // StorageSettings moved to DevPanel
 import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText } from 'lucide-react';
@@ -32,9 +33,11 @@ const AdminPanel = () => {
   const [loginLoading, setLoginLoading] = useState(false);
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null);
   const [cafeName, setCafeNameState] = useState('PLC');
+  const [permissions, setPermissions] = useState<PermissionsConfig | null>(null);
 
   useEffect(() => {
     fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
+    fetchPermissions().then(p => setPermissions(p));
     const handler = () => fetchCafeConfig().then(cfg => setCafeNameState(cfg.name));
     window.addEventListener('cafe-config-updated', handler);
     return () => window.removeEventListener('cafe-config-updated', handler);
@@ -84,20 +87,30 @@ const AdminPanel = () => {
     plc: [t.plcTitle, t.plcSub],
     plcLogs: [t.plcLogsTitle, t.plcLogsSub],
     cafeSettings: [t.cafeSettingsTitle, t.cafeSettingsSub],
+    permissions: [lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', lang === 'ku' ? 'دەسەڵاتی ستاف و ئەدمین' : lang === 'ar' ? 'صلاحيات الموظفين والمدراء' : 'Staff & admin permissions'],
+  };
+
+  // Helper to check if staff can access a section
+  const canAccess = (sectionId: string) => {
+    if (!user) return false;
+    if (user.role === 'super') return true;
+    if (!permissions) return sectionId === 'dashboard' || sectionId === 'orders';
+    return permissions.staffPermissions[sectionId] === true;
   };
 
   const navItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: t.dashboard, section: t.overview },
     { id: 'orders', icon: ClipboardList, label: t.orders, section: t.overview },
-    { id: 'menu', icon: UtensilsCrossed, label: t.menuItems, section: t.management, superOnly: true },
+    { id: 'menu', icon: UtensilsCrossed, label: t.menuItems, section: t.management, superOnly: false },
     // payments moved to DevPanel
-    { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: true },
+    { id: 'reports', icon: BarChart3, label: t.reports, section: t.management, superOnly: false },
     { id: 'users', icon: Users, label: t.users, section: t.management, superOnly: true },
-    { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: true },
+    { id: 'expenses', icon: Wallet, label: t.expenses, section: t.management, superOnly: false },
     // Storage removed - now in DevPanel
-    { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: true },
-    { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: true },
-    { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: true },
+    { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: false },
+    { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: false },
+    { id: 'permissions', icon: Shield, label: lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', section: t.management, superOnly: true },
+    { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: false },
   ];
 
   if (loading || needsSetup === null) {
@@ -182,6 +195,7 @@ const AdminPanel = () => {
       // storage removed - now in DevPanel
       case 'plc': return <AdminPLC lang={lang} />;
       case 'plcLogs': return <AdminPLCLogs lang={lang} />;
+      case 'permissions': return <AdminPermissions lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;
       default: return <AdminDashboard lang={lang} />;
     }
@@ -234,6 +248,7 @@ const AdminPanel = () => {
         <div className="flex-1 overflow-y-auto px-2 py-1">
           {navItems.map(item => {
             if (item.superOnly && user.role !== 'super') return null;
+            if (!item.superOnly && !canAccess(item.id)) return null;
             let sectionHeader = null;
             if (item.section !== currentSection) {
               currentSection = item.section;

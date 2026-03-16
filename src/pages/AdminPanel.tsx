@@ -248,6 +248,7 @@ const AdminPanel = () => {
         <div className="flex-1 overflow-y-auto px-2 py-1">
           {navItems.map(item => {
             if (item.superOnly && user.role !== 'super') return null;
+            if (!item.superOnly && !canAccess(item.id)) return null;
             let sectionHeader = null;
             if (item.section !== currentSection) {
               currentSection = item.section;

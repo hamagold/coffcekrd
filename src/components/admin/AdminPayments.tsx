@@ -34,7 +34,7 @@ export const fetchPaymentConfig = async (): Promise<PaymentConfig> => {
     .select('value')
     .eq('key', 'payment_config')
     .single();
-  cachedPaymentConfig = (data?.value as any) || { plc: true, fib: true, zain: true, fastpay: true };
+  cachedPaymentConfig = (data?.value as any) || { cash: true, plc: true, fib: true, zain: true, fastpay: true };
   return cachedPaymentConfig!;
 };
 

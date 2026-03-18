@@ -72,7 +72,7 @@ const MenuTypeSelect = () => {
         <div className="absolute -top-[40%] -left-[20%] w-[70%] h-[70%] rounded-full opacity-[0.07]"
           style={{ background: 'radial-gradient(circle, hsl(var(--primary)), transparent 70%)' }} />
         <div className="absolute -bottom-[30%] -right-[20%] w-[60%] h-[60%] rounded-full opacity-[0.05]"
-          style={{ background: 'radial-gradient(circle, hsl(350 80% 72%), transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, hsl(var(--primary)), transparent 70%)' }} />
       </div>
 
       {/* Header */}

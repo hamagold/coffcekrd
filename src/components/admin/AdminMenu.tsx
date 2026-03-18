@@ -119,9 +119,24 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   };
 
   const handleDeleteCategory = async (catId: string) => {
+    setDeleteCatId(catId);
+    setDeleteCatPassword('');
+    setDeleteCatError('');
+  };
+
+  const confirmDeleteCategory = async () => {
+    if (!deleteCatId) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) return;
+    const { error } = await supabase.auth.signInWithPassword({ email: user.email, password: deleteCatPassword });
+    if (error) {
+      setDeleteCatError(lang === 'ku' ? 'پاسوۆرد هەڵەیە' : lang === 'ar' ? 'كلمة المرور خاطئة' : 'Wrong password');
+      return;
+    }
     try {
-      await deleteCategory(catId);
+      await deleteCategory(deleteCatId);
       toast.success(lang === 'ku' ? 'کاتەگۆری سڕایەوە' : lang === 'ar' ? 'تم الحذف' : 'Category deleted');
+      setDeleteCatId(null);
     } catch (err: any) {
       toast.error(err.message || 'Error');
     }

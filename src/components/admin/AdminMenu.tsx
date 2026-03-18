@@ -469,9 +469,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         </div>
                         <div className="flex gap-2">
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-24" type="number" placeholder="Price" value={editVariantData.price} onChange={e => setEditVariantData(p => ({ ...p, price: e.target.value }))} />
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-20" type="number" placeholder="PLC Code" value={editVariantData.plcCode} onChange={e => setEditVariantData(p => ({ ...p, plcCode: e.target.value }))} />
                           <button onClick={async () => {
                             try {
-                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null });
+                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null, plc_code: parseInt(editVariantData.plcCode) || 0 });
                               setEditingVariant(null);
                               toast.success(lang === 'ku' ? 'نوێکرایەوە' : 'Updated');
                             } catch { toast.error('Error'); }

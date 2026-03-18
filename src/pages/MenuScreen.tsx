@@ -225,11 +225,12 @@ const MenuScreen = () => {
           </h1>
         </div>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/select')}
           className="text-black/60 hover:text-black text-xs font-bold cursor-pointer transition-colors"
           style={{ fontFamily: "'Courier New', monospace" }}
         >
-          {language === 'ku' ? 'سەرەتا' : language === 'ar' ? 'الرئيسية' : 'HOME'}
+          {language === 'ku' ? 'گەڕانەوە' : language === 'ar' ? 'رجوع' : 'BACK'}
+        </button>
         </button>
       </div>
 

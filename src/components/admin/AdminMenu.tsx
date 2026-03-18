@@ -205,7 +205,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <button onClick={() => {
                     setVariantItemId(item.id);
                     setVariantItemName(item.name[lang] || item.name.en);
-                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
                   }} className="p-1.5 bg-accent/50 text-accent-foreground border border-accent/30 rounded-md cursor-pointer hover:bg-accent transition-all relative">
                     <Layers className="w-3.5 h-3.5" />
                     {getVariantsForItem(item.id).length > 0 && (

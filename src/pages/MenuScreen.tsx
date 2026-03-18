@@ -92,8 +92,11 @@ const MenuScreen = () => {
   const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
 
   useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0].id);
+    if (categories.length > 0) {
+      const valid = categories.some(c => c.id === activeCategory);
+      if (!activeCategory || !valid) {
+        setActiveCategory(categories[0].id);
+      }
     }
   }, [categories, activeCategory]);
 

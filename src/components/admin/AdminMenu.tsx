@@ -586,6 +586,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         sort_order: getVariantsForItem(variantItemId).length,
                         image: newVariant.image || null,
                         plc_code: plcCode,
+                        out_of_stock: false,
                       });
                       setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
                       toast.success(lang === 'ku' ? `جۆر زیادکرا (PLC: ${plcCode})` : `Variant added (PLC: ${plcCode})`);

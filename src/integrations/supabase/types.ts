@@ -78,6 +78,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          image: string | null
           item_id: string
           name_ar: string
           name_en: string
@@ -88,6 +89,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          image?: string | null
           item_id: string
           name_ar?: string
           name_en?: string
@@ -98,6 +100,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          image?: string | null
           item_id?: string
           name_ar?: string
           name_en?: string

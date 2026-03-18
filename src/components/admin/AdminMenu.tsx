@@ -27,9 +27,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   // Variants state
   const [variantItemId, setVariantItemId] = useState<string | null>(null);
   const [variantItemName, setVariantItemName] = useState('');
-  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
-  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 
@@ -205,7 +205,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <button onClick={() => {
                     setVariantItemId(item.id);
                     setVariantItemName(item.name[lang] || item.name.en);
-                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
                   }} className="p-1.5 bg-accent/50 text-accent-foreground border border-accent/30 rounded-md cursor-pointer hover:bg-accent transition-all relative">
                     <Layers className="w-3.5 h-3.5" />
                     {getVariantsForItem(item.id).length > 0 && (
@@ -457,6 +457,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <div key={v.id} className="flex items-center gap-2 p-3 bg-secondary rounded-lg border border-border">
                     {editingVariant?.id === v.id ? (
                       <div className="flex-1 space-y-2">
+                        <ImageUpload
+                          onUpload={(url) => setEditVariantData(p => ({ ...p, image: url }))}
+                          currentImage={editVariantData.image || undefined}
+                          folder="variants"
+                        />
                         <div className="grid grid-cols-3 gap-2">
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Kurdish" value={editVariantData.nameKu} onChange={e => setEditVariantData(p => ({ ...p, nameKu: e.target.value }))} />
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Arabic" value={editVariantData.nameAr} onChange={e => setEditVariantData(p => ({ ...p, nameAr: e.target.value }))} />
@@ -466,7 +471,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-24" type="number" placeholder="Price" value={editVariantData.price} onChange={e => setEditVariantData(p => ({ ...p, price: e.target.value }))} />
                           <button onClick={async () => {
                             try {
-                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0 });
+                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null });
                               setEditingVariant(null);
                               toast.success(lang === 'ku' ? 'نوێکرایەوە' : 'Updated');
                             } catch { toast.error('Error'); }
@@ -476,11 +481,12 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                       </div>
                     ) : (
                       <>
-                        <div className="flex-1">
+                        {v.image && <img src={v.image} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
+                        <div className="flex-1 min-w-0">
                           <span className="text-foreground text-xs font-medium">{lang === 'ku' ? v.name_ku : lang === 'ar' ? v.name_ar : v.name_en}</span>
                           <span className="text-primary text-xs font-bold ml-2">IQD {v.price.toLocaleString()}</span>
                         </div>
-                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price) }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
+                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price), image: v.image || '' }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
                           <Pencil className="w-3 h-3" />
                         </button>
                         <button onClick={async () => { try { await deleteVariant(v.id); toast.success(lang === 'ku' ? 'سڕایەوە' : 'Deleted'); } catch { toast.error('Error'); } }} className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors">
@@ -498,6 +504,17 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">
                 {lang === 'ku' ? 'جۆری نوێ زیادبکە' : lang === 'ar' ? 'إضافة خيار جديد' : 'Add New Variant'}
               </p>
+              {/* Image upload for new variant */}
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1 font-semibold">
+                  {lang === 'ku' ? 'وێنە (ئارەزوومەندانە)' : lang === 'ar' ? 'صورة (اختياري)' : 'Image (optional)'}
+                </label>
+                <ImageUpload
+                  onUpload={(url) => setNewVariant(p => ({ ...p, image: url }))}
+                  currentImage={newVariant.image || undefined}
+                  folder="variants"
+                />
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ku' ? 'ناوی کوردی' : 'Kurdish'} value={newVariant.nameKu} onChange={e => setNewVariant(p => ({ ...p, nameKu: e.target.value }))} />
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ar' ? 'الاسم بالعربية' : 'Arabic'} value={newVariant.nameAr} onChange={e => setNewVariant(p => ({ ...p, nameAr: e.target.value }))} />
@@ -516,8 +533,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         name_en: newVariant.nameEn,
                         price: parseInt(newVariant.price) || 0,
                         sort_order: getVariantsForItem(variantItemId).length,
+                        image: newVariant.image || null,
                       });
-                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
                       toast.success(lang === 'ku' ? 'جۆر زیادکرا' : 'Variant added');
                     } catch { toast.error('Error'); }
                   }}

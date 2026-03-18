@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_item_variants ADD COLUMN image text DEFAULT NULL;

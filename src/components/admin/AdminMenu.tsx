@@ -10,7 +10,7 @@ import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
-  const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
+  const { robotItems, staffItems, loading, addItem, deleteItem, updateItem, toggleOutOfStock } = useMenuItems();
   const { robotCategories, staffCategories, addCategory, deleteCategory, loading: catsLoading } = useCategories();
   const { variants, getVariantsForItem, addVariant, updateVariant, deleteVariant } = useVariants();
   const t = adminT[lang];
@@ -201,7 +201,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, t.priceIqd, t.menuType, t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, t.priceIqd, lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
@@ -220,7 +220,25 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
                 <td className="p-3">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await toggleOutOfStock(item.id, !!item.out_of_stock);
+                        toast.success(item.out_of_stock 
+                          ? (lang === 'ku' ? 'بەردەست کرایەوە' : lang === 'ar' ? 'متوفر الآن' : 'Now available')
+                          : (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out of stock'));
+                      } catch { toast.error('Error'); }
+                    }}
+                    className={`text-[10px] font-semibold px-3 py-1 rounded-full cursor-pointer transition-all ${
+                      item.out_of_stock 
+                        ? 'bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20' 
+                        : 'bg-success/10 text-success border border-success/20 hover:bg-success/20'
+                    }`}
+                  >
+                    {item.out_of_stock 
+                      ? (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out') 
+                      : (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'In Stock')}
+                  </button>
                 </td>
                 <td className="p-3 flex gap-1.5">
                   <button onClick={() => {

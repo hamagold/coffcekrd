@@ -296,6 +296,7 @@ const MenuScreen = () => {
                   <button
                     key={item.id}
                     onClick={() => {
+                      if (item.out_of_stock) return;
                       const itemVariants = getVariantsForItem(item.id);
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
@@ -303,8 +304,15 @@ const MenuScreen = () => {
                         addToCart(item);
                       }
                     }}
-                    className="group bg-white rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-black/20 active:scale-[0.97] text-left"
+                    className={`group bg-white rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all text-left relative ${item.out_of_stock ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-lg hover:border-black/20 active:scale-[0.97]'}`}
                   >
+                    {item.out_of_stock && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 rounded-2xl">
+                        <span className="bg-red-600 text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                          {language === 'ku' ? 'نەماوە' : language === 'ar' ? 'نفذ' : 'Out of Stock'}
+                        </span>
+                      </div>
+                    )}
                     <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-2">
                       {menuImages[item.id] ? (
                         <img src={menuImages[item.id]} alt={item.name[language]} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />

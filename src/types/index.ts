@@ -20,6 +20,7 @@ export interface MenuItem {
   price: number;
   image?: string;
   plc_code?: number;
+  out_of_stock?: boolean;
 }
 
 export interface Category {

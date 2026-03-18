@@ -257,38 +257,8 @@ const MenuScreen = () => {
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 overflow-hidden flex flex-col">
 
-        {/* ===== CATEGORY SELECTION VIEW ===== */}
-        {view === 'categories' && (
-          <div className="flex-1 overflow-y-auto bg-white">
 
-            {/* Category Grid - 3x2 */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 px-4 sm:px-8 pb-24">
-              {categories.map((cat) => {
-                const catImg = cat.image || getCategoryImage(cat.id);
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => selectCategory(cat.id)}
-                    className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
-                  >
-                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
-                      {catImg ? (
-                        <img src={catImg} alt={cat.name[language]} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
-                      ) : (
-                        <span className="text-4xl sm:text-5xl">{cat.icon}</span>
-                      )}
-                    </div>
-                    <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
-                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {cat.name[language]}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+
 
         {/* ===== ITEMS VIEW ===== */}
         {view === 'items' && (

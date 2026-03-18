@@ -217,13 +217,11 @@ const MenuScreen = () => {
   };
 
   const menuLabel = menuType === 'robot' ? (t.tabRobot || 'Robot Menu') : (t.tabStaff || 'Staff Menu');
-  const headerTitle = view === 'categories'
+  const headerTitle = view === 'items'
     ? menuLabel
-    : view === 'items'
-      ? (language === 'ku' ? `${categories.find(c => c.id === activeCategory)?.name[language] || ''} هەڵبژێرە` : language === 'ar' ? `اختر ${categories.find(c => c.id === activeCategory)?.name[language] || ''}` : `Select ${categories.find(c => c.id === activeCategory)?.name[language] || ''}`)
-      : view === 'cart'
-        ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
-        : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
+    : view === 'cart'
+      ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
+      : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden relative" style={{ background: '#f8f8f8' }} dir={direction}>

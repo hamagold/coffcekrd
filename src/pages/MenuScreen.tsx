@@ -42,6 +42,8 @@ const MenuScreen = () => {
   const [lastOrderNum, setLastOrderNum] = useState('');
   const [cashBalance, setCashBalance] = useState(0);
   const [view, setView] = useState<ViewState>('items');
+  const { getVariantsForItem } = useVariants();
+  const [variantItem, setVariantItem] = useState<MenuItem | null>(null);
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);

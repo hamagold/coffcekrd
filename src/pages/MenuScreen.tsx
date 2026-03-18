@@ -40,7 +40,7 @@ const MenuScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
   const [cashBalance, setCashBalance] = useState(0);
-  const [view, setView] = useState<ViewState>('categories');
+  const [view, setView] = useState<ViewState>('items');
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
@@ -89,8 +89,16 @@ const MenuScreen = () => {
   const items = (menuType === 'robot' ? robotItems : staffItems).filter(i => i.cat === activeCategory);
 
   useEffect(() => {
-    setActiveCategory('');
-    setView('categories');
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0].id);
+    }
+  }, [categories, activeCategory]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setActiveCategory(categories[0].id);
+    }
+    setView('items');
   }, [menuType]);
 
   const selectCategory = (catId: string) => {

@@ -748,6 +748,7 @@ const MenuScreen = () => {
                     <button
                       key={opt.id}
                       onClick={() => {
+                        if (opt.out_of_stock) return;
                         if (opt.isBase) {
                           addToCart(variantItem);
                         } else {
@@ -763,8 +764,15 @@ const MenuScreen = () => {
                         }
                         setVariantItem(null);
                       }}
-                      className="group rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all hover:shadow-xl hover:border-black/20 active:scale-[0.96] text-left bg-white"
+                      className={`group rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all text-left bg-white relative ${opt.out_of_stock ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-xl hover:border-black/20 active:scale-[0.96]'}`}
                     >
+                      {opt.out_of_stock && (
+                        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 rounded-2xl">
+                          <span className="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            {language === 'ku' ? 'نەماوە' : language === 'ar' ? 'نفذ' : 'Out of Stock'}
+                          </span>
+                        </div>
+                      )}
                       {/* Variant image */}
                       <div className="aspect-[4/3] overflow-hidden bg-gray-50 flex items-center justify-center relative">
                         {opt.image ? (

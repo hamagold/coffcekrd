@@ -27,9 +27,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   // Variants state
   const [variantItemId, setVariantItemId] = useState<string | null>(null);
   const [variantItemName, setVariantItemName] = useState('');
-  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
-  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 

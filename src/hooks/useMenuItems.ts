@@ -118,9 +118,15 @@ export const useMenuItems = () => {
     if (updates.image !== undefined) dbUpdates.image = updates.image || null;
     if (updates.emoji !== undefined) dbUpdates.emoji = updates.emoji;
     if (updates.cat !== undefined) dbUpdates.cat = updates.cat;
+    if (updates.out_of_stock !== undefined) dbUpdates.out_of_stock = updates.out_of_stock;
     const { error } = await supabase.from('menu_items').update(dbUpdates).eq('item_id', itemId);
     if (error) throw error;
   }, []);
 
-  return { robotItems, staffItems, loading, addItem, deleteItem, updateItem, refetch: fetchItems };
+  const toggleOutOfStock = useCallback(async (itemId: string, currentValue: boolean) => {
+    const { error } = await supabase.from('menu_items').update({ out_of_stock: !currentValue }).eq('item_id', itemId);
+    if (error) throw error;
+  }, []);
+
+  return { robotItems, staffItems, loading, addItem, deleteItem, updateItem, toggleOutOfStock, refetch: fetchItems };
 };

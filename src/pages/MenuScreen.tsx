@@ -26,7 +26,7 @@ const FROOZT_PINK = '#ffb0be';
 const FROOZT_ICE = '#9eecff';
 const FROOZT_LILAC = '#e2bdff';
 
-type ViewState = 'categories' | 'items' | 'cart' | 'checkout';
+type ViewState = 'items' | 'cart' | 'checkout';
 
 const MenuScreen = () => {
   const navigate = useNavigate();

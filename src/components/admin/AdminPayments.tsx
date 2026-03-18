@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchStorageConfig } from '@/components/settings/StorageSettings';
 
 export interface PaymentConfig {
+  cash: boolean;
   plc: boolean;
   fib: boolean;
   zain: boolean;

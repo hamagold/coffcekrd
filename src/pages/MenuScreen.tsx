@@ -193,8 +193,9 @@ const MenuScreen = () => {
     return null;
   };
 
+  const menuLabel = menuType === 'robot' ? (t.tabRobot || 'Robot Menu') : (t.tabStaff || 'Staff Menu');
   const headerTitle = view === 'categories'
-    ? (language === 'ku' ? 'ئۆردەرەکەت دەست پێ بکە' : language === 'ar' ? 'ابدأ طلبك' : 'Start your order')
+    ? menuLabel
     : view === 'items'
       ? (language === 'ku' ? `${categories.find(c => c.id === activeCategory)?.name[language] || ''} هەڵبژێرە` : language === 'ar' ? `اختر ${categories.find(c => c.id === activeCategory)?.name[language] || ''}` : `Select ${categories.find(c => c.id === activeCategory)?.name[language] || ''}`)
       : view === 'cart'

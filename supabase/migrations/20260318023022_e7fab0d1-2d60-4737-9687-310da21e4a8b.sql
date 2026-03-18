@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_item_variants ADD COLUMN out_of_stock boolean NOT NULL DEFAULT false;

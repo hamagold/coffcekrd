@@ -45,9 +45,9 @@ const MenuTypeSelect = () => {
       sub: t.tabRobotSub || 'Automated preparation',
       icon: Bot,
       image: robotImage,
-      gradient: 'from-amber-500/20 via-yellow-400/10 to-transparent',
+      gradient: 'from-primary/20 via-accent/10 to-transparent',
       accentHsl: 'hsl(var(--primary))',
-      glowColor: 'hsl(38 92% 55% / 0.4)',
+      glowColor: 'hsl(var(--primary) / 0.4)',
     },
     {
       type: 'staff' as const,
@@ -55,9 +55,9 @@ const MenuTypeSelect = () => {
       sub: t.tabStaffSub || 'Manual preparation',
       icon: ChefHat,
       image: staffImage,
-      gradient: 'from-rose-500/20 via-pink-400/10 to-transparent',
-      accentHsl: 'hsl(350 80% 72%)',
-      glowColor: 'hsl(350 80% 72% / 0.4)',
+      gradient: 'from-primary/20 via-accent/10 to-transparent',
+      accentHsl: 'hsl(var(--primary))',
+      glowColor: 'hsl(var(--primary) / 0.4)',
     },
   ];
 

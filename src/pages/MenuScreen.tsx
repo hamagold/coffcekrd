@@ -179,7 +179,7 @@ const MenuScreen = () => {
   };
   const printLabel = () => doPrint(lastOrderNum);
 
-  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
   useEffect(() => { fetchPaymentConfig().then(setPaymentConfig); fetchPaymentLogos().then(setPaymentLogos); }, []);
 

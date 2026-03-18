@@ -332,11 +332,16 @@ const AdminPayments = () => {
           </div>
           <div className="flex-1">
             <div className="text-foreground font-bold text-sm">{labels.cashTitle[lang]}</div>
-            <div className="text-muted-foreground text-xs">{labels.cashDesc[lang]}</div>
+            <div className="text-muted-foreground text-xs">
+              {lang === 'ku' ? 'پارەدانی کاش بەدەست (MANUAL CASH)' : lang === 'ar' ? 'الدفع النقدي اليدوي' : 'Manual cash payment'}
+            </div>
           </div>
-          <span className="px-3 py-1 rounded-full bg-success/10 text-success text-[10px] font-bold border border-success/20">
-            {labels.alwaysOn[lang]}
-          </span>
+          <button onClick={() => toggleProvider('cash')} className="transition-all" title={labels.showInMenu[lang]}>
+            {config.cash !== false
+              ? <ToggleRight className="w-8 h-8 text-success" />
+              : <ToggleLeft className="w-8 h-8 text-muted-foreground" />
+            }
+          </button>
         </div>
       </div>
 

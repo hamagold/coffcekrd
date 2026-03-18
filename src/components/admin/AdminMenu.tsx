@@ -10,7 +10,7 @@ import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
-  const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
+  const { robotItems, staffItems, loading, addItem, deleteItem, updateItem, toggleOutOfStock } = useMenuItems();
   const { robotCategories, staffCategories, addCategory, deleteCategory, loading: catsLoading } = useCategories();
   const { variants, getVariantsForItem, addVariant, updateVariant, deleteVariant } = useVariants();
   const t = adminT[lang];

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import OrderQRCode, { OrderQRCodeHandle } from '@/components/OrderQRCode';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
@@ -29,9 +29,11 @@ type ViewState = 'categories' | 'items' | 'cart' | 'checkout';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { language, direction, robotItems, staffItems, cart, addToCart, changeQty, cartTotal, cartItemCount, placeOrder, clearCart } = useStore();
   const t = translations[language];
-  const [menuType, setMenuType] = useState<MenuType>('robot');
+  const initialType = (searchParams.get('type') === 'staff' ? 'staff' : 'robot') as MenuType;
+  const [menuType, setMenuType] = useState<MenuType>(initialType);
   const [activeCategory, setActiveCategory] = useState('');
   const [payment, setPayment] = useState<PaymentMethod>('cash');
   const [orderType, setOrderType] = useState<OrderType>('dine');

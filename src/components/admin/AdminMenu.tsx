@@ -457,6 +457,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <div key={v.id} className="flex items-center gap-2 p-3 bg-secondary rounded-lg border border-border">
                     {editingVariant?.id === v.id ? (
                       <div className="flex-1 space-y-2">
+                        <ImageUpload
+                          onUpload={(url) => setEditVariantData(p => ({ ...p, image: url }))}
+                          currentImage={editVariantData.image || undefined}
+                          folder="variants"
+                        />
                         <div className="grid grid-cols-3 gap-2">
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Kurdish" value={editVariantData.nameKu} onChange={e => setEditVariantData(p => ({ ...p, nameKu: e.target.value }))} />
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Arabic" value={editVariantData.nameAr} onChange={e => setEditVariantData(p => ({ ...p, nameAr: e.target.value }))} />
@@ -466,7 +471,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-24" type="number" placeholder="Price" value={editVariantData.price} onChange={e => setEditVariantData(p => ({ ...p, price: e.target.value }))} />
                           <button onClick={async () => {
                             try {
-                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0 });
+                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null });
                               setEditingVariant(null);
                               toast.success(lang === 'ku' ? 'نوێکرایەوە' : 'Updated');
                             } catch { toast.error('Error'); }

@@ -498,6 +498,17 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">
                 {lang === 'ku' ? 'جۆری نوێ زیادبکە' : lang === 'ar' ? 'إضافة خيار جديد' : 'Add New Variant'}
               </p>
+              {/* Image upload for new variant */}
+              <div>
+                <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1 font-semibold">
+                  {lang === 'ku' ? 'وێنە (ئارەزوومەندانە)' : lang === 'ar' ? 'صورة (اختياري)' : 'Image (optional)'}
+                </label>
+                <ImageUpload
+                  onUpload={(url) => setNewVariant(p => ({ ...p, image: url }))}
+                  currentImage={newVariant.image || undefined}
+                  folder="variants"
+                />
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ku' ? 'ناوی کوردی' : 'Kurdish'} value={newVariant.nameKu} onChange={e => setNewVariant(p => ({ ...p, nameKu: e.target.value }))} />
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ar' ? 'الاسم بالعربية' : 'Arabic'} value={newVariant.nameAr} onChange={e => setNewVariant(p => ({ ...p, nameAr: e.target.value }))} />
@@ -516,8 +527,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         name_en: newVariant.nameEn,
                         price: parseInt(newVariant.price) || 0,
                         sort_order: getVariantsForItem(variantItemId).length,
+                        image: newVariant.image || null,
                       });
-                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
                       toast.success(lang === 'ku' ? 'جۆر زیادکرا' : 'Variant added');
                     } catch { toast.error('Error'); }
                   }}

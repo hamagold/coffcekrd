@@ -231,14 +231,16 @@ const MenuScreen = () => {
       {/* ===== YELLOW HEADER BAR ===== */}
       <div className="shrink-0 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between relative z-20" style={{ background: FROOZT_YELLOW }}>
         <div className="flex items-center gap-3">
-          {view !== 'categories' && (
             <button
               onClick={() => {
                 if (view === 'checkout') setView('cart');
                 else if (view === 'cart') setView('items');
-                else setView('categories');
+                else navigate('/select');
               }}
               className="w-10 h-10 rounded-full border-2 border-black/80 flex items-center justify-center cursor-pointer hover:bg-black/10 transition-all"
+            >
+              <ChevronLeft className="w-5 h-5 text-black/80" />
+            </button>
             >
               <ChevronLeft className="w-5 h-5 text-black/80" />
             </button>

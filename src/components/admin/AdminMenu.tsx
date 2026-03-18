@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { MenuItem, MenuType, Language } from '@/types';
-import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil, FolderPlus, Tag } from 'lucide-react';
+import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil, FolderPlus, Tag, Layers } from 'lucide-react';
 import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useCategories } from '@/hooks/useCategories';
+import { useVariants, Variant } from '@/hooks/useVariants';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
   const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
   const { robotCategories, staffCategories, addCategory, deleteCategory, loading: catsLoading } = useCategories();
+  const { variants, getVariantsForItem, addVariant, updateVariant, deleteVariant } = useVariants();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [tab, setTab] = useState<MenuType>('robot');
@@ -21,6 +23,13 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
   const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
+  
+  // Variants state
+  const [variantItemId, setVariantItemId] = useState<string | null>(null);
+  const [variantItemName, setVariantItemName] = useState('');
+  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+  const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
+  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 

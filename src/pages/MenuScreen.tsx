@@ -317,7 +317,14 @@ const MenuScreen = () => {
                 {items.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => addToCart(item)}
+                    onClick={() => {
+                      const itemVariants = getVariantsForItem(item.id);
+                      if (itemVariants.length > 0) {
+                        setVariantItem(item);
+                      } else {
+                        addToCart(item);
+                      }
+                    }}
                     className="group bg-white rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-black/20 active:scale-[0.97] text-left"
                   >
                     <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-2">

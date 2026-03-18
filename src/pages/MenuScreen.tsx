@@ -179,9 +179,21 @@ const MenuScreen = () => {
   };
   const printLabel = () => doPrint(lastOrderNum);
 
-  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
-  useEffect(() => { fetchPaymentConfig().then(setPaymentConfig); fetchPaymentLogos().then(setPaymentLogos); }, []);
+  useEffect(() => {
+    fetchPaymentConfig().then(cfg => {
+      setPaymentConfig(cfg);
+      // Auto-select first available payment if cash is disabled
+      if (cfg.cash === false) {
+        if (cfg.plc !== false) setPayment('plc');
+        else if (cfg.fib !== false) setPayment('fib');
+        else if (cfg.zain !== false) setPayment('zain');
+        else if (cfg.fastpay !== false) setPayment('fastpay');
+      }
+    });
+    fetchPaymentLogos().then(setPaymentLogos);
+  }, []);
 
   const getFibLogo = () => paymentLogos.fib || defaultFibLogo;
   const getZainLogo = () => paymentLogos.zain || defaultZaincashLogo;
@@ -429,6 +441,7 @@ const MenuScreen = () => {
 
               {/* Cash options */}
               <div className="space-y-3 mb-4">
+                {paymentConfig.cash !== false && (
                 <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${payment === 'cash' ? 'border-pink-400' : 'border-black/20'}`}>
                     {payment === 'cash' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: FROOZT_PINK }} />}
@@ -440,6 +453,7 @@ const MenuScreen = () => {
                     </span>
                   </div>
                 </label>
+                )}
 
                 {paymentConfig.plc !== false && (
                   <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">

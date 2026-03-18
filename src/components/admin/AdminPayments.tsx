@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchStorageConfig } from '@/components/settings/StorageSettings';
 
 export interface PaymentConfig {
+  cash: boolean;
   plc: boolean;
   fib: boolean;
   zain: boolean;
@@ -33,7 +34,7 @@ export const fetchPaymentConfig = async (): Promise<PaymentConfig> => {
     .select('value')
     .eq('key', 'payment_config')
     .single();
-  cachedPaymentConfig = (data?.value as any) || { plc: true, fib: true, zain: true, fastpay: true };
+  cachedPaymentConfig = (data?.value as any) || { cash: true, plc: true, fib: true, zain: true, fastpay: true };
   return cachedPaymentConfig!;
 };
 
@@ -127,7 +128,7 @@ const providers = [
 
 const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
-  const [config, setConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [config, setConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [fieldValues, setFieldValues] = useState<PaymentKeys>({});
   const [logos, setLogos] = useState<PaymentLogos>({});
   const [loading, setLoading] = useState(true);
@@ -331,11 +332,16 @@ const AdminPayments = () => {
           </div>
           <div className="flex-1">
             <div className="text-foreground font-bold text-sm">{labels.cashTitle[lang]}</div>
-            <div className="text-muted-foreground text-xs">{labels.cashDesc[lang]}</div>
+            <div className="text-muted-foreground text-xs">
+              {lang === 'ku' ? 'پارەدانی کاش بەدەست (MANUAL CASH)' : lang === 'ar' ? 'الدفع النقدي اليدوي' : 'Manual cash payment'}
+            </div>
           </div>
-          <span className="px-3 py-1 rounded-full bg-success/10 text-success text-[10px] font-bold border border-success/20">
-            {labels.alwaysOn[lang]}
-          </span>
+          <button onClick={() => toggleProvider('cash')} className="transition-all" title={labels.showInMenu[lang]}>
+            {config.cash !== false
+              ? <ToggleRight className="w-8 h-8 text-success" />
+              : <ToggleLeft className="w-8 h-8 text-muted-foreground" />
+            }
+          </button>
         </div>
       </div>
 

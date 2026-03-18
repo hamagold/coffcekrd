@@ -24,7 +24,7 @@ const App = () => (
       <StoreProvider>
         <Toaster />
         <Sonner />
-        <HashRouter>
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<LanguageSelect />} />
             <Route path="/select" element={<MenuTypeSelect />} />

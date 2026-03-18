@@ -172,6 +172,8 @@ const PLCItemCodes = ({ lang }: { lang: Language }) => {
   );
 };
 
+type ConnectionStatus = 'unknown' | 'checking' | 'connected' | 'disconnected';
+
 /* ─── Main AdminPLC Component ─── */
 const AdminPLC = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
@@ -181,6 +183,7 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
+  const [statuses, setStatuses] = useState<Record<string, ConnectionStatus>>({});
 
   useEffect(() => {
     fetchPLCConfig().then(cfg => {

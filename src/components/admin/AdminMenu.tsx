@@ -5,6 +5,7 @@ import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useCategories } from '@/hooks/useCategories';
 import { useVariants, Variant } from '@/hooks/useVariants';
+import { supabase } from '@/integrations/supabase/client';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
@@ -27,9 +28,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   // Variants state
   const [variantItemId, setVariantItemId] = useState<string | null>(null);
   const [variantItemName, setVariantItemName] = useState('');
-  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
   const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
-  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 
@@ -205,7 +206,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <button onClick={() => {
                     setVariantItemId(item.id);
                     setVariantItemName(item.name[lang] || item.name.en);
-                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
+                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
                   }} className="p-1.5 bg-accent/50 text-accent-foreground border border-accent/30 rounded-md cursor-pointer hover:bg-accent transition-all relative">
                     <Layers className="w-3.5 h-3.5" />
                     {getVariantsForItem(item.id).length > 0 && (
@@ -469,9 +470,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         </div>
                         <div className="flex gap-2">
                           <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-24" type="number" placeholder="Price" value={editVariantData.price} onChange={e => setEditVariantData(p => ({ ...p, price: e.target.value }))} />
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-20" type="number" placeholder="PLC Code" value={editVariantData.plcCode} onChange={e => setEditVariantData(p => ({ ...p, plcCode: e.target.value }))} />
                           <button onClick={async () => {
                             try {
-                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null });
+                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0, image: editVariantData.image || null, plc_code: parseInt(editVariantData.plcCode) || 0 });
                               setEditingVariant(null);
                               toast.success(lang === 'ku' ? 'نوێکرایەوە' : 'Updated');
                             } catch { toast.error('Error'); }
@@ -485,8 +487,9 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         <div className="flex-1 min-w-0">
                           <span className="text-foreground text-xs font-medium">{lang === 'ku' ? v.name_ku : lang === 'ar' ? v.name_ar : v.name_en}</span>
                           <span className="text-primary text-xs font-bold ml-2">IQD {v.price.toLocaleString()}</span>
+                          {v.plc_code > 0 && <span className="text-muted-foreground text-[10px] ml-1">PLC:{v.plc_code}</span>}
                         </div>
-                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price), image: v.image || '' }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
+                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price), image: v.image || '', plcCode: String(v.plc_code || '') }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
                           <Pencil className="w-3 h-3" />
                         </button>
                         <button onClick={async () => { try { await deleteVariant(v.id); toast.success(lang === 'ku' ? 'سڕایەوە' : 'Deleted'); } catch { toast.error('Error'); } }} className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors">
@@ -522,10 +525,20 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               </div>
               <div className="flex gap-2">
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50 w-28" type="number" placeholder={lang === 'ku' ? 'نرخ (IQD)' : 'Price (IQD)'} value={newVariant.price} onChange={e => setNewVariant(p => ({ ...p, price: e.target.value }))} />
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50 w-20" type="number" placeholder="PLC Code" value={newVariant.plcCode} onChange={e => setNewVariant(p => ({ ...p, plcCode: e.target.value }))} />
                 <button
                   onClick={async () => {
                     if (!newVariant.nameEn && !newVariant.nameKu) { toast.error(lang === 'ku' ? 'ناو پێویستە' : 'Name required'); return; }
                     try {
+                      // Auto-generate plc_code if not provided
+                      let plcCode = parseInt(newVariant.plcCode) || 0;
+                      if (plcCode === 0) {
+                        const { data: maxData } = await supabase.from('menu_item_variants').select('plc_code').order('plc_code', { ascending: false }).limit(1);
+                        const { data: maxItemData } = await supabase.from('menu_items').select('plc_code').order('plc_code', { ascending: false }).limit(1);
+                        const maxVariant = (maxData as any)?.[0]?.plc_code || 0;
+                        const maxItem = maxItemData?.[0]?.plc_code || 0;
+                        plcCode = Math.max(maxVariant, maxItem) + 1;
+                      }
                       await addVariant({
                         item_id: variantItemId,
                         name_ku: newVariant.nameKu,
@@ -534,9 +547,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         price: parseInt(newVariant.price) || 0,
                         sort_order: getVariantsForItem(variantItemId).length,
                         image: newVariant.image || null,
+                        plc_code: plcCode,
                       });
-                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
-                      toast.success(lang === 'ku' ? 'جۆر زیادکرا' : 'Variant added');
+                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
+                      toast.success(lang === 'ku' ? `جۆر زیادکرا (PLC: ${plcCode})` : `Variant added (PLC: ${plcCode})`);
                     } catch { toast.error('Error'); }
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1"

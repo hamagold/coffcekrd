@@ -8,6 +8,7 @@ export interface Variant {
   name_ar: string;
   name_en: string;
   price: number;
+  plc_code: number;
   sort_order: number;
   image: string | null;
 }

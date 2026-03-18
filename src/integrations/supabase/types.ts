@@ -83,6 +83,7 @@ export type Database = {
           name_ar: string
           name_en: string
           name_ku: string
+          plc_code: number
           price: number
           sort_order: number
         }
@@ -94,6 +95,7 @@ export type Database = {
           name_ar?: string
           name_en?: string
           name_ku?: string
+          plc_code?: number
           price?: number
           sort_order?: number
         }
@@ -105,6 +107,7 @@ export type Database = {
           name_ar?: string
           name_en?: string
           name_ku?: string
+          plc_code?: number
           price?: number
           sort_order?: number
         }

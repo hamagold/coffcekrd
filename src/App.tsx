@@ -6,6 +6,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import { StoreProvider } from "@/store/StoreContext";
 import { initTheme } from "@/hooks/useTheme";
 import LanguageSelect from "./pages/LanguageSelect";
+import MenuTypeSelect from "./pages/MenuTypeSelect";
 import MenuScreen from "./pages/MenuScreen";
 import AdminPanel from "./pages/AdminPanel";
 import OnlineOrder from "./pages/OnlineOrder";

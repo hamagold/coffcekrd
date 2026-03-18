@@ -705,6 +705,89 @@ const MenuScreen = () => {
           </div>
         </div>
       )}
+
+      {/* ===== VARIANT SELECTION MODAL ===== */}
+      {variantItem && (() => {
+        const itemVariants = getVariantsForItem(variantItem.id);
+        const itemImg = menuImages[variantItem.id] || variantItem.image;
+        return (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-[1000]" onClick={() => setVariantItem(null)}>
+            <div
+              className="bg-white w-full max-w-[480px] rounded-t-3xl sm:rounded-3xl overflow-hidden animate-slide-up"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Item header */}
+              <div className="relative h-48 sm:h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
+                {itemImg ? (
+                  <img src={itemImg} alt={variantItem.name[language]} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-6xl">{variantItem.emoji}</span>
+                )}
+                <button
+                  onClick={() => setVariantItem(null)}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <h3 className="text-white text-xl font-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {variantItem.name[language]}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Variant options */}
+              <div className="p-4 max-h-[50vh] overflow-y-auto">
+                <p className="text-xs font-bold text-black/50 uppercase tracking-widest mb-3" style={{ fontFamily: "'Courier New', monospace" }}>
+                  {language === 'ku' ? 'جۆرێک هەڵبژێرە' : language === 'ar' ? 'اختر نوعاً' : 'Select an option'}
+                </p>
+                <div className="space-y-2">
+                  {/* Base item option (original price) */}
+                  <button
+                    onClick={() => {
+                      addToCart(variantItem);
+                      setVariantItem(null);
+                    }}
+                    className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-black/10 hover:border-black/30 hover:bg-gray-50 transition-all cursor-pointer text-left"
+                  >
+                    <span className="text-sm font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                      {variantItem.name[language]}
+                    </span>
+                    <span className="text-sm font-bold" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
+                      IQD {variantItem.price.toLocaleString()}
+                    </span>
+                  </button>
+
+                  {/* Variant options */}
+                  {itemVariants.map(v => (
+                    <button
+                      key={v.id}
+                      onClick={() => {
+                        const variantMenuItem: MenuItem = {
+                          ...variantItem,
+                          id: `${variantItem.id}_v_${v.id}`,
+                          name: { ku: v.name_ku || variantItem.name.ku, ar: v.name_ar || variantItem.name.ar, en: v.name_en || variantItem.name.en },
+                          price: v.price,
+                        };
+                        addToCart(variantMenuItem);
+                        setVariantItem(null);
+                      }}
+                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-black/10 hover:border-black/30 hover:bg-gray-50 transition-all cursor-pointer text-left"
+                    >
+                      <span className="text-sm font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? v.name_ku : language === 'ar' ? v.name_ar : v.name_en}
+                      </span>
+                      <span className="text-sm font-bold" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
+                        IQD {v.price.toLocaleString()}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

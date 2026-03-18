@@ -231,7 +231,6 @@ const MenuScreen = () => {
         >
           {language === 'ku' ? 'گەڕانەوە' : language === 'ar' ? 'رجوع' : 'BACK'}
         </button>
-        </button>
       </div>
 
       {/* Menu type tabs removed - selection happens on /select page */}

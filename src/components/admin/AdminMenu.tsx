@@ -25,6 +25,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
   const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
   
+  // Delete category password state
+  const [deleteCatId, setDeleteCatId] = useState<string | null>(null);
+  const [deleteCatPassword, setDeleteCatPassword] = useState('');
+  const [deleteCatError, setDeleteCatError] = useState('');
+
   // Variants state
   const [variantItemId, setVariantItemId] = useState<string | null>(null);
   const [variantItemName, setVariantItemName] = useState('');

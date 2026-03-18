@@ -589,6 +589,34 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
           </div>
         </div>
       )}
+
+      {/* Delete Category Password Modal */}
+      {deleteCatId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div dir={dir} className="bg-card p-6 rounded-2xl w-full max-w-sm shadow-xl border border-border space-y-4">
+            <h3 className="text-lg font-bold text-foreground">
+              {lang === 'ku' ? 'پاسوۆرد بنووسە بۆ سڕینەوە' : lang === 'ar' ? 'أدخل كلمة المرور للحذف' : 'Enter password to delete'}
+            </h3>
+            <input
+              type="password"
+              value={deleteCatPassword}
+              onChange={e => { setDeleteCatPassword(e.target.value); setDeleteCatError(''); }}
+              placeholder={lang === 'ku' ? 'پاسوۆرد' : lang === 'ar' ? 'كلمة المرور' : 'Password'}
+              className="w-full px-3 py-2 rounded-lg border border-border bg-secondary text-foreground text-sm"
+              onKeyDown={e => e.key === 'Enter' && confirmDeleteCategory()}
+            />
+            {deleteCatError && <p className="text-destructive text-xs">{deleteCatError}</p>}
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setDeleteCatId(null)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">
+                {lang === 'ku' ? 'پاشگەزبوونەوە' : lang === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button onClick={confirmDeleteCategory} className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all">
+                {lang === 'ku' ? 'سڕینەوە' : lang === 'ar' ? 'حذف' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

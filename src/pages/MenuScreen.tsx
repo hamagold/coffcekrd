@@ -181,7 +181,19 @@ const MenuScreen = () => {
 
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
-  useEffect(() => { fetchPaymentConfig().then(setPaymentConfig); fetchPaymentLogos().then(setPaymentLogos); }, []);
+  useEffect(() => {
+    fetchPaymentConfig().then(cfg => {
+      setPaymentConfig(cfg);
+      // Auto-select first available payment if cash is disabled
+      if (cfg.cash === false) {
+        if (cfg.plc !== false) setPayment('plc');
+        else if (cfg.fib !== false) setPayment('fib');
+        else if (cfg.zain !== false) setPayment('zain');
+        else if (cfg.fastpay !== false) setPayment('fastpay');
+      }
+    });
+    fetchPaymentLogos().then(setPaymentLogos);
+  }, []);
 
   const getFibLogo = () => paymentLogos.fib || defaultFibLogo;
   const getZainLogo = () => paymentLogos.zain || defaultZaincashLogo;

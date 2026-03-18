@@ -5,6 +5,7 @@ import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useCategories } from '@/hooks/useCategories';
 import { useVariants, Variant } from '@/hooks/useVariants';
+import { supabase } from '@/integrations/supabase/client';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 

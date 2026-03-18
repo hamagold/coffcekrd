@@ -27,6 +27,7 @@ const App = () => (
         <HashRouter>
           <Routes>
             <Route path="/" element={<LanguageSelect />} />
+            <Route path="/select" element={<MenuTypeSelect />} />
             <Route path="/menu" element={<MenuScreen />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/order" element={<OnlineOrder />} />

@@ -44,7 +44,7 @@ const LanguageSelect = () => {
 
   const handleSelect = (lang: Language) => {
     setLanguage(lang);
-    navigate('/menu');
+    navigate('/select');
   };
 
   const languages = [

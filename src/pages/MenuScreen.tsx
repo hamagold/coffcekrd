@@ -429,6 +429,7 @@ const MenuScreen = () => {
 
               {/* Cash options */}
               <div className="space-y-3 mb-4">
+                {paymentConfig.cash !== false && (
                 <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${payment === 'cash' ? 'border-pink-400' : 'border-black/20'}`}>
                     {payment === 'cash' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: FROOZT_PINK }} />}
@@ -440,6 +441,7 @@ const MenuScreen = () => {
                     </span>
                   </div>
                 </label>
+                )}
 
                 {paymentConfig.plc !== false && (
                   <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">

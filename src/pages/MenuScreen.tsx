@@ -241,16 +241,6 @@ const MenuScreen = () => {
         {/* ===== CATEGORY SELECTION VIEW ===== */}
         {view === 'categories' && (
           <div className="flex-1 overflow-y-auto bg-white">
-            {/* Robot mascot greeting */}
-            <div className="text-center pt-6 sm:pt-10 pb-4 sm:pb-6">
-              <div className="text-5xl sm:text-6xl mb-3" style={{ fontFamily: "'Courier New', monospace" }}>🤖</div>
-              <h2 className="text-xl sm:text-2xl font-black text-black" style={{ fontFamily: "'Courier New', monospace" }}>
-                {language === 'ku' ? 'سڵاو!' : language === 'ar' ? 'مرحباً!' : 'Hello human!'}
-              </h2>
-              <p className="text-sm sm:text-base text-black/60 mt-1" style={{ fontFamily: "'Courier New', monospace" }}>
-                {language === 'ku' ? 'چی بۆت ئامادە بکەم؟' : language === 'ar' ? 'ماذا يمكنني أن أقدم لك؟' : 'What can I get you today?'}
-              </p>
-            </div>
 
             {/* Category Grid - 3x2 */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4 px-4 sm:px-8 pb-24">

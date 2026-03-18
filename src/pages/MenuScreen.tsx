@@ -232,38 +232,7 @@ const MenuScreen = () => {
         </button>
       </div>
 
-      {/* ===== MENU TYPE TABS ===== */}
-      {view === 'categories' && (
-        <div className="shrink-0 flex border-b-2 border-black/10 bg-white relative z-10">
-          <button
-            onClick={() => setMenuType('robot')}
-            className="flex-1 py-3 text-center cursor-pointer transition-all flex items-center justify-center gap-2"
-            style={{
-              borderBottom: menuType === 'robot' ? `3px solid ${FROOZT_YELLOW}` : '3px solid transparent',
-              fontFamily: "'Courier New', monospace",
-              fontWeight: menuType === 'robot' ? 900 : 600,
-              color: menuType === 'robot' ? '#1a1a1a' : '#999',
-            }}
-          >
-            <Bot className="w-4 h-4" />
-            <span className="text-xs sm:text-sm uppercase tracking-wider">{t.tabRobot}</span>
-          </button>
-          <div className="w-px bg-black/10" />
-          <button
-            onClick={() => setMenuType('staff')}
-            className="flex-1 py-3 text-center cursor-pointer transition-all flex items-center justify-center gap-2"
-            style={{
-              borderBottom: menuType === 'staff' ? `3px solid ${FROOZT_PINK}` : '3px solid transparent',
-              fontFamily: "'Courier New', monospace",
-              fontWeight: menuType === 'staff' ? 900 : 600,
-              color: menuType === 'staff' ? '#1a1a1a' : '#999',
-            }}
-          >
-            <ChefHat className="w-4 h-4" />
-            <span className="text-xs sm:text-sm uppercase tracking-wider">{t.tabStaff}</span>
-          </button>
-        </div>
-      )}
+      {/* Menu type tabs removed - selection happens on /select page */}
 
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 overflow-hidden flex flex-col">

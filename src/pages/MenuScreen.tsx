@@ -677,7 +677,7 @@ const MenuScreen = () => {
             </div>
             <div className="mb-5"><OrderQRCode ref={qrRef} orderNumber={lastOrderNum} cafeName={cafeName} /></div>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => { setShowModal(false); setView('categories'); }} className="px-6 py-3 rounded-xl font-black text-sm cursor-pointer uppercase tracking-wider" style={{ background: FROOZT_YELLOW, color: '#1a1a1a', fontFamily: "'Courier New', monospace" }}>{t.modalOk}</button>
+              <button onClick={() => { setShowModal(false); setView('items'); }} className="px-6 py-3 rounded-xl font-black text-sm cursor-pointer uppercase tracking-wider" style={{ background: FROOZT_YELLOW, color: '#1a1a1a', fontFamily: "'Courier New', monospace" }}>{t.modalOk}</button>
               <button onClick={printLabel} className="px-6 py-3 rounded-xl bg-gray-100 text-black border-2 border-black/10 font-bold text-sm cursor-pointer hover:bg-gray-200 transition-all flex items-center gap-2" style={{ fontFamily: "'Courier New', monospace" }}>
                 <Printer className="w-4 h-4" />{t.modalPrint}
               </button>

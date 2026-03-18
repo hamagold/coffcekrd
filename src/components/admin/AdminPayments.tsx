@@ -128,7 +128,7 @@ const providers = [
 
 const AdminPayments = () => {
   const [lang, setLang] = useState<'ku' | 'ar' | 'en'>('ku');
-  const [config, setConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [config, setConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [fieldValues, setFieldValues] = useState<PaymentKeys>({});
   const [logos, setLogos] = useState<PaymentLogos>({});
   const [loading, setLoading] = useState(true);

@@ -480,7 +480,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                           <span className="text-foreground text-xs font-medium">{lang === 'ku' ? v.name_ku : lang === 'ar' ? v.name_ar : v.name_en}</span>
                           <span className="text-primary text-xs font-bold ml-2">IQD {v.price.toLocaleString()}</span>
                         </div>
-                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price) }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
+                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price), image: v.image || '' }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
                           <Pencil className="w-3 h-3" />
                         </button>
                         <button onClick={async () => { try { await deleteVariant(v.id); toast.success(lang === 'ku' ? 'سڕایەوە' : 'Deleted'); } catch { toast.error('Error'); } }} className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors">

@@ -34,7 +34,7 @@ const App = () => (
             <Route path="/dev" element={<DevPanel />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </HashRouter>
+        </BrowserRouter>
       </StoreProvider>
     </TooltipProvider>
   </QueryClientProvider>

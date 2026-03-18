@@ -316,10 +316,22 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
         <PLCItemCodes lang={lang} />
       </div>
 
+      {/* Check All Button */}
+      <div className="mb-4">
+        <button
+          onClick={checkAllConnections}
+          className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-primary/20 transition-all"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          {lang === 'ku' ? 'پشکنینی هەموو ئامێرەکان' : lang === 'ar' ? 'فحص جميع الأجهزة' : 'Check All Machines'}
+        </button>
+      </div>
+
       {/* Machines List */}
       <div className="space-y-3 mb-5">
         {config.machines.map((machine, idx) => {
           const isExpanded = expandedIdx === idx;
+          const statusInfo = getStatusInfo(machine.machineId);
           return (
             <div key={idx} className="bg-card rounded-xl border border-border overflow-hidden">
               <button
@@ -332,6 +344,27 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
                 <div className="flex-1 text-start">
                   <div className="text-foreground font-bold text-sm">{machine.name}</div>
                   <div className="text-muted-foreground text-xs font-mono">{machine.machineId} · {machine.ip}:{machine.port}</div>
+                </div>
+                {/* Connection Status Indicator */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border" style={{
+                    borderColor: statusInfo.color === 'text-success' ? 'hsl(var(--success) / 0.3)' :
+                                 statusInfo.color === 'text-destructive' ? 'hsl(var(--destructive) / 0.3)' :
+                                 statusInfo.color === 'text-warning' ? 'hsl(var(--warning, 45 93% 47%) / 0.3)' :
+                                 'hsl(var(--border))',
+                    backgroundColor: statusInfo.color === 'text-success' ? 'hsl(var(--success) / 0.08)' :
+                                     statusInfo.color === 'text-destructive' ? 'hsl(var(--destructive) / 0.08)' :
+                                     statusInfo.color === 'text-warning' ? 'hsl(var(--warning, 45 93% 47%) / 0.08)' :
+                                     'transparent',
+                  }}>
+                    <span className={`relative flex h-2 w-2`}>
+                      {statusInfo.pulse && (
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${statusInfo.bg}`}></span>
+                      )}
+                      <span className={`relative inline-flex rounded-full h-2 w-2 ${statusInfo.bg}`}></span>
+                    </span>
+                    <span className={`text-[10px] font-bold ${statusInfo.color}`}>{statusInfo.label}</span>
+                  </div>
                 </div>
                 <div className="text-muted-foreground text-xs">
                   {isExpanded ? '▲' : '▼'}

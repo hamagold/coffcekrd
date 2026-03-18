@@ -710,80 +710,102 @@ const MenuScreen = () => {
       {variantItem && (() => {
         const itemVariants = getVariantsForItem(variantItem.id);
         const itemImg = menuImages[variantItem.id] || variantItem.image;
+        const allOptions = [
+          { id: '__base', name: variantItem.name[language], price: variantItem.price, image: itemImg || null, isBase: true },
+          ...itemVariants.map(v => ({
+            id: v.id,
+            name: language === 'ku' ? v.name_ku : language === 'ar' ? v.name_ar : v.name_en,
+            price: v.price,
+            image: v.image || null,
+            isBase: false,
+            variant: v,
+          })),
+        ];
         return (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-[1000]" onClick={() => setVariantItem(null)}>
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center z-[1000]" onClick={() => setVariantItem(null)}>
             <div
-              className="bg-white w-full max-w-[480px] rounded-t-3xl sm:rounded-3xl overflow-hidden animate-slide-up"
+              className="bg-white w-full max-w-[520px] rounded-t-[28px] sm:rounded-[28px] overflow-hidden"
+              style={{ animation: 'slideUp 0.35s cubic-bezier(0.16,1,0.3,1)' }}
               onClick={e => e.stopPropagation()}
             >
-              {/* Item header */}
-              <div className="relative h-48 sm:h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
+              {/* Hero header with item image */}
+              <div className="relative h-52 sm:h-60 bg-black flex items-center justify-center overflow-hidden">
                 {itemImg ? (
-                  <img src={itemImg} alt={variantItem.name[language]} className="w-full h-full object-cover" />
+                  <img src={itemImg} alt={variantItem.name[language]} className="w-full h-full object-cover opacity-80" />
                 ) : (
-                  <span className="text-6xl">{variantItem.emoji}</span>
+                  <div className="text-7xl">{variantItem.emoji}</div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                 <button
                   onClick={() => setVariantItem(null)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center"
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all"
                 >
                   <X className="w-4 h-4" />
                 </button>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                  <h3 className="text-white text-xl font-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h3 className="text-white text-2xl font-black tracking-tight" style={{ fontFamily: "'Courier New', monospace" }}>
                     {variantItem.name[language]}
                   </h3>
+                  <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.25em] mt-1" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {language === 'ku' ? 'جۆرێک هەڵبژێرە' : language === 'ar' ? 'اختر نوعاً' : 'SELECT AN OPTION'}
+                  </p>
                 </div>
               </div>
 
-              {/* Variant options */}
-              <div className="p-4 max-h-[50vh] overflow-y-auto">
-                <p className="text-xs font-bold text-black/50 uppercase tracking-widest mb-3" style={{ fontFamily: "'Courier New', monospace" }}>
-                  {language === 'ku' ? 'جۆرێک هەڵبژێرە' : language === 'ar' ? 'اختر نوعاً' : 'Select an option'}
-                </p>
-                <div className="space-y-2">
-                  {/* Base item option (original price) */}
-                  <button
-                    onClick={() => {
-                      addToCart(variantItem);
-                      setVariantItem(null);
-                    }}
-                    className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-black/10 hover:border-black/30 hover:bg-gray-50 transition-all cursor-pointer text-left"
-                  >
-                    <span className="text-sm font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>
-                      {variantItem.name[language]}
-                    </span>
-                    <span className="text-sm font-bold" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
-                      IQD {variantItem.price.toLocaleString()}
-                    </span>
-                  </button>
-
-                  {/* Variant options */}
-                  {itemVariants.map(v => (
+              {/* Variant cards */}
+              <div className="p-4 sm:p-5 max-h-[45vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-3">
+                  {allOptions.map((opt: any) => (
                     <button
-                      key={v.id}
+                      key={opt.id}
                       onClick={() => {
-                        const variantMenuItem: MenuItem = {
-                          ...variantItem,
-                          id: `${variantItem.id}_v_${v.id}`,
-                          name: { ku: v.name_ku || variantItem.name.ku, ar: v.name_ar || variantItem.name.ar, en: v.name_en || variantItem.name.en },
-                          price: v.price,
-                        };
-                        addToCart(variantMenuItem);
+                        if (opt.isBase) {
+                          addToCart(variantItem);
+                        } else {
+                          const variantMenuItem: MenuItem = {
+                            ...variantItem,
+                            id: `${variantItem.id}_v_${opt.id}`,
+                            name: { ku: opt.variant.name_ku || variantItem.name.ku, ar: opt.variant.name_ar || variantItem.name.ar, en: opt.variant.name_en || variantItem.name.en },
+                            price: opt.price,
+                            image: opt.image || variantItem.image,
+                          };
+                          addToCart(variantMenuItem);
+                        }
                         setVariantItem(null);
                       }}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-black/10 hover:border-black/30 hover:bg-gray-50 transition-all cursor-pointer text-left"
+                      className="group rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all hover:shadow-xl hover:border-black/20 active:scale-[0.96] text-left bg-white"
                     >
-                      <span className="text-sm font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {language === 'ku' ? v.name_ku : language === 'ar' ? v.name_ar : v.name_en}
-                      </span>
-                      <span className="text-sm font-bold" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
-                        IQD {v.price.toLocaleString()}
-                      </span>
+                      {/* Variant image */}
+                      <div className="aspect-[4/3] overflow-hidden bg-gray-50 flex items-center justify-center relative">
+                        {opt.image ? (
+                          <img src={opt.image} alt={opt.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        ) : itemImg ? (
+                          <img src={itemImg} alt={opt.name} className="w-full h-full object-cover opacity-60 transition-transform duration-500 group-hover:scale-110" />
+                        ) : (
+                          <span className="text-3xl opacity-30">{variantItem.emoji}</span>
+                        )}
+                        {opt.isBase && (
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider" style={{ background: FROOZT_YELLOW, color: '#000', fontFamily: "'Courier New', monospace" }}>
+                            {language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'أصلي' : 'ORIGINAL'}
+                          </div>
+                        )}
+                      </div>
+                      {/* Info */}
+                      <div className="px-3 py-3 text-center">
+                        <div className="text-xs sm:text-sm font-bold text-black truncate" style={{ fontFamily: "'Courier New', monospace" }}>
+                          {opt.name}
+                        </div>
+                        <div className="text-sm font-black mt-1" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace" }}>
+                          IQD {opt.price.toLocaleString()}
+                        </div>
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Bottom accent bar */}
+              <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${FROOZT_YELLOW}, ${FROOZT_PINK})` }} />
             </div>
           </div>
         );

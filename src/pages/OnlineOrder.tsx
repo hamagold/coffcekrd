@@ -29,7 +29,7 @@ const OnlineOrder = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
-  const [onlinePaymentConfig, setOnlinePaymentConfig] = useState<PaymentConfig>({ plc: true, fib: true, zain: true, fastpay: true });
+  const [onlinePaymentConfig, setOnlinePaymentConfig] = useState<PaymentConfig>({ cash: true, plc: true, fib: true, zain: true, fastpay: true });
   const [paymentLogos, setPaymentLogos] = useState<PaymentLogos>({});
   
 

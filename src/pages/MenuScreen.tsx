@@ -40,7 +40,7 @@ const MenuScreen = () => {
   const [showModal, setShowModal] = useState(false);
   const [lastOrderNum, setLastOrderNum] = useState('');
   const [cashBalance, setCashBalance] = useState(0);
-  const [view, setView] = useState<ViewState>('categories');
+  const [view, setView] = useState<ViewState>('items');
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);

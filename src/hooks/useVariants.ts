@@ -9,6 +9,7 @@ export interface Variant {
   name_en: string;
   price: number;
   sort_order: number;
+  image: string | null;
 }
 
 export const useVariants = () => {

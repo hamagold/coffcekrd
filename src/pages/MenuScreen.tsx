@@ -699,7 +699,7 @@ const MenuScreen = () => {
         const itemVariants = getVariantsForItem(variantItem.id);
         const itemImg = menuImages[variantItem.id] || variantItem.image;
         const allOptions = [
-          { id: '__base', name: variantItem.name[language], price: variantItem.price, image: itemImg || null, isBase: true },
+          { id: '__base', name: variantItem.name[language], price: variantItem.price, image: itemImg || null, isBase: true, out_of_stock: !!variantItem.out_of_stock },
           ...itemVariants.map(v => ({
             id: v.id,
             name: language === 'ku' ? v.name_ku : language === 'ar' ? v.name_ar : v.name_en,
@@ -707,6 +707,7 @@ const MenuScreen = () => {
             image: v.image || null,
             isBase: false,
             variant: v,
+            out_of_stock: !!v.out_of_stock,
           })),
         ];
         return (

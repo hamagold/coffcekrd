@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import OrderQRCode, { OrderQRCodeHandle } from '@/components/OrderQRCode';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInactivityRedirect } from '@/hooks/useInactivityRedirect';
 import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';

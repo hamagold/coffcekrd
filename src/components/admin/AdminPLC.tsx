@@ -242,11 +242,54 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
     }
   };
 
+  const checkConnection = useCallback(async (machine: PLCMachine) => {
+    setStatuses(prev => ({ ...prev, [machine.machineId]: 'checking' }));
+    try {
+      const { data, error } = await supabase.functions.invoke('send-to-plc', {
+        body: {
+          orderNumber: 'PING',
+          items: [],
+          total: 0,
+          payment: 'test',
+          _ping: true,
+          _targetMachine: machine.machineId,
+        },
+      });
+      // If the edge function could reach the machine IP, it's connected
+      const machineResult = data?.results?.find((r: any) => r.machineId === machine.machineId);
+      const isConnected = machineResult?.success === true;
+      setStatuses(prev => ({ ...prev, [machine.machineId]: isConnected ? 'connected' : 'disconnected' }));
+      if (isConnected) {
+        toast.success(lang === 'ku' ? `${machine.name} کۆنیکت بووە ✓` : lang === 'ar' ? `${machine.name} متصل ✓` : `${machine.name} connected ✓`);
+      } else {
+        toast.error(lang === 'ku' ? `${machine.name} کۆنیکت نەبوو` : lang === 'ar' ? `${machine.name} غير متصل` : `${machine.name} not reachable`);
+      }
+    } catch {
+      setStatuses(prev => ({ ...prev, [machine.machineId]: 'disconnected' }));
+      toast.error(lang === 'ku' ? `${machine.name} کۆنیکت نەبوو` : lang === 'ar' ? `${machine.name} غير متصل` : `${machine.name} not reachable`);
+    }
+  }, [lang]);
+
+  const checkAllConnections = useCallback(() => {
+    config.machines.forEach(m => checkConnection(m));
+  }, [config.machines, checkConnection]);
+
   const handleTest = (machine: PLCMachine) => {
-    toast.info(lang === 'ku' ? `تاقیکردنەوەی ${machine.name}...` : lang === 'ar' ? `اختبار ${machine.name}...` : `Testing ${machine.name}...`);
-    setTimeout(() => {
-      toast.success(lang === 'ku' ? `${machine.name} کۆنیکت بوو` : lang === 'ar' ? `${machine.name} متصل` : `${machine.name} connected`);
-    }, 1500);
+    checkConnection(machine);
+  };
+
+  const getStatusInfo = (machineId: string) => {
+    const status = statuses[machineId] || 'unknown';
+    switch (status) {
+      case 'connected':
+        return { color: 'text-success', bg: 'bg-success', label: lang === 'ku' ? 'کۆنیکت بووە' : lang === 'ar' ? 'متصل' : 'Connected', pulse: false };
+      case 'disconnected':
+        return { color: 'text-destructive', bg: 'bg-destructive', label: lang === 'ku' ? 'کۆنیکت نەبووە' : lang === 'ar' ? 'غير متصل' : 'Disconnected', pulse: false };
+      case 'checking':
+        return { color: 'text-warning', bg: 'bg-warning', label: lang === 'ku' ? 'پشکنین...' : lang === 'ar' ? 'فحص...' : 'Checking...', pulse: true };
+      default:
+        return { color: 'text-muted-foreground', bg: 'bg-muted-foreground', label: lang === 'ku' ? 'نەزانراو' : lang === 'ar' ? 'غير معروف' : 'Unknown', pulse: false };
+    }
   };
 
   if (loading) {

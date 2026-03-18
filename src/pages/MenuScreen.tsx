@@ -768,6 +768,7 @@ const MenuScreen = () => {
                             name: { ku: opt.variant.name_ku || variantItem.name.ku, ar: opt.variant.name_ar || variantItem.name.ar, en: opt.variant.name_en || variantItem.name.en },
                             price: opt.price,
                             image: opt.image || variantItem.image,
+                            plc_code: opt.variant.plc_code || variantItem.plc_code,
                           };
                           addToCart(variantMenuItem);
                         }

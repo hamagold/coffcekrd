@@ -202,6 +202,18 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
                 </td>
                 <td className="p-3 flex gap-1.5">
+                  <button onClick={() => {
+                    setVariantItemId(item.id);
+                    setVariantItemName(item.name[lang] || item.name.en);
+                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                  }} className="p-1.5 bg-accent/50 text-accent-foreground border border-accent/30 rounded-md cursor-pointer hover:bg-accent transition-all relative">
+                    <Layers className="w-3.5 h-3.5" />
+                    {getVariantsForItem(item.id).length > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {getVariantsForItem(item.id).length}
+                      </span>
+                    )}
+                  </button>
                   <button onClick={() => openEdit(item)} className="p-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md cursor-pointer hover:bg-primary/20 transition-all">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>

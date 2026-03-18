@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2, Hash } from 'lucide-react';
+import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2, Hash, Circle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';

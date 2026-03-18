@@ -11,6 +11,7 @@ export interface Variant {
   plc_code: number;
   sort_order: number;
   image: string | null;
+  out_of_stock: boolean;
 }
 
 export const useVariants = () => {

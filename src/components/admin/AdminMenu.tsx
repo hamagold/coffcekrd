@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { MenuItem, MenuType, Language } from '@/types';
-import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil, FolderPlus, Tag } from 'lucide-react';
+import { UtensilsCrossed, Plus, Trash2, Bot, ChefHat, Loader2, Pencil, FolderPlus, Tag, Layers } from 'lucide-react';
 import { adminT } from '@/data/adminTranslations';
 import { useMenuItems } from '@/hooks/useMenuItems';
 import { useCategories } from '@/hooks/useCategories';
+import { useVariants, Variant } from '@/hooks/useVariants';
 import ImageUpload from '@/components/ImageUpload';
 import { toast } from 'sonner';
 
 const AdminMenu = ({ lang }: { lang: Language }) => {
   const { robotItems, staffItems, loading, addItem, deleteItem, updateItem } = useMenuItems();
   const { robotCategories, staffCategories, addCategory, deleteCategory, loading: catsLoading } = useCategories();
+  const { variants, getVariantsForItem, addVariant, updateVariant, deleteVariant } = useVariants();
   const t = adminT[lang];
   const dir = lang === 'en' ? 'ltr' : 'rtl';
   const [tab, setTab] = useState<MenuType>('robot');
@@ -21,6 +23,13 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
   const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
+  
+  // Variants state
+  const [variantItemId, setVariantItemId] = useState<string | null>(null);
+  const [variantItemName, setVariantItemName] = useState('');
+  const [newVariant, setNewVariant] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+  const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
+  const [editVariantData, setEditVariantData] = useState({ nameKu: '', nameAr: '', nameEn: '', price: '' });
 
   const items = tab === 'robot' ? robotItems : staffItems;
 
@@ -193,6 +202,18 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                   <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${tab === 'robot' ? 'bg-info/10 text-info' : 'bg-success/10 text-success'}`}>{tab === 'robot' ? t.robotMenu : t.staffMenu}</span>
                 </td>
                 <td className="p-3 flex gap-1.5">
+                  <button onClick={() => {
+                    setVariantItemId(item.id);
+                    setVariantItemName(item.name[lang] || item.name.en);
+                    setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                  }} className="p-1.5 bg-accent/50 text-accent-foreground border border-accent/30 rounded-md cursor-pointer hover:bg-accent transition-all relative">
+                    <Layers className="w-3.5 h-3.5" />
+                    {getVariantsForItem(item.id).length > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {getVariantsForItem(item.id).length}
+                      </span>
+                    )}
+                  </button>
                   <button onClick={() => openEdit(item)} className="p-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md cursor-pointer hover:bg-primary/20 transition-all">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -413,6 +434,104 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               <button onClick={handleAddCategory} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">
                 {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 {lang === 'ku' ? 'زیادکردن' : lang === 'ar' ? 'إضافة' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== VARIANTS MODAL ===== */}
+      {variantItemId && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-[1000] p-4">
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6 w-full max-w-[520px] max-h-[90vh] overflow-y-auto animate-modal-in">
+            <h3 className="text-foreground text-base font-bold mb-1 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-primary" />
+              {lang === 'ku' ? 'جۆرەکان' : lang === 'ar' ? 'الخيارات' : 'Variants / Options'}
+            </h3>
+            <p className="text-muted-foreground text-xs mb-4">{variantItemName}</p>
+
+            {/* Existing variants */}
+            {getVariantsForItem(variantItemId).length > 0 && (
+              <div className="space-y-2 mb-4">
+                {getVariantsForItem(variantItemId).map(v => (
+                  <div key={v.id} className="flex items-center gap-2 p-3 bg-secondary rounded-lg border border-border">
+                    {editingVariant?.id === v.id ? (
+                      <div className="flex-1 space-y-2">
+                        <div className="grid grid-cols-3 gap-2">
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Kurdish" value={editVariantData.nameKu} onChange={e => setEditVariantData(p => ({ ...p, nameKu: e.target.value }))} />
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="Arabic" value={editVariantData.nameAr} onChange={e => setEditVariantData(p => ({ ...p, nameAr: e.target.value }))} />
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs" placeholder="English" value={editVariantData.nameEn} onChange={e => setEditVariantData(p => ({ ...p, nameEn: e.target.value }))} />
+                        </div>
+                        <div className="flex gap-2">
+                          <input className="p-2 bg-background border border-border rounded text-foreground text-xs w-24" type="number" placeholder="Price" value={editVariantData.price} onChange={e => setEditVariantData(p => ({ ...p, price: e.target.value }))} />
+                          <button onClick={async () => {
+                            try {
+                              await updateVariant(v.id, { name_ku: editVariantData.nameKu, name_ar: editVariantData.nameAr, name_en: editVariantData.nameEn, price: parseInt(editVariantData.price) || 0 });
+                              setEditingVariant(null);
+                              toast.success(lang === 'ku' ? 'نوێکرایەوە' : 'Updated');
+                            } catch { toast.error('Error'); }
+                          }} className="px-3 py-1 bg-primary text-primary-foreground rounded text-xs font-semibold">✓</button>
+                          <button onClick={() => setEditingVariant(null)} className="px-3 py-1 bg-secondary border border-border text-foreground rounded text-xs">✕</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1">
+                          <span className="text-foreground text-xs font-medium">{lang === 'ku' ? v.name_ku : lang === 'ar' ? v.name_ar : v.name_en}</span>
+                          <span className="text-primary text-xs font-bold ml-2">IQD {v.price.toLocaleString()}</span>
+                        </div>
+                        <button onClick={() => { setEditingVariant(v); setEditVariantData({ nameKu: v.name_ku, nameAr: v.name_ar, nameEn: v.name_en, price: String(v.price) }); }} className="p-1 text-primary hover:bg-primary/10 rounded transition-colors">
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button onClick={async () => { try { await deleteVariant(v.id); toast.success(lang === 'ku' ? 'سڕایەوە' : 'Deleted'); } catch { toast.error('Error'); } }} className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add new variant */}
+            <div className="border border-dashed border-border rounded-lg p-3 space-y-2">
+              <p className="text-muted-foreground text-[10px] tracking-widest uppercase font-semibold">
+                {lang === 'ku' ? 'جۆری نوێ زیادبکە' : lang === 'ar' ? 'إضافة خيار جديد' : 'Add New Variant'}
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ku' ? 'ناوی کوردی' : 'Kurdish'} value={newVariant.nameKu} onChange={e => setNewVariant(p => ({ ...p, nameKu: e.target.value }))} />
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder={lang === 'ar' ? 'الاسم بالعربية' : 'Arabic'} value={newVariant.nameAr} onChange={e => setNewVariant(p => ({ ...p, nameAr: e.target.value }))} />
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50" placeholder="English" value={newVariant.nameEn} onChange={e => setNewVariant(p => ({ ...p, nameEn: e.target.value }))} />
+              </div>
+              <div className="flex gap-2">
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50 w-28" type="number" placeholder={lang === 'ku' ? 'نرخ (IQD)' : 'Price (IQD)'} value={newVariant.price} onChange={e => setNewVariant(p => ({ ...p, price: e.target.value }))} />
+                <button
+                  onClick={async () => {
+                    if (!newVariant.nameEn && !newVariant.nameKu) { toast.error(lang === 'ku' ? 'ناو پێویستە' : 'Name required'); return; }
+                    try {
+                      await addVariant({
+                        item_id: variantItemId,
+                        name_ku: newVariant.nameKu,
+                        name_ar: newVariant.nameAr,
+                        name_en: newVariant.nameEn,
+                        price: parseInt(newVariant.price) || 0,
+                        sort_order: getVariantsForItem(variantItemId).length,
+                      });
+                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '' });
+                      toast.success(lang === 'ku' ? 'جۆر زیادکرا' : 'Variant added');
+                    } catch { toast.error('Error'); }
+                  }}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {lang === 'ku' ? 'زیادکردن' : lang === 'ar' ? 'إضافة' : 'Add'}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button onClick={() => { setVariantItemId(null); setEditingVariant(null); }} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">
+                {lang === 'ku' ? 'داخستن' : lang === 'ar' ? 'إغلاق' : 'Close'}
               </button>
             </div>
           </div>

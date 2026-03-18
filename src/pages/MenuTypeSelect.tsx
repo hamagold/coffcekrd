@@ -89,7 +89,7 @@ const MenuTypeSelect = () => {
       </div>
 
       {/* Main content - two big cards */}
-      <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-6 p-6">
+      <div className="flex-1 flex flex-col md:flex-row items-center justify-center gap-4 p-4 sm:p-6">
         {options.map((opt) => {
           const isHovered = hoveredType === opt.type;
           const Icon = opt.icon;
@@ -99,10 +99,10 @@ const MenuTypeSelect = () => {
               onClick={() => handleSelect(opt.type)}
               onMouseEnter={() => setHoveredType(opt.type)}
               onMouseLeave={() => setHoveredType(null)}
-              className="group relative w-full md:w-1/2 max-w-[500px] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500"
+              className="group relative w-full md:w-1/2 max-w-[380px] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500"
               style={{
-                aspectRatio: '3/4',
-                maxHeight: 'calc(100vh - 160px)',
+                aspectRatio: '4/5',
+                maxHeight: 'calc(100vh - 180px)',
                 border: `3px solid ${isHovered ? opt.color : 'rgba(255,255,255,0.15)'}`,
                 boxShadow: isHovered ? `0 0 60px -10px ${opt.color}60` : 'none',
                 transform: isHovered ? 'scale(1.02)' : 'scale(1)',

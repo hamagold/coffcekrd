@@ -481,7 +481,8 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                       </div>
                     ) : (
                       <>
-                        <div className="flex-1">
+                        {v.image && <img src={v.image} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
+                        <div className="flex-1 min-w-0">
                           <span className="text-foreground text-xs font-medium">{lang === 'ku' ? v.name_ku : lang === 'ar' ? v.name_ar : v.name_en}</span>
                           <span className="text-primary text-xs font-bold ml-2">IQD {v.price.toLocaleString()}</span>
                         </div>

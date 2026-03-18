@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2, Hash } from 'lucide-react';
+import { Cpu, Wifi, WifiOff, Save, Play, ToggleLeft, ToggleRight, Loader2, Plus, Trash2, Hash, Circle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Language } from '@/types';
 import { adminT } from '@/data/adminTranslations';
@@ -172,6 +172,8 @@ const PLCItemCodes = ({ lang }: { lang: Language }) => {
   );
 };
 
+type ConnectionStatus = 'unknown' | 'checking' | 'connected' | 'disconnected';
+
 /* ─── Main AdminPLC Component ─── */
 const AdminPLC = ({ lang }: { lang: Language }) => {
   const t = adminT[lang];
@@ -181,6 +183,7 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
+  const [statuses, setStatuses] = useState<Record<string, ConnectionStatus>>({});
 
   useEffect(() => {
     fetchPLCConfig().then(cfg => {
@@ -239,11 +242,54 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
     }
   };
 
+  const checkConnection = useCallback(async (machine: PLCMachine) => {
+    setStatuses(prev => ({ ...prev, [machine.machineId]: 'checking' }));
+    try {
+      const { data, error } = await supabase.functions.invoke('send-to-plc', {
+        body: {
+          orderNumber: 'PING',
+          items: [],
+          total: 0,
+          payment: 'test',
+          _ping: true,
+          _targetMachine: machine.machineId,
+        },
+      });
+      // If the edge function could reach the machine IP, it's connected
+      const machineResult = data?.results?.find((r: any) => r.machineId === machine.machineId);
+      const isConnected = machineResult?.success === true;
+      setStatuses(prev => ({ ...prev, [machine.machineId]: isConnected ? 'connected' : 'disconnected' }));
+      if (isConnected) {
+        toast.success(lang === 'ku' ? `${machine.name} کۆنیکت بووە ✓` : lang === 'ar' ? `${machine.name} متصل ✓` : `${machine.name} connected ✓`);
+      } else {
+        toast.error(lang === 'ku' ? `${machine.name} کۆنیکت نەبوو` : lang === 'ar' ? `${machine.name} غير متصل` : `${machine.name} not reachable`);
+      }
+    } catch {
+      setStatuses(prev => ({ ...prev, [machine.machineId]: 'disconnected' }));
+      toast.error(lang === 'ku' ? `${machine.name} کۆنیکت نەبوو` : lang === 'ar' ? `${machine.name} غير متصل` : `${machine.name} not reachable`);
+    }
+  }, [lang]);
+
+  const checkAllConnections = useCallback(() => {
+    config.machines.forEach(m => checkConnection(m));
+  }, [config.machines, checkConnection]);
+
   const handleTest = (machine: PLCMachine) => {
-    toast.info(lang === 'ku' ? `تاقیکردنەوەی ${machine.name}...` : lang === 'ar' ? `اختبار ${machine.name}...` : `Testing ${machine.name}...`);
-    setTimeout(() => {
-      toast.success(lang === 'ku' ? `${machine.name} کۆنیکت بوو` : lang === 'ar' ? `${machine.name} متصل` : `${machine.name} connected`);
-    }, 1500);
+    checkConnection(machine);
+  };
+
+  const getStatusInfo = (machineId: string) => {
+    const status = statuses[machineId] || 'unknown';
+    switch (status) {
+      case 'connected':
+        return { color: 'text-success', bg: 'bg-success', label: lang === 'ku' ? 'کۆنیکت بووە' : lang === 'ar' ? 'متصل' : 'Connected', pulse: false };
+      case 'disconnected':
+        return { color: 'text-destructive', bg: 'bg-destructive', label: lang === 'ku' ? 'کۆنیکت نەبووە' : lang === 'ar' ? 'غير متصل' : 'Disconnected', pulse: false };
+      case 'checking':
+        return { color: 'text-warning', bg: 'bg-warning', label: lang === 'ku' ? 'پشکنین...' : lang === 'ar' ? 'فحص...' : 'Checking...', pulse: true };
+      default:
+        return { color: 'text-muted-foreground', bg: 'bg-muted-foreground', label: lang === 'ku' ? 'نەزانراو' : lang === 'ar' ? 'غير معروف' : 'Unknown', pulse: false };
+    }
   };
 
   if (loading) {
@@ -270,10 +316,22 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
         <PLCItemCodes lang={lang} />
       </div>
 
+      {/* Check All Button */}
+      <div className="mb-4">
+        <button
+          onClick={checkAllConnections}
+          className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-primary/20 transition-all"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          {lang === 'ku' ? 'پشکنینی هەموو ئامێرەکان' : lang === 'ar' ? 'فحص جميع الأجهزة' : 'Check All Machines'}
+        </button>
+      </div>
+
       {/* Machines List */}
       <div className="space-y-3 mb-5">
         {config.machines.map((machine, idx) => {
           const isExpanded = expandedIdx === idx;
+          const statusInfo = getStatusInfo(machine.machineId);
           return (
             <div key={idx} className="bg-card rounded-xl border border-border overflow-hidden">
               <button
@@ -286,6 +344,27 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
                 <div className="flex-1 text-start">
                   <div className="text-foreground font-bold text-sm">{machine.name}</div>
                   <div className="text-muted-foreground text-xs font-mono">{machine.machineId} · {machine.ip}:{machine.port}</div>
+                </div>
+                {/* Connection Status Indicator */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border" style={{
+                    borderColor: statusInfo.color === 'text-success' ? 'hsl(var(--success) / 0.3)' :
+                                 statusInfo.color === 'text-destructive' ? 'hsl(var(--destructive) / 0.3)' :
+                                 statusInfo.color === 'text-warning' ? 'hsl(var(--warning, 45 93% 47%) / 0.3)' :
+                                 'hsl(var(--border))',
+                    backgroundColor: statusInfo.color === 'text-success' ? 'hsl(var(--success) / 0.08)' :
+                                     statusInfo.color === 'text-destructive' ? 'hsl(var(--destructive) / 0.08)' :
+                                     statusInfo.color === 'text-warning' ? 'hsl(var(--warning, 45 93% 47%) / 0.08)' :
+                                     'transparent',
+                  }}>
+                    <span className={`relative flex h-2 w-2`}>
+                      {statusInfo.pulse && (
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${statusInfo.bg}`}></span>
+                      )}
+                      <span className={`relative inline-flex rounded-full h-2 w-2 ${statusInfo.bg}`}></span>
+                    </span>
+                    <span className={`text-[10px] font-bold ${statusInfo.color}`}>{statusInfo.label}</span>
+                  </div>
                 </div>
                 <div className="text-muted-foreground text-xs">
                   {isExpanded ? '▲' : '▼'}

@@ -524,10 +524,20 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
               </div>
               <div className="flex gap-2">
                 <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50 w-28" type="number" placeholder={lang === 'ku' ? 'نرخ (IQD)' : 'Price (IQD)'} value={newVariant.price} onChange={e => setNewVariant(p => ({ ...p, price: e.target.value }))} />
+                <input className="p-2 bg-secondary border border-border rounded-lg text-foreground text-xs focus:outline-none focus:border-primary/50 w-20" type="number" placeholder="PLC Code" value={newVariant.plcCode} onChange={e => setNewVariant(p => ({ ...p, plcCode: e.target.value }))} />
                 <button
                   onClick={async () => {
                     if (!newVariant.nameEn && !newVariant.nameKu) { toast.error(lang === 'ku' ? 'ناو پێویستە' : 'Name required'); return; }
                     try {
+                      // Auto-generate plc_code if not provided
+                      let plcCode = parseInt(newVariant.plcCode) || 0;
+                      if (plcCode === 0) {
+                        const { data: maxData } = await supabase.from('menu_item_variants').select('plc_code').order('plc_code', { ascending: false }).limit(1);
+                        const { data: maxItemData } = await supabase.from('menu_items').select('plc_code').order('plc_code', { ascending: false }).limit(1);
+                        const maxVariant = (maxData as any)?.[0]?.plc_code || 0;
+                        const maxItem = maxItemData?.[0]?.plc_code || 0;
+                        plcCode = Math.max(maxVariant, maxItem) + 1;
+                      }
                       await addVariant({
                         item_id: variantItemId,
                         name_ku: newVariant.nameKu,
@@ -536,9 +546,10 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                         price: parseInt(newVariant.price) || 0,
                         sort_order: getVariantsForItem(variantItemId).length,
                         image: newVariant.image || null,
+                        plc_code: plcCode,
                       });
-                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '' });
-                      toast.success(lang === 'ku' ? 'جۆر زیادکرا' : 'Variant added');
+                      setNewVariant({ nameKu: '', nameAr: '', nameEn: '', price: '', image: '', plcCode: '' });
+                      toast.success(lang === 'ku' ? `جۆر زیادکرا (PLC: ${plcCode})` : `Variant added (PLC: ${plcCode})`);
                     } catch { toast.error('Error'); }
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1"

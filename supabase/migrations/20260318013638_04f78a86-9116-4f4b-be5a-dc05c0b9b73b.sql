@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_item_variants ADD COLUMN plc_code integer NOT NULL DEFAULT 0;

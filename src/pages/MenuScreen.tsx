@@ -26,7 +26,7 @@ const FROOZT_PINK = '#ffb0be';
 const FROOZT_ICE = '#9eecff';
 const FROOZT_LILAC = '#e2bdff';
 
-type ViewState = 'categories' | 'items' | 'cart' | 'checkout';
+type ViewState = 'items' | 'cart' | 'checkout';
 
 const MenuScreen = () => {
   const navigate = useNavigate();
@@ -217,13 +217,11 @@ const MenuScreen = () => {
   };
 
   const menuLabel = menuType === 'robot' ? (t.tabRobot || 'Robot Menu') : (t.tabStaff || 'Staff Menu');
-  const headerTitle = view === 'categories'
+  const headerTitle = view === 'items'
     ? menuLabel
-    : view === 'items'
-      ? (language === 'ku' ? `${categories.find(c => c.id === activeCategory)?.name[language] || ''} هەڵبژێرە` : language === 'ar' ? `اختر ${categories.find(c => c.id === activeCategory)?.name[language] || ''}` : `Select ${categories.find(c => c.id === activeCategory)?.name[language] || ''}`)
-      : view === 'cart'
-        ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
-        : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
+    : view === 'cart'
+      ? (language === 'ku' ? 'ئۆردەرەکەت' : language === 'ar' ? 'طلبك' : 'Your order')
+      : (language === 'ku' ? 'پارەدان' : language === 'ar' ? 'الدفع' : 'Checkout');
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden relative" style={{ background: '#f8f8f8' }} dir={direction}>
@@ -231,18 +229,16 @@ const MenuScreen = () => {
       {/* ===== YELLOW HEADER BAR ===== */}
       <div className="shrink-0 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between relative z-20" style={{ background: FROOZT_YELLOW }}>
         <div className="flex items-center gap-3">
-          {view !== 'categories' && (
-            <button
-              onClick={() => {
-                if (view === 'checkout') setView('cart');
-                else if (view === 'cart') setView('items');
-                else setView('categories');
-              }}
-              className="w-10 h-10 rounded-full border-2 border-black/80 flex items-center justify-center cursor-pointer hover:bg-black/10 transition-all"
-            >
-              <ChevronLeft className="w-5 h-5 text-black/80" />
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (view === 'checkout') setView('cart');
+              else if (view === 'cart') setView('items');
+              else navigate('/select');
+            }}
+            className="w-10 h-10 rounded-full border-2 border-black/80 flex items-center justify-center cursor-pointer hover:bg-black/10 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5 text-black/80" />
+          </button>
           <h1 className="text-black text-lg sm:text-xl font-black tracking-tight" style={{ fontFamily: "'Courier New', monospace" }}>
             {headerTitle}
           </h1>
@@ -261,38 +257,8 @@ const MenuScreen = () => {
       {/* ===== MAIN CONTENT ===== */}
       <div className="flex-1 overflow-hidden flex flex-col">
 
-        {/* ===== CATEGORY SELECTION VIEW ===== */}
-        {view === 'categories' && (
-          <div className="flex-1 overflow-y-auto bg-white">
 
-            {/* Category Grid - 3x2 */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 px-4 sm:px-8 pb-24">
-              {categories.map((cat) => {
-                const catImg = cat.image || getCategoryImage(cat.id);
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => selectCategory(cat.id)}
-                    className="group bg-white rounded-2xl border-2 border-black/10 overflow-hidden cursor-pointer transition-all hover:border-black/30 hover:shadow-lg active:scale-95"
-                  >
-                    <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center p-3">
-                      {catImg ? (
-                        <img src={catImg} alt={cat.name[language]} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
-                      ) : (
-                        <span className="text-4xl sm:text-5xl">{cat.icon}</span>
-                      )}
-                    </div>
-                    <div className="px-2 py-2.5 sm:py-3 text-center border-t border-black/5">
-                      <span className="text-[10px] sm:text-xs font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {cat.name[language]}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+
 
         {/* ===== ITEMS VIEW ===== */}
         {view === 'items' && (
@@ -564,7 +530,7 @@ const MenuScreen = () => {
       {/* ===== BOTTOM BAR ===== */}
       <div className="shrink-0 relative z-20 border-t-2 border-black/10">
         {/* Category view: show YOUR ORDER bar */}
-        {(view === 'categories' || view === 'items') && (
+        {view === 'items' && (
           <div className="flex" style={{ fontFamily: "'Courier New', monospace" }}>
             <button
               onClick={() => setView('cart')}
@@ -711,7 +677,7 @@ const MenuScreen = () => {
             </div>
             <div className="mb-5"><OrderQRCode ref={qrRef} orderNumber={lastOrderNum} cafeName={cafeName} /></div>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => { setShowModal(false); setView('categories'); }} className="px-6 py-3 rounded-xl font-black text-sm cursor-pointer uppercase tracking-wider" style={{ background: FROOZT_YELLOW, color: '#1a1a1a', fontFamily: "'Courier New', monospace" }}>{t.modalOk}</button>
+              <button onClick={() => { setShowModal(false); setView('items'); }} className="px-6 py-3 rounded-xl font-black text-sm cursor-pointer uppercase tracking-wider" style={{ background: FROOZT_YELLOW, color: '#1a1a1a', fontFamily: "'Courier New', monospace" }}>{t.modalOk}</button>
               <button onClick={printLabel} className="px-6 py-3 rounded-xl bg-gray-100 text-black border-2 border-black/10 font-bold text-sm cursor-pointer hover:bg-gray-200 transition-all flex items-center gap-2" style={{ fontFamily: "'Courier New', monospace" }}>
                 <Printer className="w-4 h-4" />{t.modalPrint}
               </button>

@@ -568,6 +568,11 @@
 .animate-cash-insert { animation: cash-insert 0.6s ease-in forwards; }
 .animate-balance-bump { animation: balance-bump 0.4s ease-out; }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* Glass effect */
 .glass {
   background: hsl(220 14% 10% / 0.8);

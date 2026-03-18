@@ -74,6 +74,39 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_item_variants: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          name_ar: string
+          name_en: string
+          name_ku: string
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          price?: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          name_ar?: string
+          name_en?: string
+          name_ku?: string
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           cat: string

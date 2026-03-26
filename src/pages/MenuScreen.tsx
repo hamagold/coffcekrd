@@ -789,7 +789,7 @@ const MenuScreen = () => {
                             plc_code: opt.variant.plc_code || variantItem.plc_code,
                           };
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
+                         setSelectedParams({ sugar: 1, size: 2, milk: 0 });
                             setParamItem({ item: variantMenuItem, variantData: opt.variant });
                             setVariantItem(null);
                           } else {

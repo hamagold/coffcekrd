@@ -267,6 +267,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                       ? (lang === 'ku' ? 'چالاکە' : lang === 'ar' ? 'مفعل' : 'ON')
                       : (lang === 'ku' ? 'ناچالاکە' : lang === 'ar' ? 'معطل' : 'OFF')}
                   </button>
+                </td>
                 <td className="p-3 flex gap-1.5">
                   <button onClick={() => {
                     setVariantItemId(item.id);

@@ -11,6 +11,15 @@ export interface MultiLangText {
   en: string;
 }
 
+export interface PLCParams {
+  sugar: number;   // 0=none, 1=little, 2=medium, 3=full → VW1224
+  size: number;    // 1=small, 2=medium, 3=large → VW1226
+  milk: number;    // 0=none, 1=regular, 2=oat, 3=almond → VW1228
+  param4?: number; // → VW1230
+  param5?: number; // → VW1232
+  param6?: number; // → VW1234
+}
+
 export interface MenuItem {
   id: string;
   cat: string;
@@ -32,6 +41,7 @@ export interface Category {
 
 export interface CartItem extends MenuItem {
   qty: number;
+  plcParams?: PLCParams;
 }
 
 export interface Order {

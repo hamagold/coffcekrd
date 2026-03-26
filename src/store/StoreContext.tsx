@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser } from '@/types';
+import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser, PLCParams } from '@/types';
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 import { supabase } from '@/integrations/supabase/client';
 import { useMenuItems } from '@/hooks/useMenuItems';
@@ -19,7 +19,7 @@ interface StoreContextType {
 
   // Cart
   cart: CartItem[];
-  addToCart: (item: MenuItem) => void;
+  addToCart: (item: MenuItem, plcParams?: PLCParams) => void;
   removeFromCart: (id: string) => void;
   changeQty: (id: string, delta: number) => void;
   clearCart: () => void;
@@ -92,11 +92,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLanguageState(lang);
   }, []);
 
-  const addToCart = useCallback((item: MenuItem) => {
+  const addToCart = useCallback((item: MenuItem, plcParams?: PLCParams) => {
     setCart(prev => {
-      const existing = prev.find(c => c.id === item.id);
-      if (existing) return prev.map(c => c.id === item.id ? { ...c, qty: c.qty + 1 } : c);
-      return [...prev, { ...item, qty: 1 }];
+      const cartId = plcParams ? `${item.id}_p${plcParams.sugar}${plcParams.size}${plcParams.milk}` : item.id;
+      const existing = prev.find(c => c.id === cartId);
+      if (existing) return prev.map(c => c.id === cartId ? { ...c, qty: c.qty + 1 } : c);
+      return [...prev, { ...item, id: cartId, qty: 1, plcParams }];
     });
   }, []);
 

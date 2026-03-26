@@ -45,6 +45,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
       name: { ku: newItem.nameKu || 'نو', ar: newItem.nameAr || 'جديد', en: newItem.nameEn || 'New Item' },
       desc: { ku: '', ar: '', en: '' }, price: parseInt(newItem.price) || 0,
       image: newItem.image || undefined,
+      plc_code: parseInt(newItem.plcCode) || 0,
     };
     setSaving(true);
     try {

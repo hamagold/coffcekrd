@@ -28,6 +28,7 @@ export interface MenuItem {
   image?: string;
   plc_code?: number;
   out_of_stock?: boolean;
+  has_params?: boolean;
 }
 
 export interface Category {

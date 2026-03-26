@@ -305,7 +305,7 @@ const MenuScreen = () => {
                       const itemVariants = getVariantsForItem(item.id);
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
-                      } else if (menuType === 'robot') {
+                      } else if (menuType === 'robot' && item.has_params) {
                         setSelectedParams({ sugar: 1, size: 2, milk: 0 });
                         setParamItem({ item });
                       } else {

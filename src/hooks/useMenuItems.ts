@@ -124,7 +124,8 @@ export const useMenuItems = () => {
     if (updates.cat !== undefined) dbUpdates.cat = updates.cat;
     if (updates.out_of_stock !== undefined) dbUpdates.out_of_stock = updates.out_of_stock;
     if (updates.plc_code !== undefined) dbUpdates.plc_code = updates.plc_code;
-    const { error } = await supabase.from('menu_items').update(dbUpdates).eq('item_id', itemId);
+    if (updates.has_params !== undefined) dbUpdates.has_params = updates.has_params;
+    const { error } = await supabase.from('menu_items').update(dbUpdates as any).eq('item_id', itemId);
     if (error) throw error;
   }, []);
 

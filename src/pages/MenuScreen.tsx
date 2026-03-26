@@ -45,7 +45,7 @@ const MenuScreen = () => {
   const { getVariantsForItem } = useVariants();
   const [variantItem, setVariantItem] = useState<MenuItem | null>(null);
   const [paramItem, setParamItem] = useState<{ item: MenuItem; variantData?: any } | null>(null);
-  const [selectedParams, setSelectedParams] = useState<PLCParams>({ sugar: 2, size: 2, milk: 0 });
+  const [selectedParams, setSelectedParams] = useState<PLCParams>({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);

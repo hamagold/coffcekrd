@@ -72,7 +72,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     setEditItem(item);
     setEditData({
       emoji: item.emoji, nameKu: item.name.ku, nameAr: item.name.ar, nameEn: item.name.en,
-      price: String(item.price), cat: item.cat, image: item.image || '',
+      price: String(item.price), cat: item.cat, image: item.image || '', plcCode: String(item.plc_code || ''),
     });
   };
 

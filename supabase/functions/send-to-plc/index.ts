@@ -166,23 +166,14 @@ async function sendOrderToMachine(
   const results: any[] = [];
   let transactionId = 1;
 
-  // For each item in the order, write its plc_code and qty to registers
+  // For each item in the order, write its plc_code, qty, and params to registers
   for (const item of items) {
     const plcCode = item.plc_code || 0;
     const qty = item.qty || 1;
-
-    // Write to command registers:
-    // Register 101 (VW1202) = 1 (prepare command)
-    // Register 102 (VW1204) = 1 (new item)
-    // Register 110 (VW1220) = plc_code (item code)
-    // Register 111 (VW1222) = qty
-    const registerValues = [
-      1,        // VW1202 = command (1 = prepare)
-      1,        // VW1204 = sub-command
-    ];
+    const params = item.plcParams || { sugar: 0, size: 0, milk: 0 };
 
     // Write command registers (40102-40103, offset 101-102)
-    const cmdFrame = buildWriteMultipleRegisters(transactionId++, 1, 101, registerValues);
+    const cmdFrame = buildWriteMultipleRegisters(transactionId++, 1, 101, [1, 1]);
     const cmdResult = await sendModbusTCP(ip, port, cmdFrame);
 
     if (!cmdResult.success) {
@@ -190,7 +181,6 @@ async function sendOrderToMachine(
       continue;
     }
 
-    // Parse command response
     if (cmdResult.response) {
       const parsed = parseModbusResponse(cmdResult.response);
       if (!parsed.success) {
@@ -199,19 +189,18 @@ async function sendOrderToMachine(
       }
     }
 
-    // Small delay between writes
     await new Promise(r => setTimeout(r, 50));
 
-    // Write item data (register 110-117, offset 110 = VW1220)
+    // Write item data + parameters (register 110-117 = VW1220-VW1234)
     const itemValues = [
-      plcCode,   // VW1220 = item/drink code
-      qty,       // VW1222 = quantity
-      0,         // VW1224 = parameter 1 (sugar level, etc.)
-      0,         // VW1226 = parameter 2 (size, etc.)
-      0,         // VW1228 = parameter 3
-      0,         // VW1230 = parameter 4
-      0,         // VW1232 = parameter 5
-      0,         // VW1234 = parameter 6
+      plcCode,              // VW1220 = item/drink code
+      qty,                  // VW1222 = quantity
+      params.sugar || 0,    // VW1224 = sugar level (0-3)
+      params.size || 0,     // VW1226 = size (1-3)
+      params.milk || 0,     // VW1228 = milk type (0-3)
+      params.param4 || 0,   // VW1230
+      params.param5 || 0,   // VW1232
+      params.param6 || 0,   // VW1234
     ];
 
     const itemFrame = buildWriteMultipleRegisters(transactionId++, 1, 110, itemValues);
@@ -224,12 +213,11 @@ async function sendOrderToMachine(
 
     if (itemResult.response) {
       const parsed = parseModbusResponse(itemResult.response);
-      results.push({ item: item.id, plc_code: plcCode, qty, success: parsed.success, error: parsed.error });
+      results.push({ item: item.id, plc_code: plcCode, qty, params, success: parsed.success, error: parsed.error });
     } else {
-      results.push({ item: item.id, plc_code: plcCode, qty, success: true });
+      results.push({ item: item.id, plc_code: plcCode, qty, params, success: true });
     }
 
-    // Delay between items
     await new Promise(r => setTimeout(r, 100));
   }
 

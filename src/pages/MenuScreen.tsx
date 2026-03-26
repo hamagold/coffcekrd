@@ -6,7 +6,7 @@ import { useStore } from '@/store/StoreContext';
 import { translations } from '@/data/translations';
 import { useCategories } from '@/hooks/useCategories';
 import { menuImages } from '@/data/menuImages';
-import { MenuType, PaymentMethod, OrderType, MenuItem } from '@/types';
+import { MenuType, PaymentMethod, OrderType, MenuItem, PLCParams } from '@/types';
 import { isPaymentConfigured, fetchPaymentConfig, fetchPaymentLogos, PaymentConfig, PaymentLogos } from '@/components/admin/AdminPayments';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchCafeConfig } from '@/hooks/useAdminLang';

@@ -395,6 +395,27 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={editData.price} onChange={e => setEditData(p => ({ ...p, price: e.target.value }))} />
               </div>
             </div>
+            {/* PLC Code */}
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold flex items-center gap-1.5">
+                🔧 PLC Code (VW1220)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm font-mono focus:outline-none focus:border-primary/50 transition-colors"
+                  type="number"
+                  value={editData.plcCode}
+                  onChange={e => setEditData(p => ({ ...p, plcCode: e.target.value }))}
+                  placeholder="1-100"
+                  min="0"
+                  max="200"
+                />
+                <span className="text-muted-foreground text-[10px] whitespace-nowrap">1-50 / 51-100</span>
+              </div>
+              <p className="text-muted-foreground text-[10px] mt-1">
+                {lang === 'ku' ? 'کۆدی ئامێر: ئەم ژمارەیە دەنێردرێت بۆ VW1220 بۆ ناسینەوەی خواردنەوە' : 'Machine code: sent to VW1220 register'}
+              </p>
+            </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setEditItem(null)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
               <button onClick={handleUpdate} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">

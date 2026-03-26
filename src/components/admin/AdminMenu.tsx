@@ -21,7 +21,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [saving, setSaving] = useState(false);
   const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
-  const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '' });
+  const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '', plcCode: '' });
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });
   const [catIconType, setCatIconType] = useState<'emoji' | 'image'>('emoji');
   
@@ -72,7 +72,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
     setEditItem(item);
     setEditData({
       emoji: item.emoji, nameKu: item.name.ku, nameAr: item.name.ar, nameEn: item.name.en,
-      price: String(item.price), cat: item.cat, image: item.image || '',
+      price: String(item.price), cat: item.cat, image: item.image || '', plcCode: String(item.plc_code || ''),
     });
   };
 
@@ -85,6 +85,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
         desc: editItem.desc, price: parseInt(editData.price) || 0,
         image: editData.image || undefined,
+        plc_code: parseInt(editData.plcCode) || 0,
       });
       setEditItem(null);
       toast.success(lang === 'ku' ? 'ئایتم نوێکرایەوە' : lang === 'ar' ? 'تم التحديث' : 'Item updated');
@@ -201,7 +202,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, t.priceIqd, lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, t.priceIqd, 'PLC', lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
@@ -219,6 +220,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <td className="p-3 text-foreground text-xs font-medium">{item.name[lang] || item.name.en}</td>
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
+                <td className="p-3">
+                  <span className="text-[10px] font-mono font-bold bg-accent/50 text-accent-foreground px-2 py-0.5 rounded-md border border-accent/30">
+                    {item.plc_code || '—'}
+                  </span>
+                </td>
                 <td className="p-3">
                   <button
                     onClick={async () => {
@@ -388,6 +394,27 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold">{t.priceIqd}</label>
                 <input className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm focus:outline-none focus:border-primary/50 transition-colors" type="number" value={editData.price} onChange={e => setEditData(p => ({ ...p, price: e.target.value }))} />
               </div>
+            </div>
+            {/* PLC Code */}
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold flex items-center gap-1.5">
+                🔧 PLC Code (VW1220)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm font-mono focus:outline-none focus:border-primary/50 transition-colors"
+                  type="number"
+                  value={editData.plcCode}
+                  onChange={e => setEditData(p => ({ ...p, plcCode: e.target.value }))}
+                  placeholder="1-100"
+                  min="0"
+                  max="200"
+                />
+                <span className="text-muted-foreground text-[10px] whitespace-nowrap">1-50 / 51-100</span>
+              </div>
+              <p className="text-muted-foreground text-[10px] mt-1">
+                {lang === 'ku' ? 'کۆدی ئامێر: ئەم ژمارەیە دەنێردرێت بۆ VW1220 بۆ ناسینەوەی خواردنەوە' : 'Machine code: sent to VW1220 register'}
+              </p>
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setEditItem(null)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>

@@ -306,7 +306,7 @@ const MenuScreen = () => {
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
                       } else if (menuType === 'robot') {
-                        setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                        setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                         setParamItem({ item });
                       } else {
                         addToCart(item);
@@ -781,7 +781,7 @@ const MenuScreen = () => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                             setParamItem({ item: variantItem });
                             setVariantItem(null);
                           } else {
@@ -798,7 +798,7 @@ const MenuScreen = () => {
                             plc_code: opt.variant.plc_code || variantItem.plc_code,
                           };
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                             setParamItem({ item: variantMenuItem, variantData: opt.variant });
                             setVariantItem(null);
                           } else {

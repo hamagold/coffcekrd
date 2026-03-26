@@ -394,6 +394,16 @@ const MenuScreen = () => {
                               🥛 {item.plcParams.milk === 1 ? (language === 'ku' ? 'ئاسایی' : 'Reg') : item.plcParams.milk === 2 ? (language === 'ku' ? 'ئۆت' : 'Oat') : (language === 'ku' ? 'بادەم' : 'Alm')}
                             </span>
                           )}
+                          {item.plcParams.recipe && item.plcParams.recipe !== 1 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#ffcba440', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              ☕ {item.plcParams.recipe === 2 ? (language === 'ku' ? 'توند' : 'Strong') : (language === 'ku' ? 'سووک' : 'Light')}
+                            </span>
+                          )}
+                          {item.plcParams.waterLevel && item.plcParams.waterLevel !== 2 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#a4d8ff40', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              💧 {item.plcParams.waterLevel === 1 ? (language === 'ku' ? 'کەم' : 'Little') : (language === 'ku' ? 'زۆر' : 'Full')}
+                            </span>
+                          )}
                         </div>
                       )}
                       <div className="flex items-center gap-2 mt-2">

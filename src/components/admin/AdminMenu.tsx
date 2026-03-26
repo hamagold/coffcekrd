@@ -221,6 +221,11 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 <td className="p-3 text-muted-foreground text-xs">{catLabels[item.cat] || item.cat}</td>
                 <td className="p-3 text-primary font-bold text-xs">{item.price.toLocaleString()}</td>
                 <td className="p-3">
+                  <span className="text-[10px] font-mono font-bold bg-accent/50 text-accent-foreground px-2 py-0.5 rounded-md border border-accent/30">
+                    {item.plc_code || '—'}
+                  </span>
+                </td>
+                <td className="p-3">
                   <button
                     onClick={async () => {
                       try {

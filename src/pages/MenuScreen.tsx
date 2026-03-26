@@ -772,9 +772,9 @@ const MenuScreen = () => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
-                            setParamItem({ item: variantItem });
-                            setVariantItem(null);
+                            setSelectedParams({ sugar: 1, size: 2, milk: 0 });
+                             setParamItem({ item: variantItem });
+                             setVariantItem(null);
                           } else {
                             addToCart(variantItem);
                             setVariantItem(null);

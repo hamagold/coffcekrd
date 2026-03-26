@@ -758,7 +758,14 @@ const MenuScreen = () => {
                       onClick={() => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
-                          addToCart(variantItem);
+                          if (menuType === 'robot') {
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setParamItem({ item: variantItem });
+                            setVariantItem(null);
+                          } else {
+                            addToCart(variantItem);
+                            setVariantItem(null);
+                          }
                         } else {
                           const variantMenuItem: MenuItem = {
                             ...variantItem,
@@ -768,9 +775,15 @@ const MenuScreen = () => {
                             image: opt.image || variantItem.image,
                             plc_code: opt.variant.plc_code || variantItem.plc_code,
                           };
-                          addToCart(variantMenuItem);
+                          if (menuType === 'robot') {
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setParamItem({ item: variantMenuItem, variantData: opt.variant });
+                            setVariantItem(null);
+                          } else {
+                            addToCart(variantMenuItem);
+                            setVariantItem(null);
+                          }
                         }
-                        setVariantItem(null);
                       }}
                       className={`group rounded-2xl border-2 border-black/8 overflow-hidden cursor-pointer transition-all text-left bg-white relative ${opt.out_of_stock ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-xl hover:border-black/20 active:scale-[0.96]'}`}
                     >

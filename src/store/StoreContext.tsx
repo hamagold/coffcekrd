@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser } from '@/types';
+import { Language, MenuType, CartItem, MenuItem, Order, PaymentMethod, OrderType, Expense, AppUser, PLCParams } from '@/types';
 import { defaultRobotItems, defaultStaffItems } from '@/data/menuData';
 import { supabase } from '@/integrations/supabase/client';
 import { useMenuItems } from '@/hooks/useMenuItems';

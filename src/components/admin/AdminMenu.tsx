@@ -19,7 +19,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
   const [showModal, setShowModal] = useState(false);
   const [showCatModal, setShowCatModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '' });
+  const [newItem, setNewItem] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: 'hot', type: 'robot' as MenuType, image: '', plcCode: '' });
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [editData, setEditData] = useState({ emoji: '', nameKu: '', nameAr: '', nameEn: '', price: '', cat: '', image: '', plcCode: '' });
   const [newCat, setNewCat] = useState({ catId: '', icon: '', image: '', nameKu: '', nameAr: '', nameEn: '', menuType: 'robot' });

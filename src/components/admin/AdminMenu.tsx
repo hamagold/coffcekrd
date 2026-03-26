@@ -202,7 +202,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, t.priceIqd, lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, t.priceIqd, 'PLC', lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>

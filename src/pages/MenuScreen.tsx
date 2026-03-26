@@ -150,7 +150,7 @@ const MenuScreen = () => {
       return;
     }
     const isRobotOrder = menuType === 'robot'; const currentCart = [...cart]; const currentTotal = cartTotal;
-    const num = await placeOrder(payment, orderType);
+    const num = await placeOrder(payment, orderType, menuType);
     setLastOrderNum(num); setShowModal(true);
     if (isRobotOrder) {
       try {

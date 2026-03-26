@@ -124,6 +124,7 @@ export type Database = {
           desc_en: string
           desc_ku: string
           emoji: string
+          has_params: boolean
           id: string
           image: string | null
           item_id: string
@@ -144,6 +145,7 @@ export type Database = {
           desc_en?: string
           desc_ku?: string
           emoji?: string
+          has_params?: boolean
           id?: string
           image?: string | null
           item_id: string
@@ -164,6 +166,7 @@ export type Database = {
           desc_en?: string
           desc_ku?: string
           emoji?: string
+          has_params?: boolean
           id?: string
           image?: string | null
           item_id?: string

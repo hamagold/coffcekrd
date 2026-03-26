@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_items ADD COLUMN has_params boolean NOT NULL DEFAULT false;

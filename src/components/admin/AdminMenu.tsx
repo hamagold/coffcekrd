@@ -203,7 +203,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              {[t.item, t.nameEn, t.category, t.priceIqd, 'PLC', lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', t.actions].map(h => (
+              {[t.item, t.nameEn, t.category, t.priceIqd, 'PLC', lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'Stock', lang === 'ku' ? 'ئۆپشن' : lang === 'ar' ? 'خيارات' : 'Params', t.actions].map(h => (
                 <th key={h} className="bg-secondary text-muted-foreground text-[10px] tracking-widest uppercase p-3 text-left font-semibold">{h}</th>
               ))}
             </tr>
@@ -245,6 +245,27 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                     {item.out_of_stock 
                       ? (lang === 'ku' ? 'نەماوە' : lang === 'ar' ? 'نفذ' : 'Out') 
                       : (lang === 'ku' ? 'بەردەستە' : lang === 'ar' ? 'متوفر' : 'In Stock')}
+                  </button>
+                </td>
+                <td className="p-3">
+                  <button
+                    onClick={async () => {
+                      try {
+                        await updateItem(item.id, { has_params: !item.has_params });
+                        toast.success(item.has_params
+                          ? (lang === 'ku' ? 'ئۆپشن ناچالاک کرا' : lang === 'ar' ? 'تم إلغاء الخيارات' : 'Params disabled')
+                          : (lang === 'ku' ? 'ئۆپشن چالاک کرا' : lang === 'ar' ? 'تم تفعيل الخيارات' : 'Params enabled'));
+                      } catch { toast.error('Error'); }
+                    }}
+                    className={`text-[10px] font-semibold px-3 py-1 rounded-full cursor-pointer transition-all ${
+                      item.has_params
+                        ? 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20'
+                        : 'bg-muted text-muted-foreground border border-border hover:bg-muted/80'
+                    }`}
+                  >
+                    {item.has_params
+                      ? (lang === 'ku' ? 'چالاکە' : lang === 'ar' ? 'مفعل' : 'ON')
+                      : (lang === 'ku' ? 'ناچالاکە' : lang === 'ar' ? 'معطل' : 'OFF')}
                   </button>
                 </td>
                 <td className="p-3 flex gap-1.5">

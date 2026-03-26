@@ -305,7 +305,7 @@ const MenuScreen = () => {
                       const itemVariants = getVariantsForItem(item.id);
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
-                      } else if (menuType === 'robot') {
+                      } else if (menuType === 'robot' && item.has_params) {
                         setSelectedParams({ sugar: 1, size: 2, milk: 0 });
                         setParamItem({ item });
                       } else {
@@ -771,7 +771,7 @@ const MenuScreen = () => {
                       onClick={() => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
-                          if (menuType === 'robot') {
+                          if (menuType === 'robot' && variantItem.has_params) {
                             setSelectedParams({ sugar: 1, size: 2, milk: 0 });
                              setParamItem({ item: variantItem });
                              setVariantItem(null);
@@ -787,8 +787,9 @@ const MenuScreen = () => {
                             price: opt.price,
                             image: opt.image || variantItem.image,
                             plc_code: opt.variant.plc_code || variantItem.plc_code,
+                            has_params: variantItem.has_params,
                           };
-                          if (menuType === 'robot') {
+                          if (menuType === 'robot' && variantItem.has_params) {
                          setSelectedParams({ sugar: 1, size: 2, milk: 0 });
                             setParamItem({ item: variantMenuItem, variantData: opt.variant });
                             setVariantItem(null);

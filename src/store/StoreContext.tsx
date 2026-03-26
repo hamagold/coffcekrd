@@ -19,7 +19,7 @@ interface StoreContextType {
 
   // Cart
   cart: CartItem[];
-  addToCart: (item: MenuItem) => void;
+  addToCart: (item: MenuItem, plcParams?: PLCParams) => void;
   removeFromCart: (id: string) => void;
   changeQty: (id: string, delta: number) => void;
   clearCart: () => void;

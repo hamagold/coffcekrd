@@ -12,11 +12,9 @@ export interface MultiLangText {
 }
 
 export interface PLCParams {
-  sugar: number;      // 0=none, 1=little, 2=medium, 3=full → VW1224
-  size: number;       // 1=small, 2=medium, 3=large → VW1226
-  milk: number;       // 0=none, 1=regular, 2=oat, 3=almond → VW1228
-  recipe: number;     // 1=normal, 2=strong, 3=light → VW1230
-  waterLevel: number; // 1=little, 2=medium, 3=full → VW1232
+  sugar: number;      // 0=no sugar, 1=with sugar → VW1224
+  size: number;       // 1=small, 2=large → VW1226
+  milk: number;       // 0=no milk, 1=with milk → VW1228
   param6?: number;    // → VW1234
 }
 

@@ -874,11 +874,23 @@ const MenuScreen = () => {
           { value: 2, label: language === 'ku' ? 'شیری ئۆت' : language === 'ar' ? 'حليب شوفان' : 'Oat', emoji: '🌾' },
           { value: 3, label: language === 'ku' ? 'شیری بادەم' : language === 'ar' ? 'حليب لوز' : 'Almond', emoji: '🌰' },
         ];
+        const recipeOptions = [
+          { value: 1, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '☕' },
+          { value: 2, label: language === 'ku' ? 'توند' : language === 'ar' ? 'قوي' : 'Strong', emoji: '💪' },
+          { value: 3, label: language === 'ku' ? 'سووک' : language === 'ar' ? 'خفيف' : 'Light', emoji: '🌿' },
+        ];
+        const waterOptions = [
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Little', emoji: '💧' },
+          { value: 2, label: language === 'ku' ? 'مامناوەند' : language === 'ar' ? 'وسط' : 'Medium', emoji: '💧💧' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Full', emoji: '💧💧💧' },
+        ];
 
         const paramSections = [
           { key: 'sugar' as const, title: language === 'ku' ? 'شەکر' : language === 'ar' ? 'السكر' : 'Sugar', options: sugarOptions, color: FROOZT_YELLOW },
           { key: 'size' as const, title: language === 'ku' ? 'قەبارە' : language === 'ar' ? 'الحجم' : 'Size', options: sizeOptions, color: FROOZT_ICE },
           { key: 'milk' as const, title: language === 'ku' ? 'شیر' : language === 'ar' ? 'الحليب' : 'Milk', options: milkOptions, color: FROOZT_LILAC },
+          { key: 'recipe' as const, title: language === 'ku' ? 'ڕیسێپی' : language === 'ar' ? 'الوصفة' : 'Recipe', options: recipeOptions, color: '#ffcba4' },
+          { key: 'waterLevel' as const, title: language === 'ku' ? 'ئاستی ئاو' : language === 'ar' ? 'مستوى الماء' : 'Water Level', options: waterOptions, color: '#a4d8ff' },
         ];
 
         return (

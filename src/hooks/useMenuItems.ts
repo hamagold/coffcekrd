@@ -13,6 +13,7 @@ const dbToMenuItem = (row: any): MenuItem => ({
   image: row.image || undefined,
   plc_code: row.plc_code || 0,
   out_of_stock: row.out_of_stock || false,
+  has_params: row.has_params || false,
 });
 
 const menuItemToDb = (item: MenuItem, menuType: 'robot' | 'staff', sortOrder: number) => ({

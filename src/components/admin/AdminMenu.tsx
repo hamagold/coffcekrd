@@ -85,6 +85,7 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
         name: { ku: editData.nameKu, ar: editData.nameAr, en: editData.nameEn },
         desc: editItem.desc, price: parseInt(editData.price) || 0,
         image: editData.image || undefined,
+        plc_code: parseInt(editData.plcCode) || 0,
       });
       setEditItem(null);
       toast.success(lang === 'ku' ? 'ئایتم نوێکرایەوە' : lang === 'ar' ? 'تم التحديث' : 'Item updated');

@@ -117,8 +117,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const cartTotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const cartItemCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
-  const placeOrder = useCallback(async (payment: PaymentMethod, orderType: OrderType): Promise<string> => {
+  const placeOrder = useCallback(async (payment: PaymentMethod, orderType: OrderType, menuType?: string): Promise<string> => {
     const orderNum = getNextDailyOrderNumber();
+
+    // Robot orders → 'pending' (bridge picks up), Staff → 'done'
+    const status = menuType === 'robot' ? 'pending' : 'done';
 
     // Insert into database
     await supabase.from('orders').insert({
@@ -128,7 +131,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       payment,
       order_type: orderType,
       lang: language,
-      status: 'done',
+      status,
       is_online: false,
     });
 

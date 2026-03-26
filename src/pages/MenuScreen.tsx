@@ -829,6 +829,122 @@ const MenuScreen = () => {
           </div>
         );
       })()}
+
+      {/* ===== PARAMETER SELECTION MODAL (Robot only) ===== */}
+      {paramItem && (() => {
+        const item = paramItem.item;
+        const itemImg = menuImages[item.id] || item.image;
+
+        const sugarOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ شەکر' : language === 'ar' ? 'بدون سكر' : 'No Sugar', emoji: '🚫' },
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Little', emoji: '🍬' },
+          { value: 2, label: language === 'ku' ? 'مامناوەند' : language === 'ar' ? 'وسط' : 'Medium', emoji: '🍬🍬' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Full', emoji: '🍬🍬🍬' },
+        ];
+        const sizeOptions = [
+          { value: 1, label: language === 'ku' ? 'بچووک' : language === 'ar' ? 'صغير' : 'Small', emoji: 'S' },
+          { value: 2, label: language === 'ku' ? 'مامناوەند' : language === 'ar' ? 'وسط' : 'Medium', emoji: 'M' },
+          { value: 3, label: language === 'ku' ? 'گەورە' : language === 'ar' ? 'كبير' : 'Large', emoji: 'L' },
+        ];
+        const milkOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ شیر' : language === 'ar' ? 'بدون حليب' : 'No Milk', emoji: '🚫' },
+          { value: 1, label: language === 'ku' ? 'شیری ئاسایی' : language === 'ar' ? 'حليب عادي' : 'Regular', emoji: '🥛' },
+          { value: 2, label: language === 'ku' ? 'شیری ئۆت' : language === 'ar' ? 'حليب شوفان' : 'Oat', emoji: '🌾' },
+          { value: 3, label: language === 'ku' ? 'شیری بادەم' : language === 'ar' ? 'حليب لوز' : 'Almond', emoji: '🌰' },
+        ];
+
+        const paramSections = [
+          { key: 'sugar' as const, title: language === 'ku' ? 'شەکر' : language === 'ar' ? 'السكر' : 'Sugar', options: sugarOptions, color: FROOZT_YELLOW },
+          { key: 'size' as const, title: language === 'ku' ? 'قەبارە' : language === 'ar' ? 'الحجم' : 'Size', options: sizeOptions, color: FROOZT_ICE },
+          { key: 'milk' as const, title: language === 'ku' ? 'شیر' : language === 'ar' ? 'الحليب' : 'Milk', options: milkOptions, color: FROOZT_LILAC },
+        ];
+
+        return (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end sm:items-center justify-center z-[1000]" onClick={() => setParamItem(null)}>
+            <div
+              className="bg-white w-full max-w-[520px] rounded-t-[28px] sm:rounded-[28px] overflow-hidden"
+              style={{ animation: 'slideUp 0.35s cubic-bezier(0.16,1,0.3,1)' }}
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header with item info */}
+              <div className="relative h-36 sm:h-44 bg-black flex items-center justify-center overflow-hidden">
+                {itemImg ? (
+                  <img src={itemImg} alt={item.name[language]} className="w-full h-full object-cover opacity-70" />
+                ) : (
+                  <div className="text-6xl">{item.emoji}</div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <button
+                  onClick={() => setParamItem(null)}
+                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/25 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h3 className="text-white text-xl font-black tracking-tight" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {item.name[language]}
+                  </h3>
+                  <p className="text-white/50 text-[10px] font-bold uppercase tracking-[0.25em] mt-1" style={{ fontFamily: "'Courier New', monospace" }}>
+                    {language === 'ku' ? 'ڕێکخستنەکان هەڵبژێرە' : language === 'ar' ? 'اختر الإعدادات' : 'CUSTOMIZE YOUR DRINK'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Parameter sections */}
+              <div className="p-4 sm:p-5 max-h-[50vh] overflow-y-auto space-y-5">
+                {paramSections.map((section) => (
+                  <div key={section.key}>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2.5 text-black/40" style={{ fontFamily: "'Courier New', monospace" }}>
+                      {section.title}
+                    </div>
+                    <div className="flex gap-2">
+                      {section.options.map((opt) => {
+                        const isSelected = selectedParams[section.key] === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={() => setSelectedParams(prev => ({ ...prev, [section.key]: opt.value }))}
+                            className="flex-1 py-3 px-2 rounded-xl border-2 text-center cursor-pointer transition-all"
+                            style={{
+                              borderColor: isSelected ? section.color : 'rgba(0,0,0,0.08)',
+                              background: isSelected ? `${section.color}20` : 'white',
+                              boxShadow: isSelected ? `0 4px 12px ${section.color}30` : 'none',
+                            }}
+                          >
+                            <div className="text-lg mb-0.5">{opt.emoji}</div>
+                            <div className="text-[10px] font-bold text-black/70" style={{ fontFamily: "'Courier New', monospace" }}>
+                              {opt.label}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add to cart button */}
+              <div className="px-4 pb-4 sm:px-5 sm:pb-5">
+                <button
+                  onClick={() => {
+                    addToCart(item, selectedParams);
+                    setParamItem(null);
+                  }}
+                  className="w-full py-4 rounded-2xl text-black font-black text-sm flex items-center justify-center gap-2 cursor-pointer transition-all hover:opacity-90 active:scale-[0.97]"
+                  style={{ background: FROOZT_YELLOW, fontFamily: "'Courier New', monospace" }}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {language === 'ku' ? 'زیادکردن بۆ سەبەتە' : language === 'ar' ? 'أضف إلى السلة' : 'ADD TO CART'}
+                  <span className="opacity-60">— IQD {item.price.toLocaleString()}</span>
+                </button>
+              </div>
+
+              {/* Bottom accent bar */}
+              <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${FROOZT_YELLOW}, ${FROOZT_ICE}, ${FROOZT_LILAC})` }} />
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

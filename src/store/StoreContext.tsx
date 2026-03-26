@@ -92,11 +92,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLanguageState(lang);
   }, []);
 
-  const addToCart = useCallback((item: MenuItem) => {
+  const addToCart = useCallback((item: MenuItem, plcParams?: PLCParams) => {
     setCart(prev => {
-      const existing = prev.find(c => c.id === item.id);
-      if (existing) return prev.map(c => c.id === item.id ? { ...c, qty: c.qty + 1 } : c);
-      return [...prev, { ...item, qty: 1 }];
+      const cartId = plcParams ? `${item.id}_p${plcParams.sugar}${plcParams.size}${plcParams.milk}` : item.id;
+      const existing = prev.find(c => c.id === cartId);
+      if (existing) return prev.map(c => c.id === cartId ? { ...c, qty: c.qty + 1 } : c);
+      return [...prev, { ...item, id: cartId, qty: 1, plcParams }];
     });
   }, []);
 

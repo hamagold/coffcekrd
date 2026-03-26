@@ -333,6 +333,26 @@ const AdminMenu = ({ lang }: { lang: Language }) => {
                 ))}
               </select>
             </div>
+            {/* PLC Code for new item */}
+            <div className="mb-4">
+              <label className="text-muted-foreground text-[10px] tracking-widest uppercase block mb-1.5 font-semibold flex items-center gap-1.5">
+                🔧 PLC Code (VW1220)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  className="w-full p-2.5 bg-secondary border border-border rounded-lg text-foreground text-sm font-mono focus:outline-none focus:border-primary/50 transition-colors"
+                  type="number"
+                  value={newItem.plcCode}
+                  onChange={e => setNewItem(p => ({ ...p, plcCode: e.target.value }))}
+                  placeholder={lang === 'ku' ? 'بەتاڵ = ئۆتۆماتیکی' : 'Empty = auto'}
+                  min="0"
+                  max="200"
+                />
+              </div>
+              <p className="text-muted-foreground text-[10px] mt-1">
+                {lang === 'ku' ? 'بەتاڵی بهێڵە بۆ کۆدی ئۆتۆماتیکی، یان ژمارەیەک بنووسە (1-100)' : 'Leave empty for auto code, or enter a number (1-100)'}
+              </p>
+            </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-xs font-semibold cursor-pointer hover:bg-muted transition-all">{t.cancel}</button>
               <button onClick={handleAdd} disabled={saving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5 disabled:opacity-50">

@@ -374,6 +374,28 @@ const MenuScreen = () => {
                       <div className="text-sm sm:text-base font-black text-black" style={{ fontFamily: "'Courier New', monospace" }}>
                         {item.name[language]}
                       </div>
+                      {item.plcParams && (
+                        <div className="flex gap-1.5 mt-1 flex-wrap">
+                          {item.plcParams.sugar > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_YELLOW}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              🍬 {item.plcParams.sugar === 1 ? (language === 'ku' ? 'کەم' : 'Little') : item.plcParams.sugar === 2 ? (language === 'ku' ? 'ناوەند' : 'Med') : (language === 'ku' ? 'زۆر' : 'Full')}
+                            </span>
+                          )}
+                          {item.plcParams.sugar === 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#f0f0f0', color: '#999', fontFamily: "'Courier New', monospace" }}>
+                              🚫 {language === 'ku' ? 'بێ شەکر' : 'No Sugar'}
+                            </span>
+                          )}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_ICE}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                            {item.plcParams.size === 1 ? 'S' : item.plcParams.size === 2 ? 'M' : 'L'}
+                          </span>
+                          {item.plcParams.milk > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_LILAC}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              🥛 {item.plcParams.milk === 1 ? (language === 'ku' ? 'ئاسایی' : 'Reg') : item.plcParams.milk === 2 ? (language === 'ku' ? 'ئۆت' : 'Oat') : (language === 'ku' ? 'بادەم' : 'Alm')}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-2">
                         <button onClick={() => changeQty(item.id, -1)} className="w-8 h-8 border-2 border-black/20 rounded flex items-center justify-center cursor-pointer hover:bg-black/5 transition-all">
                           {item.qty === 1 ? <X className="w-3.5 h-3.5 text-black/60" /> : <Minus className="w-3.5 h-3.5 text-black/60" />}

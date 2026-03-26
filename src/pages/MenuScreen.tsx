@@ -45,7 +45,7 @@ const MenuScreen = () => {
   const { getVariantsForItem } = useVariants();
   const [variantItem, setVariantItem] = useState<MenuItem | null>(null);
   const [paramItem, setParamItem] = useState<{ item: MenuItem; variantData?: any } | null>(null);
-  const [selectedParams, setSelectedParams] = useState<PLCParams>({ sugar: 2, size: 2, milk: 0 });
+  const [selectedParams, setSelectedParams] = useState<PLCParams>({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
@@ -306,7 +306,7 @@ const MenuScreen = () => {
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
                       } else if (menuType === 'robot') {
-                        setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                        setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                         setParamItem({ item });
                       } else {
                         addToCart(item);
@@ -392,6 +392,16 @@ const MenuScreen = () => {
                           {item.plcParams.milk > 0 && (
                             <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_LILAC}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
                               🥛 {item.plcParams.milk === 1 ? (language === 'ku' ? 'ئاسایی' : 'Reg') : item.plcParams.milk === 2 ? (language === 'ku' ? 'ئۆت' : 'Oat') : (language === 'ku' ? 'بادەم' : 'Alm')}
+                            </span>
+                          )}
+                          {item.plcParams.recipe && item.plcParams.recipe !== 1 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#ffcba440', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              ☕ {item.plcParams.recipe === 2 ? (language === 'ku' ? 'توند' : 'Strong') : (language === 'ku' ? 'سووک' : 'Light')}
+                            </span>
+                          )}
+                          {item.plcParams.waterLevel && item.plcParams.waterLevel !== 2 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: '#a4d8ff40', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              💧 {item.plcParams.waterLevel === 1 ? (language === 'ku' ? 'کەم' : 'Little') : (language === 'ku' ? 'زۆر' : 'Full')}
                             </span>
                           )}
                         </div>
@@ -781,7 +791,7 @@ const MenuScreen = () => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                             setParamItem({ item: variantItem });
                             setVariantItem(null);
                           } else {
@@ -798,7 +808,7 @@ const MenuScreen = () => {
                             plc_code: opt.variant.plc_code || variantItem.plc_code,
                           };
                           if (menuType === 'robot') {
-                            setSelectedParams({ sugar: 2, size: 2, milk: 0 });
+                            setSelectedParams({ sugar: 2, size: 2, milk: 0, recipe: 1, waterLevel: 2 });
                             setParamItem({ item: variantMenuItem, variantData: opt.variant });
                             setVariantItem(null);
                           } else {
@@ -874,11 +884,23 @@ const MenuScreen = () => {
           { value: 2, label: language === 'ku' ? 'شیری ئۆت' : language === 'ar' ? 'حليب شوفان' : 'Oat', emoji: '🌾' },
           { value: 3, label: language === 'ku' ? 'شیری بادەم' : language === 'ar' ? 'حليب لوز' : 'Almond', emoji: '🌰' },
         ];
+        const recipeOptions = [
+          { value: 1, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '☕' },
+          { value: 2, label: language === 'ku' ? 'توند' : language === 'ar' ? 'قوي' : 'Strong', emoji: '💪' },
+          { value: 3, label: language === 'ku' ? 'سووک' : language === 'ar' ? 'خفيف' : 'Light', emoji: '🌿' },
+        ];
+        const waterOptions = [
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Little', emoji: '💧' },
+          { value: 2, label: language === 'ku' ? 'مامناوەند' : language === 'ar' ? 'وسط' : 'Medium', emoji: '💧💧' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Full', emoji: '💧💧💧' },
+        ];
 
         const paramSections = [
           { key: 'sugar' as const, title: language === 'ku' ? 'شەکر' : language === 'ar' ? 'السكر' : 'Sugar', options: sugarOptions, color: FROOZT_YELLOW },
           { key: 'size' as const, title: language === 'ku' ? 'قەبارە' : language === 'ar' ? 'الحجم' : 'Size', options: sizeOptions, color: FROOZT_ICE },
           { key: 'milk' as const, title: language === 'ku' ? 'شیر' : language === 'ar' ? 'الحليب' : 'Milk', options: milkOptions, color: FROOZT_LILAC },
+          { key: 'recipe' as const, title: language === 'ku' ? 'ڕیسێپی' : language === 'ar' ? 'الوصفة' : 'Recipe', options: recipeOptions, color: '#ffcba4' },
+          { key: 'waterLevel' as const, title: language === 'ku' ? 'ئاستی ئاو' : language === 'ar' ? 'مستوى الماء' : 'Water Level', options: waterOptions, color: '#a4d8ff' },
         ];
 
         return (

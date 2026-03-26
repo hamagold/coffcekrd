@@ -193,14 +193,14 @@ async function sendOrderToMachine(
 
     // Write item data + parameters (register 110-117 = VW1220-VW1234)
     const itemValues = [
-      plcCode,              // VW1220 = item/drink code
-      qty,                  // VW1222 = quantity
-      params.sugar || 0,    // VW1224 = sugar level (0-3)
-      params.size || 0,     // VW1226 = size (1-3)
-      params.milk || 0,     // VW1228 = milk type (0-3)
-      params.param4 || 0,   // VW1230
-      params.param5 || 0,   // VW1232
-      params.param6 || 0,   // VW1234
+      plcCode,                       // VW1220 = item/drink code
+      qty,                           // VW1222 = quantity
+      params.sugar || 0,             // VW1224 = sugar level (0-3)
+      params.size || 0,              // VW1226 = size (1-3)
+      params.milk || 0,              // VW1228 = milk type (0-3)
+      params.recipe || 1,            // VW1230 = recipe type (1=normal, 2=strong, 3=light)
+      params.waterLevel || 2,        // VW1232 = water level (1=little, 2=medium, 3=full)
+      params.param6 || 0,            // VW1234
     ];
 
     const itemFrame = buildWriteMultipleRegisters(transactionId++, 1, 110, itemValues);

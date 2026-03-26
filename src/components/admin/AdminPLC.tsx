@@ -311,6 +311,78 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
       </h2>
       <p className="text-muted-foreground text-sm mb-6">{t.plcDesc}</p>
 
+      {/* Modbus TCP Register Mapping */}
+      <div className="bg-card rounded-xl border border-border overflow-hidden mb-5">
+        <div className="p-4 border-b border-border flex items-center gap-2">
+          <Cpu className="w-4 h-4 text-primary" />
+          <span className="text-foreground font-bold text-sm">
+            {lang === 'ku' ? 'نەخشەی ڕیجیستەرەکانی Modbus TCP' : lang === 'ar' ? 'خريطة سجلات Modbus TCP' : 'Modbus TCP Register Mapping'}
+          </span>
+          <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full font-mono">S7-200 Smart</span>
+        </div>
+        <div className="p-4 space-y-2">
+          <div className="text-muted-foreground text-xs mb-3">
+            {lang === 'ku' ? 'HoldStart = VB1000 · MaxHold = 200 · Port = 502' : 'HoldStart = VB1000 · MaxHold = 200 · Port = 502'}
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-start py-2 px-3 text-muted-foreground font-semibold">
+                    {lang === 'ku' ? 'ڕیجیستەر' : 'Register'}
+                  </th>
+                  <th className="text-start py-2 px-3 text-muted-foreground font-semibold">V Memory</th>
+                  <th className="text-start py-2 px-3 text-muted-foreground font-semibold">
+                    {lang === 'ku' ? 'بەکارهاتن' : 'Usage'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="font-mono">
+                {[
+                  { reg: '40102', vm: 'VW1202', desc: lang === 'ku' ? 'فەرمانی سەرەکی (Command)' : 'Main Command' },
+                  { reg: '40103', vm: 'VW1204', desc: lang === 'ku' ? 'فەرمانی لاوەکی (Sub-command)' : 'Sub-command' },
+                  { reg: '40111', vm: 'VW1220', desc: lang === 'ku' ? 'کۆدی خواردنەوە/ئایتم (plc_code)' : 'Item/Drink Code (plc_code)' },
+                  { reg: '40112', vm: 'VW1222', desc: lang === 'ku' ? 'بڕ / ژمارە' : 'Quantity' },
+                  { reg: '40113', vm: 'VW1224', desc: lang === 'ku' ? 'پاڕامیتەر ١ (شەکر)' : 'Parameter 1 (Sugar)' },
+                  { reg: '40114', vm: 'VW1226', desc: lang === 'ku' ? 'پاڕامیتەر ٢ (قەبارە)' : 'Parameter 2 (Size)' },
+                  { reg: '40115', vm: 'VW1228', desc: lang === 'ku' ? 'پاڕامیتەر ٣' : 'Parameter 3' },
+                  { reg: '40116', vm: 'VW1230', desc: lang === 'ku' ? 'پاڕامیتەر ٤' : 'Parameter 4' },
+                  { reg: '40117', vm: 'VW1232', desc: lang === 'ku' ? 'پاڕامیتەر ٥' : 'Parameter 5' },
+                  { reg: '40118', vm: 'VW1234', desc: lang === 'ku' ? 'پاڕامیتەر ٦' : 'Parameter 6' },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
+                    <td className="py-2 px-3 text-primary font-bold">{row.reg}</td>
+                    <td className="py-2 px-3 text-foreground">{row.vm}</td>
+                    <td className="py-2 px-3 text-muted-foreground font-sans">{row.desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-[11px] text-muted-foreground mt-3 space-y-1">
+            <div className="text-primary font-bold">
+              {lang === 'ku' ? 'چۆن کار دەکات:' : 'How it works:'}
+            </div>
+            <div>{lang === 'ku' ? '١. سیستەم plc_code ی ئایتمەکە دەنووسێت بۆ VW1220 (ڕیجیستەر 40111)' : '1. System writes item plc_code to VW1220 (register 40111)'}</div>
+            <div>{lang === 'ku' ? '٢. بڕ/ژمارە دەنووسێت بۆ VW1222 (ڕیجیستەر 40112)' : '2. Quantity is written to VW1222 (register 40112)'}</div>
+            <div>{lang === 'ku' ? '٣. فەرمانی ئامادەکردن (١) دەنووسێت بۆ VW1202 (ڕیجیستەر 40102)' : '3. Prepare command (1) is written to VW1202 (register 40102)'}</div>
+            <div>{lang === 'ku' ? '٤. PLC فەرمانەکە دەخوێنێتەوە و دەستبەکار دەبێت' : '4. PLC reads the command and starts processing'}</div>
+          </div>
+          <div className="bg-secondary/50 border border-border rounded-lg p-3 text-[11px] text-muted-foreground mt-2 space-y-1">
+            <div className="text-foreground font-bold">
+              {lang === 'ku' ? 'ئامێرە کۆیلاینەکان (Modbus Client):' : 'Client Machines (Modbus Client):'}
+            </div>
+            <div>• 192.168.0.52:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB200/VB250)' : 'Register 43201, 20 registers (VB200/VB250)'}</div>
+            <div>• 192.168.0.53:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB350/VB300)' : 'Register 43201, 20 registers (VB350/VB300)'}</div>
+            <div className="mt-1 text-foreground font-bold">
+              {lang === 'ku' ? 'RS485 (Modbus RTU):' : 'RS485 (Modbus RTU):'}
+            </div>
+            <div>• Slave 3, 4, 5 — {lang === 'ku' ? 'ناونیشان 40085، ٣ ڕیجیستەر' : 'Address 40085, 3 registers'}</div>
+            <div>• Slave 20, 21 — {lang === 'ku' ? 'ناونیشان 40001، ١١ ڕیجیستەر' : 'Address 40001, 11 registers'}</div>
+          </div>
+        </div>
+      </div>
+
       {/* PLC Item Codes */}
       <div className="mb-5">
         <PLCItemCodes lang={lang} />

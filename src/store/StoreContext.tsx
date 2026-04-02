@@ -94,7 +94,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const addToCart = useCallback((item: MenuItem, plcParams?: PLCParams) => {
     setCart(prev => {
-      const cartId = plcParams ? `${item.id}_p${plcParams.sugar}${plcParams.size}${plcParams.milk}` : item.id;
+      const cartId = plcParams ? `${item.id}_p${plcParams.ice}${plcParams.sugar}${plcParams.cupType}${plcParams.topping}${plcParams.latteArt}` : item.id;
       const existing = prev.find(c => c.id === cartId);
       if (existing) return prev.map(c => c.id === cartId ? { ...c, qty: c.qty + 1 } : c);
       return [...prev, { ...item, id: cartId, qty: 1, plcParams }];

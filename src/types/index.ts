@@ -12,10 +12,13 @@ export interface MultiLangText {
 }
 
 export interface PLCParams {
-  sugar: number;      // 0=no sugar, 1=with sugar → VW1224
-  size: number;       // 1=small, 2=large → VW1226
-  milk: number;       // 0=no milk, 1=with milk → VW1228
-  param6?: number;    // → VW1234
+  ice: number;        // 0=no ice, 1=less, 2=normal, 3=more → VW1224
+  sugar: number;      // 0=none, 1=less, 2=normal, 3=more → VW1232
+  sugarType: number;  // 1-50 coffee syrups → VW1228
+  cupType: number;    // 1=coffee 8oz, 5=coffee 16oz, 51=tea 12oz, 52=tea 16oz → VW1230
+  topping: number;    // 0=none, 51=boba, 52=strawberry, 53=orange, 54=lychee → VW1234
+  latteArt: number;   // 0=none, 1-3=patterns → VW1226
+  param6?: number;
 }
 
 export interface MenuItem {

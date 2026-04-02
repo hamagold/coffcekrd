@@ -45,7 +45,7 @@ const MenuScreen = () => {
   const { getVariantsForItem } = useVariants();
   const [variantItem, setVariantItem] = useState<MenuItem | null>(null);
   const [paramItem, setParamItem] = useState<{ item: MenuItem; variantData?: any } | null>(null);
-  const [selectedParams, setSelectedParams] = useState<PLCParams>({ sugar: 1, size: 2, milk: 0 });
+  const [selectedParams, setSelectedParams] = useState<PLCParams>({ ice: 0, sugar: 0, sugarType: 0, cupType: 1, topping: 0, latteArt: 0 });
 
   useInactivityRedirect(cartItemCount > 0 || cashBalance > 0);
   const [lastInserted, setLastInserted] = useState<number | null>(null);
@@ -154,7 +154,7 @@ const MenuScreen = () => {
     setLastOrderNum(num); setShowModal(true);
     if (isRobotOrder) {
       try {
-        await supabase.functions.invoke('send-to-plc', { body: { orderNumber: num, items: currentCart.map(item => ({ id: item.id, plc_code: item.plc_code || 0, name: item.name, qty: item.qty, cat: item.cat, plcParams: item.plcParams || { sugar: 0, size: 1, milk: 0 } })), total: currentTotal, payment } });
+        await supabase.functions.invoke('send-to-plc', { body: { orderNumber: num, items: currentCart.map(item => ({ id: item.id, plc_code: item.plc_code || 0, name: item.name, qty: item.qty, cat: item.cat, plcParams: item.plcParams || { ice: 0, sugar: 0, sugarType: 0, cupType: 1, topping: 0, latteArt: 0 } })), total: currentTotal, payment } });
         const { toast } = await import('sonner');
         toast.success(language === 'ku' ? `🤖 ئۆردەر #${num} بۆ سیستەمی PLC نێردرا` : language === 'ar' ? `🤖 تم إرسال الطلب #${num} إلى نظام PLC` : `🤖 Order #${num} sent to PLC system`);
       } catch (err) { console.error('PLC auto-send error:', err); }
@@ -306,7 +306,7 @@ const MenuScreen = () => {
                       if (itemVariants.length > 0) {
                         setVariantItem(item);
                       } else if (menuType === 'robot' && item.has_params) {
-                        setSelectedParams({ sugar: 1, size: 2, milk: 0 });
+                        setSelectedParams({ ice: 0, sugar: 0, sugarType: 0, cupType: 1, topping: 0, latteArt: 0 });
                         setParamItem({ item });
                       } else {
                         addToCart(item);
@@ -376,15 +376,22 @@ const MenuScreen = () => {
                       </div>
                       {item.plcParams && (
                         <div className="flex gap-1.5 mt-1 flex-wrap">
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.sugar > 0 ? `${FROOZT_YELLOW}40` : '#f0f0f0', color: item.plcParams.sugar > 0 ? '#666' : '#999', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.sugar > 0 ? (language === 'ku' ? '🍬 بە شەکر' : '🍬 Sugar') : (language === 'ku' ? '🚫 بێ شەکر' : '🚫 No Sugar')}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.ice > 0 ? `${FROOZT_ICE}40` : '#f0f0f0', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                            {item.plcParams.ice === 0 ? '🚫' : item.plcParams.ice === 1 ? '🧊少' : item.plcParams.ice === 2 ? '🧊' : '🧊🧊'}
                           </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_ICE}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.size === 1 ? 'S' : 'L'}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.sugar > 0 ? `${FROOZT_YELLOW}40` : '#f0f0f0', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                            {item.plcParams.sugar === 0 ? (language === 'ku' ? '🚫 بێ شەکر' : '🚫 No Sugar') : item.plcParams.sugar === 1 ? '🍬 少' : item.plcParams.sugar === 2 ? '🍬' : '🍬🍬'}
                           </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.milk > 0 ? `${FROOZT_LILAC}40` : '#f0f0f0', color: item.plcParams.milk > 0 ? '#666' : '#999', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.milk > 0 ? (language === 'ku' ? '🥛 بە شیر' : '🥛 Milk') : (language === 'ku' ? '🚫 بێ شیر' : '🚫 No Milk')}
-                          </span>
+                          {item.plcParams.cupType > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_LILAC}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              {item.plcParams.cupType === 1 ? '☕8oz' : item.plcParams.cupType === 5 ? '☕16oz' : item.plcParams.cupType === 51 ? '🫖12oz' : '🫖16oz'}
+                            </span>
+                          )}
+                          {item.plcParams.topping > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_PINK}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              {item.plcParams.topping === 51 ? '🫧 Boba' : item.plcParams.topping === 52 ? '🍓' : item.plcParams.topping === 53 ? '🍊' : '🫐 Lychee'}
+                            </span>
+                          )}
                         </div>
                       )}
                       <div className="flex items-center gap-2 mt-2">
@@ -772,7 +779,7 @@ const MenuScreen = () => {
                         if (opt.out_of_stock) return;
                         if (opt.isBase) {
                           if (menuType === 'robot' && variantItem.has_params) {
-                            setSelectedParams({ sugar: 1, size: 2, milk: 0 });
+                            setSelectedParams({ ice: 0, sugar: 0, sugarType: 0, cupType: 1, topping: 0, latteArt: 0 });
                              setParamItem({ item: variantItem });
                              setVariantItem(null);
                           } else {
@@ -790,7 +797,7 @@ const MenuScreen = () => {
                             has_params: variantItem.has_params,
                           };
                           if (menuType === 'robot' && variantItem.has_params) {
-                         setSelectedParams({ sugar: 1, size: 2, milk: 0 });
+                         setSelectedParams({ ice: 0, sugar: 0, sugarType: 0, cupType: 1, topping: 0, latteArt: 0 });
                             setParamItem({ item: variantMenuItem, variantData: opt.variant });
                             setVariantItem(null);
                           } else {
@@ -849,23 +856,37 @@ const MenuScreen = () => {
         const item = paramItem.item;
         const itemImg = menuImages[item.id] || item.image;
 
+        const iceOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ سەهۆڵ' : language === 'ar' ? 'بدون ثلج' : 'No Ice', emoji: '🚫' },
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Less', emoji: '🧊' },
+          { value: 2, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '🧊🧊' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Extra', emoji: '🧊🧊🧊' },
+        ];
         const sugarOptions = [
           { value: 0, label: language === 'ku' ? 'بێ شەکر' : language === 'ar' ? 'بدون سكر' : 'No Sugar', emoji: '🚫' },
-          { value: 1, label: language === 'ku' ? 'بە شەکر' : language === 'ar' ? 'مع سكر' : 'With Sugar', emoji: '🍬' },
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Less', emoji: '🍬' },
+          { value: 2, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '🍬🍬' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Extra', emoji: '🍬🍬🍬' },
         ];
-        const sizeOptions = [
-          { value: 1, label: language === 'ku' ? 'بچووک' : language === 'ar' ? 'صغير' : 'Small', emoji: 'S' },
-          { value: 2, label: language === 'ku' ? 'گەورە' : language === 'ar' ? 'كبير' : 'Large', emoji: 'L' },
+        const cupOptions = [
+          { value: 1, label: '☕ 8oz', emoji: '☕' },
+          { value: 5, label: '☕ 16oz', emoji: '☕' },
+          { value: 51, label: '🫖 12oz', emoji: '🫖' },
+          { value: 52, label: '🫖 16oz', emoji: '🫖' },
         ];
-        const milkOptions = [
-          { value: 0, label: language === 'ku' ? 'بێ شیر' : language === 'ar' ? 'بدون حليب' : 'No Milk', emoji: '🚫' },
-          { value: 1, label: language === 'ku' ? 'بە شیر' : language === 'ar' ? 'مع حليب' : 'With Milk', emoji: '🥛' },
+        const toppingOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ تۆپینگ' : language === 'ar' ? 'بدون' : 'None', emoji: '🚫' },
+          { value: 51, label: 'Boba', emoji: '🫧' },
+          { value: 52, label: language === 'ku' ? 'فراولە' : 'Strawberry', emoji: '🍓' },
+          { value: 53, label: language === 'ku' ? 'پرتەقاڵ' : 'Orange', emoji: '🍊' },
+          { value: 54, label: 'Lychee', emoji: '🫐' },
         ];
 
         const paramSections = [
+          { key: 'ice' as const, title: language === 'ku' ? 'سەهۆڵ' : language === 'ar' ? 'الثلج' : 'Ice', options: iceOptions, color: FROOZT_ICE },
           { key: 'sugar' as const, title: language === 'ku' ? 'شەکر' : language === 'ar' ? 'السكر' : 'Sugar', options: sugarOptions, color: FROOZT_YELLOW },
-          { key: 'size' as const, title: language === 'ku' ? 'قەبارە' : language === 'ar' ? 'الحجم' : 'Size', options: sizeOptions, color: FROOZT_ICE },
-          { key: 'milk' as const, title: language === 'ku' ? 'شیر' : language === 'ar' ? 'الحليب' : 'Milk', options: milkOptions, color: FROOZT_LILAC },
+          { key: 'cupType' as const, title: language === 'ku' ? 'کوپ' : language === 'ar' ? 'الكوب' : 'Cup', options: cupOptions, color: FROOZT_LILAC },
+          { key: 'topping' as const, title: language === 'ku' ? 'تۆپینگ' : language === 'ar' ? 'الإضافات' : 'Topping', options: toppingOptions, color: FROOZT_PINK },
         ];
 
         return (

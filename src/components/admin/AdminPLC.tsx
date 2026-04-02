@@ -37,9 +37,9 @@ interface PLCItem {
 const DEFAULT_MACHINE: PLCMachine = {
   machineId: 'machine-01',
   name: 'Robot 1',
-  ip: '192.168.1.100',
+  ip: '192.168.0.50',
   port: '502',
-  model: 'Siemens S7-1200',
+  model: 'Siemens S7-200 Smart',
   protocol: 'Modbus TCP',
 };
 
@@ -47,8 +47,8 @@ const DEFAULT_CONFIG: PLCConfig = {
   autoSend: false,
   machines: [
     { ...DEFAULT_MACHINE },
-    { machineId: 'machine-02', name: 'Robot 2', ip: '192.168.1.101', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP' },
-    { machineId: 'machine-03', name: 'Robot 3', ip: '192.168.1.102', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP' },
+    { machineId: 'machine-02', name: 'Robot 2', ip: '192.168.0.52', port: '502', model: 'Siemens S7-200 Smart', protocol: 'Modbus TCP' },
+    { machineId: 'machine-03', name: 'Robot 3', ip: '192.168.0.53', port: '502', model: 'Siemens S7-200 Smart', protocol: 'Modbus TCP' },
   ],
 };
 
@@ -339,16 +339,15 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
               </thead>
               <tbody className="font-mono">
                 {[
-                  { reg: '40102', vm: 'VW1202', desc: lang === 'ku' ? 'فەرمانی سەرەکی (Command)' : 'Main Command' },
-                  { reg: '40103', vm: 'VW1204', desc: lang === 'ku' ? 'فەرمانی لاوەکی (Sub-command)' : 'Sub-command' },
-                  { reg: '40111', vm: 'VW1220', desc: lang === 'ku' ? 'کۆدی خواردنەوە/ئایتم (plc_code)' : 'Item/Drink Code (plc_code)' },
-                  { reg: '40112', vm: 'VW1222', desc: lang === 'ku' ? 'بڕ / ژمارە' : 'Quantity' },
-                  { reg: '40113', vm: 'VW1224', desc: lang === 'ku' ? 'پاڕامیتەر ١ (شەکر)' : 'Parameter 1 (Sugar)' },
-                  { reg: '40114', vm: 'VW1226', desc: lang === 'ku' ? 'پاڕامیتەر ٢ (قەبارە)' : 'Parameter 2 (Size)' },
-                  { reg: '40115', vm: 'VW1228', desc: lang === 'ku' ? 'پاڕامیتەر ٣' : 'Parameter 3' },
-                  { reg: '40116', vm: 'VW1230', desc: lang === 'ku' ? 'پاڕامیتەر ٤' : 'Parameter 4' },
-                  { reg: '40117', vm: 'VW1232', desc: lang === 'ku' ? 'پاڕامیتەر ٥' : 'Parameter 5' },
-                  { reg: '40118', vm: 'VW1234', desc: lang === 'ku' ? 'پاڕامیتەر ٦' : 'Parameter 6' },
+                  { reg: '40101', vm: 'VW1202', desc: lang === 'ku' ? 'فەرمانی کار (1=دەستپێکردن، 2=هەڵوەشاندنەوە، 3=ڕیسێت)' : 'Process (1=Start, 2=Cancel, 3=Reset)' },
+                  { reg: '40102', vm: 'VW1204', desc: lang === 'ku' ? 'کۆنترۆڵی ئامێر (1=ڕیسێت، 2=شوشتن)' : 'Device Control (1=Reset, 2=Clean)' },
+                  { reg: '40110', vm: 'VW1220', desc: lang === 'ku' ? 'کۆدی ڕیسێپی (قاوە 1-50، چای شیر 51-100)' : 'Recipe Code (Coffee 1-50, Tea 51-100)' },
+                  { reg: '40112', vm: 'VW1224', desc: lang === 'ku' ? 'سەهۆڵ (0=بێ، 1=کەم، 2=ئاسایی، 3=زۆر)' : 'Ice (0=None, 1=Less, 2=Normal, 3=More)' },
+                  { reg: '40113', vm: 'VW1226', desc: lang === 'ku' ? 'لاتێ ئارت (0=بێ، 1-3=شێوە)' : 'Latte Art (0=None, 1-3=Pattern)' },
+                  { reg: '40114', vm: 'VW1228', desc: lang === 'ku' ? 'جۆری شەکر/شیرە (1-50)' : 'Syrup Type (1-50)' },
+                  { reg: '40115', vm: 'VW1230', desc: lang === 'ku' ? 'کوپ (1=8oz، 5=16oz، 51=12oz، 52=16oz)' : 'Cup (1=8oz, 5=16oz, 51=12oz, 52=16oz)' },
+                  { reg: '40116', vm: 'VW1232', desc: lang === 'ku' ? 'بڕی شەکر (0=بێ، 1=کەم، 2=ئاسایی، 3=زۆر)' : 'Sugar Amount (0-3)' },
+                  { reg: '40117', vm: 'VW1234', desc: lang === 'ku' ? 'تۆپینگ (0=بێ، 51=boba، 52=فراولە، 53=پرتەقاڵ، 54=lychee)' : 'Topping (0=None, 51=Boba, 52-54)' },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
                     <td className="py-2 px-3 text-primary font-bold">{row.reg}</td>
@@ -363,22 +362,20 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
             <div className="text-primary font-bold">
               {lang === 'ku' ? 'چۆن کار دەکات:' : 'How it works:'}
             </div>
-            <div>{lang === 'ku' ? '١. سیستەم plc_code ی ئایتمەکە دەنووسێت بۆ VW1220 (ڕیجیستەر 40111)' : '1. System writes item plc_code to VW1220 (register 40111)'}</div>
-            <div>{lang === 'ku' ? '٢. بڕ/ژمارە دەنووسێت بۆ VW1222 (ڕیجیستەر 40112)' : '2. Quantity is written to VW1222 (register 40112)'}</div>
-            <div>{lang === 'ku' ? '٣. فەرمانی ئامادەکردن (١) دەنووسێت بۆ VW1202 (ڕیجیستەر 40102)' : '3. Prepare command (1) is written to VW1202 (register 40102)'}</div>
-            <div>{lang === 'ku' ? '٤. PLC فەرمانەکە دەخوێنێتەوە و دەستبەکار دەبێت' : '4. PLC reads the command and starts processing'}</div>
+            <div>{lang === 'ku' ? '١. فەرمانی دەستپێکردن (1) دەنووسێت بۆ VW1202 (40101)' : '1. Start command (1) written to VW1202 (40101)'}</div>
+            <div>{lang === 'ku' ? '٢. کۆدی ڕیسێپی دەنووسێت بۆ VW1220 (40110)' : '2. Recipe code written to VW1220 (40110)'}</div>
+            <div>{lang === 'ku' ? '٣. پاڕامیتەرەکان (سەهۆڵ/شەکر/کوپ/تۆپینگ) دەنووسرێن بۆ VW1224-VW1234' : '3. Params (Ice/Sugar/Cup/Topping) written to VW1224-VW1234'}</div>
+            <div>{lang === 'ku' ? '٤. PLC فەرمانەکە دەخوێنێتەوە و ڕۆبۆت دەستبەکار دەبێت' : '4. PLC reads and robot starts processing'}</div>
           </div>
           <div className="bg-secondary/50 border border-border rounded-lg p-3 text-[11px] text-muted-foreground mt-2 space-y-1">
             <div className="text-foreground font-bold">
-              {lang === 'ku' ? 'ئامێرە کۆیلاینەکان (Modbus Client):' : 'Client Machines (Modbus Client):'}
+              {lang === 'ku' ? 'IP ـی ئامێرەکان (لە فایلی ئێکسەل):' : 'Device IPs (from Excel):'}
             </div>
-            <div>• 192.168.0.52:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB200/VB250)' : 'Register 43201, 20 registers (VB200/VB250)'}</div>
-            <div>• 192.168.0.53:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB350/VB300)' : 'Register 43201, 20 registers (VB350/VB300)'}</div>
-            <div className="mt-1 text-foreground font-bold">
-              {lang === 'ku' ? 'RS485 (Modbus RTU):' : 'RS485 (Modbus RTU):'}
-            </div>
-            <div>• Slave 3, 4, 5 — {lang === 'ku' ? 'ناونیشان 40085، ٣ ڕیجیستەر' : 'Address 40085, 3 registers'}</div>
-            <div>• Slave 20, 21 — {lang === 'ku' ? 'ناونیشان 40001، ١١ ڕیجیستەر' : 'Address 40001, 11 registers'}</div>
+            <div>• PLC: 192.168.0.50 — Port 502</div>
+            <div>• HMI: 192.168.0.51</div>
+            <div>• ROBOT 1: 192.168.0.52</div>
+            <div>• ROBOT 2: 192.168.0.53</div>
+            <div>• IPC: 192.168.0.20</div>
           </div>
         </div>
       </div>

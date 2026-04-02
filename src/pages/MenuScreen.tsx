@@ -177,8 +177,14 @@ const MenuScreen = () => {
     document.body.appendChild(iframe);
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (!doc) return;
+    // Build items list for receipt
+    const printCart = [...cart];
+    const itemsHtml = printCart.map(item => {
+      const name = typeof item.name === 'object' ? (item.name[language] || item.name.en) : item.name;
+      return `<div class="item"><span>${name} ×${item.qty}</span><span>${(item.price * item.qty).toLocaleString()} IQD</span></div>`;
+    }).join('');
     doc.open();
-    doc.write(`<html><head><title>${cafeName}</title><style>@page{margin:5mm;size:80mm auto;}body{font-family:'Courier New',monospace;text-align:center;padding:10px;margin:0;}.line{border-top:1px dashed #000;margin:8px 0;}.big{font-size:42px;font-weight:bold;margin:8px 0;}.name{font-size:20px;font-weight:bold;margin:4px 0;}.info{font-size:12px;margin:3px 0;}.qr{margin:10px auto;}</style></head><body><div class=\"line\"></div><div class=\"name\">${cafeName} CAFETERIA</div><div class=\"line\"></div><div class=\"big\">#${orderNum}</div><div class=\"info\">${new Date().toLocaleString()}</div><div class=\"info\">Payment: ${payment.toUpperCase()} | Type: ${orderType.toUpperCase()}</div>${qrDataUrl ? `<img class=\"qr\" src=\"${qrDataUrl}\" width=\"120\" height=\"120\" />` : ''}<div class=\"line\"></div><div class=\"info\">THANK YOU / سپاسگوزارین / شكراً</div></body></html>`);
+    doc.write(`<html><head><title>${cafeName}</title><style>@page{margin:5mm;size:80mm auto;}body{font-family:'Courier New',monospace;text-align:center;padding:10px;margin:0;}.line{border-top:1px dashed #000;margin:8px 0;}.big{font-size:42px;font-weight:bold;margin:8px 0;}.name{font-size:20px;font-weight:bold;margin:4px 0;}.info{font-size:12px;margin:3px 0;}.qr{margin:10px auto;}.item{display:flex;justify-content:space-between;font-size:13px;margin:4px 0;text-align:left;}.total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:bold;margin:6px 0;}</style></head><body><div class=\"line\"></div><div class=\"name\">${cafeName} CAFETERIA</div><div class=\"line\"></div><div class=\"big\">#${orderNum}</div><div class=\"info\">${new Date().toLocaleString()}</div><div class=\"line\"></div>${itemsHtml}<div class=\"line\"></div><div class=\"total-row\"><span>TOTAL</span><span>${cartTotal.toLocaleString()} IQD</span></div><div class=\"info\">Payment: ${payment.toUpperCase()} | Type: ${orderType.toUpperCase()}</div>${qrDataUrl ? `<img class=\"qr\" src=\"${qrDataUrl}\" width=\"120\" height=\"120\" />` : ''}<div class=\"line\"></div><div class=\"info\">THANK YOU / سپاسگوزارین / شكراً</div></body></html>`);
     doc.close();
     iframe.onload = () => { setTimeout(() => { iframe.contentWindow?.print(); setTimeout(() => document.body.removeChild(iframe), 2000); }, 300); };
   };

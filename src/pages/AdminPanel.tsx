@@ -12,11 +12,12 @@ import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
 import AdminPLC from '@/components/admin/AdminPLC';
 import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
+import AdminBridgeMonitor from '@/components/admin/AdminBridgeMonitor';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import AdminPermissions, { fetchPermissions, PermissionsConfig } from '@/components/admin/AdminPermissions';
 import SetupAdmin from '@/components/admin/SetupAdmin';
 // StorageSettings moved to DevPanel
-import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, UtensilsCrossed, CreditCard, BarChart3, Users, Wallet, Coffee, LogOut, ArrowLeft, Lock, Shield, User as UserIcon, Loader2, Mail, KeyRound, HardDrive, Cpu, Settings, Globe, Menu as MenuIcon, X, FileText, Activity } from 'lucide-react';
 import { Language } from '@/types';
 
 const AdminPanel = () => {
@@ -86,6 +87,7 @@ const AdminPanel = () => {
     storage: [t.storageTitle, t.storageSub],
     plc: [t.plcTitle, t.plcSub],
     plcLogs: [t.plcLogsTitle, t.plcLogsSub],
+    bridgeMonitor: [lang === 'ku' ? 'مۆنیتۆری Bridge' : lang === 'ar' ? 'مراقب Bridge' : 'Bridge Monitor', lang === 'ku' ? 'سەیری دۆخی bridge.js و ئۆردەرەکان' : lang === 'ar' ? 'مراقبة حالة bridge.js' : 'Monitor bridge.js & order status'],
     cafeSettings: [t.cafeSettingsTitle, t.cafeSettingsSub],
     permissions: [lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', lang === 'ku' ? 'دەسەڵاتی ستاف و ئەدمین' : lang === 'ar' ? 'صلاحيات الموظفين والمدراء' : 'Staff & admin permissions'],
   };
@@ -109,6 +111,7 @@ const AdminPanel = () => {
     // Storage removed - now in DevPanel
     { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: false },
     { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: false },
+    { id: 'bridgeMonitor', icon: Activity, label: lang === 'ku' ? 'مۆنیتۆری Bridge' : lang === 'ar' ? 'مراقب Bridge' : 'Bridge Monitor', section: t.management, superOnly: false },
     { id: 'permissions', icon: Shield, label: lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', section: t.management, superOnly: true },
     { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: false },
   ];
@@ -195,6 +198,7 @@ const AdminPanel = () => {
       // storage removed - now in DevPanel
       case 'plc': return <AdminPLC lang={lang} />;
       case 'plcLogs': return <AdminPLCLogs lang={lang} />;
+      case 'bridgeMonitor': return <AdminBridgeMonitor lang={lang} />;
       case 'permissions': return <AdminPermissions lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;
       default: return <AdminDashboard lang={lang} />;

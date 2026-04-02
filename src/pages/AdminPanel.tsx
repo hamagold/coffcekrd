@@ -198,6 +198,7 @@ const AdminPanel = () => {
       // storage removed - now in DevPanel
       case 'plc': return <AdminPLC lang={lang} />;
       case 'plcLogs': return <AdminPLCLogs lang={lang} />;
+      case 'bridgeMonitor': return <AdminBridgeMonitor lang={lang} />;
       case 'permissions': return <AdminPermissions lang={lang} />;
       case 'cafeSettings': return <AdminCafeSettings lang={lang} />;
       default: return <AdminDashboard lang={lang} />;

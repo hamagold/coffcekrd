@@ -87,6 +87,7 @@ const AdminPanel = () => {
     storage: [t.storageTitle, t.storageSub],
     plc: [t.plcTitle, t.plcSub],
     plcLogs: [t.plcLogsTitle, t.plcLogsSub],
+    bridgeMonitor: [lang === 'ku' ? 'مۆنیتۆری Bridge' : lang === 'ar' ? 'مراقب Bridge' : 'Bridge Monitor', lang === 'ku' ? 'سەیری دۆخی bridge.js و ئۆردەرەکان' : lang === 'ar' ? 'مراقبة حالة bridge.js' : 'Monitor bridge.js & order status'],
     cafeSettings: [t.cafeSettingsTitle, t.cafeSettingsSub],
     permissions: [lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', lang === 'ku' ? 'دەسەڵاتی ستاف و ئەدمین' : lang === 'ar' ? 'صلاحيات الموظفين والمدراء' : 'Staff & admin permissions'],
   };

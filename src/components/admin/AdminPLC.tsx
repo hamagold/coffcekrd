@@ -362,22 +362,20 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
             <div className="text-primary font-bold">
               {lang === 'ku' ? 'چۆن کار دەکات:' : 'How it works:'}
             </div>
-            <div>{lang === 'ku' ? '١. سیستەم plc_code ی ئایتمەکە دەنووسێت بۆ VW1220 (ڕیجیستەر 40111)' : '1. System writes item plc_code to VW1220 (register 40111)'}</div>
-            <div>{lang === 'ku' ? '٢. بڕ/ژمارە دەنووسێت بۆ VW1222 (ڕیجیستەر 40112)' : '2. Quantity is written to VW1222 (register 40112)'}</div>
-            <div>{lang === 'ku' ? '٣. فەرمانی ئامادەکردن (١) دەنووسێت بۆ VW1202 (ڕیجیستەر 40102)' : '3. Prepare command (1) is written to VW1202 (register 40102)'}</div>
-            <div>{lang === 'ku' ? '٤. PLC فەرمانەکە دەخوێنێتەوە و دەستبەکار دەبێت' : '4. PLC reads the command and starts processing'}</div>
+            <div>{lang === 'ku' ? '١. فەرمانی دەستپێکردن (1) دەنووسێت بۆ VW1202 (40101)' : '1. Start command (1) written to VW1202 (40101)'}</div>
+            <div>{lang === 'ku' ? '٢. کۆدی ڕیسێپی دەنووسێت بۆ VW1220 (40110)' : '2. Recipe code written to VW1220 (40110)'}</div>
+            <div>{lang === 'ku' ? '٣. پاڕامیتەرەکان (سەهۆڵ/شەکر/کوپ/تۆپینگ) دەنووسرێن بۆ VW1224-VW1234' : '3. Params (Ice/Sugar/Cup/Topping) written to VW1224-VW1234'}</div>
+            <div>{lang === 'ku' ? '٤. PLC فەرمانەکە دەخوێنێتەوە و ڕۆبۆت دەستبەکار دەبێت' : '4. PLC reads and robot starts processing'}</div>
           </div>
           <div className="bg-secondary/50 border border-border rounded-lg p-3 text-[11px] text-muted-foreground mt-2 space-y-1">
             <div className="text-foreground font-bold">
-              {lang === 'ku' ? 'ئامێرە کۆیلاینەکان (Modbus Client):' : 'Client Machines (Modbus Client):'}
+              {lang === 'ku' ? 'IP ـی ئامێرەکان (لە فایلی ئێکسەل):' : 'Device IPs (from Excel):'}
             </div>
-            <div>• 192.168.0.52:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB200/VB250)' : 'Register 43201, 20 registers (VB200/VB250)'}</div>
-            <div>• 192.168.0.53:502 — {lang === 'ku' ? 'ڕیجیستەر 43201، ٢٠ ڕیجیستەر (VB350/VB300)' : 'Register 43201, 20 registers (VB350/VB300)'}</div>
-            <div className="mt-1 text-foreground font-bold">
-              {lang === 'ku' ? 'RS485 (Modbus RTU):' : 'RS485 (Modbus RTU):'}
-            </div>
-            <div>• Slave 3, 4, 5 — {lang === 'ku' ? 'ناونیشان 40085، ٣ ڕیجیستەر' : 'Address 40085, 3 registers'}</div>
-            <div>• Slave 20, 21 — {lang === 'ku' ? 'ناونیشان 40001، ١١ ڕیجیستەر' : 'Address 40001, 11 registers'}</div>
+            <div>• PLC: 192.168.0.50 — Port 502</div>
+            <div>• HMI: 192.168.0.51</div>
+            <div>• ROBOT 1: 192.168.0.52</div>
+            <div>• ROBOT 2: 192.168.0.53</div>
+            <div>• IPC: 192.168.0.20</div>
           </div>
         </div>
       </div>

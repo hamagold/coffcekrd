@@ -339,16 +339,15 @@ const AdminPLC = ({ lang }: { lang: Language }) => {
               </thead>
               <tbody className="font-mono">
                 {[
-                  { reg: '40102', vm: 'VW1202', desc: lang === 'ku' ? 'فەرمانی سەرەکی (Command)' : 'Main Command' },
-                  { reg: '40103', vm: 'VW1204', desc: lang === 'ku' ? 'فەرمانی لاوەکی (Sub-command)' : 'Sub-command' },
-                  { reg: '40111', vm: 'VW1220', desc: lang === 'ku' ? 'کۆدی خواردنەوە/ئایتم (plc_code)' : 'Item/Drink Code (plc_code)' },
-                  { reg: '40112', vm: 'VW1222', desc: lang === 'ku' ? 'بڕ / ژمارە' : 'Quantity' },
-                  { reg: '40113', vm: 'VW1224', desc: lang === 'ku' ? 'پاڕامیتەر ١ (شەکر)' : 'Parameter 1 (Sugar)' },
-                  { reg: '40114', vm: 'VW1226', desc: lang === 'ku' ? 'پاڕامیتەر ٢ (قەبارە)' : 'Parameter 2 (Size)' },
-                  { reg: '40115', vm: 'VW1228', desc: lang === 'ku' ? 'پاڕامیتەر ٣' : 'Parameter 3' },
-                  { reg: '40116', vm: 'VW1230', desc: lang === 'ku' ? 'پاڕامیتەر ٤' : 'Parameter 4' },
-                  { reg: '40117', vm: 'VW1232', desc: lang === 'ku' ? 'پاڕامیتەر ٥' : 'Parameter 5' },
-                  { reg: '40118', vm: 'VW1234', desc: lang === 'ku' ? 'پاڕامیتەر ٦' : 'Parameter 6' },
+                  { reg: '40101', vm: 'VW1202', desc: lang === 'ku' ? 'فەرمانی کار (1=دەستپێکردن، 2=هەڵوەشاندنەوە، 3=ڕیسێت)' : 'Process (1=Start, 2=Cancel, 3=Reset)' },
+                  { reg: '40102', vm: 'VW1204', desc: lang === 'ku' ? 'کۆنترۆڵی ئامێر (1=ڕیسێت، 2=شوشتن)' : 'Device Control (1=Reset, 2=Clean)' },
+                  { reg: '40110', vm: 'VW1220', desc: lang === 'ku' ? 'کۆدی ڕیسێپی (قاوە 1-50، چای شیر 51-100)' : 'Recipe Code (Coffee 1-50, Tea 51-100)' },
+                  { reg: '40112', vm: 'VW1224', desc: lang === 'ku' ? 'سەهۆڵ (0=بێ، 1=کەم، 2=ئاسایی، 3=زۆر)' : 'Ice (0=None, 1=Less, 2=Normal, 3=More)' },
+                  { reg: '40113', vm: 'VW1226', desc: lang === 'ku' ? 'لاتێ ئارت (0=بێ، 1-3=شێوە)' : 'Latte Art (0=None, 1-3=Pattern)' },
+                  { reg: '40114', vm: 'VW1228', desc: lang === 'ku' ? 'جۆری شەکر/شیرە (1-50)' : 'Syrup Type (1-50)' },
+                  { reg: '40115', vm: 'VW1230', desc: lang === 'ku' ? 'کوپ (1=8oz، 5=16oz، 51=12oz، 52=16oz)' : 'Cup (1=8oz, 5=16oz, 51=12oz, 52=16oz)' },
+                  { reg: '40116', vm: 'VW1232', desc: lang === 'ku' ? 'بڕی شەکر (0=بێ، 1=کەم، 2=ئاسایی، 3=زۆر)' : 'Sugar Amount (0-3)' },
+                  { reg: '40117', vm: 'VW1234', desc: lang === 'ku' ? 'تۆپینگ (0=بێ، 51=boba، 52=فراولە، 53=پرتەقاڵ، 54=lychee)' : 'Topping (0=None, 51=Boba, 52-54)' },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
                     <td className="py-2 px-3 text-primary font-bold">{row.reg}</td>

@@ -37,9 +37,9 @@ interface PLCItem {
 const DEFAULT_MACHINE: PLCMachine = {
   machineId: 'machine-01',
   name: 'Robot 1',
-  ip: '192.168.1.100',
+  ip: '192.168.0.50',
   port: '502',
-  model: 'Siemens S7-1200',
+  model: 'Siemens S7-200 Smart',
   protocol: 'Modbus TCP',
 };
 
@@ -47,8 +47,8 @@ const DEFAULT_CONFIG: PLCConfig = {
   autoSend: false,
   machines: [
     { ...DEFAULT_MACHINE },
-    { machineId: 'machine-02', name: 'Robot 2', ip: '192.168.1.101', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP' },
-    { machineId: 'machine-03', name: 'Robot 3', ip: '192.168.1.102', port: '502', model: 'Siemens S7-1200', protocol: 'Modbus TCP' },
+    { machineId: 'machine-02', name: 'Robot 2', ip: '192.168.0.52', port: '502', model: 'Siemens S7-200 Smart', protocol: 'Modbus TCP' },
+    { machineId: 'machine-03', name: 'Robot 3', ip: '192.168.0.53', port: '502', model: 'Siemens S7-200 Smart', protocol: 'Modbus TCP' },
   ],
 };
 

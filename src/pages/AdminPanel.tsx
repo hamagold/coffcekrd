@@ -111,6 +111,7 @@ const AdminPanel = () => {
     // Storage removed - now in DevPanel
     { id: 'plc', icon: Cpu, label: t.plcIntegration, section: t.management, superOnly: false },
     { id: 'plcLogs', icon: FileText, label: t.plcLogsIntegration, section: t.management, superOnly: false },
+    { id: 'bridgeMonitor', icon: Activity, label: lang === 'ku' ? 'مۆنیتۆری Bridge' : lang === 'ar' ? 'مراقب Bridge' : 'Bridge Monitor', section: t.management, superOnly: false },
     { id: 'permissions', icon: Shield, label: lang === 'ku' ? 'دەسەڵاتەکان' : lang === 'ar' ? 'الصلاحيات' : 'Permissions', section: t.management, superOnly: true },
     { id: 'cafeSettings', icon: Settings, label: t.settings, section: t.management, superOnly: false },
   ];

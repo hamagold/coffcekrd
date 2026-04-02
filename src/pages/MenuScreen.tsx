@@ -376,15 +376,22 @@ const MenuScreen = () => {
                       </div>
                       {item.plcParams && (
                         <div className="flex gap-1.5 mt-1 flex-wrap">
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.sugar > 0 ? `${FROOZT_YELLOW}40` : '#f0f0f0', color: item.plcParams.sugar > 0 ? '#666' : '#999', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.sugar > 0 ? (language === 'ku' ? '🍬 بە شەکر' : '🍬 Sugar') : (language === 'ku' ? '🚫 بێ شەکر' : '🚫 No Sugar')}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.ice > 0 ? `${FROOZT_ICE}40` : '#f0f0f0', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                            {item.plcParams.ice === 0 ? '🚫' : item.plcParams.ice === 1 ? '🧊少' : item.plcParams.ice === 2 ? '🧊' : '🧊🧊'}
                           </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_ICE}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.size === 1 ? 'S' : 'L'}
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.sugar > 0 ? `${FROOZT_YELLOW}40` : '#f0f0f0', color: '#666', fontFamily: "'Courier New', monospace" }}>
+                            {item.plcParams.sugar === 0 ? (language === 'ku' ? '🚫 بێ شەکر' : '🚫 No Sugar') : item.plcParams.sugar === 1 ? '🍬 少' : item.plcParams.sugar === 2 ? '🍬' : '🍬🍬'}
                           </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: item.plcParams.milk > 0 ? `${FROOZT_LILAC}40` : '#f0f0f0', color: item.plcParams.milk > 0 ? '#666' : '#999', fontFamily: "'Courier New', monospace" }}>
-                            {item.plcParams.milk > 0 ? (language === 'ku' ? '🥛 بە شیر' : '🥛 Milk') : (language === 'ku' ? '🚫 بێ شیر' : '🚫 No Milk')}
-                          </span>
+                          {item.plcParams.cupType > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_LILAC}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              {item.plcParams.cupType === 1 ? '☕8oz' : item.plcParams.cupType === 5 ? '☕16oz' : item.plcParams.cupType === 51 ? '🫖12oz' : '🫖16oz'}
+                            </span>
+                          )}
+                          {item.plcParams.topping > 0 && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: `${FROOZT_PINK}40`, color: '#666', fontFamily: "'Courier New', monospace" }}>
+                              {item.plcParams.topping === 51 ? '🫧 Boba' : item.plcParams.topping === 52 ? '🍓' : item.plcParams.topping === 53 ? '🍊' : '🫐 Lychee'}
+                            </span>
+                          )}
                         </div>
                       )}
                       <div className="flex items-center gap-2 mt-2">

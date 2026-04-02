@@ -12,6 +12,7 @@ import AdminUsers from '@/components/admin/AdminUsers';
 import AdminExpenses from '@/components/admin/AdminExpenses';
 import AdminPLC from '@/components/admin/AdminPLC';
 import AdminPLCLogs from '@/components/admin/AdminPLCLogs';
+import AdminBridgeMonitor from '@/components/admin/AdminBridgeMonitor';
 import AdminCafeSettings from '@/components/admin/AdminCafeSettings';
 import AdminPermissions, { fetchPermissions, PermissionsConfig } from '@/components/admin/AdminPermissions';
 import SetupAdmin from '@/components/admin/SetupAdmin';

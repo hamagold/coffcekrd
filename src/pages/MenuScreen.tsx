@@ -428,133 +428,161 @@ const MenuScreen = () => {
         {view === 'checkout' && (
           <div className="flex-1 overflow-y-auto bg-white pb-24 px-5 sm:px-8 pt-8">
             {/* Total Display */}
-            <div className="text-center mb-8">
-              <div className="text-lg font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>TOTAL:</div>
-              <div className="text-3xl sm:text-4xl font-black mt-1" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace", textDecoration: 'underline', textDecorationColor: FROOZT_PINK, textUnderlineOffset: '6px' }}>
+            <div className="text-center mb-10">
+              <div className="text-xl font-black text-black uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>TOTAL:</div>
+              <div className="text-4xl sm:text-5xl font-black mt-2" style={{ color: FROOZT_PINK, fontFamily: "'Courier New', monospace", textDecoration: 'underline', textDecorationColor: FROOZT_PINK, textUnderlineOffset: '8px' }}>
                 IQD {cartTotal.toLocaleString()}
               </div>
             </div>
 
-            <div className="border-t border-black/10 pt-6">
+            <div className="border-t-2 border-black/10 pt-8">
               {/* Payment Method */}
-              <div className="text-xs font-bold text-black/50 uppercase tracking-[0.2em] mb-4" style={{ fontFamily: "'Courier New', monospace" }}>
+              <div className="text-sm font-black text-black/60 uppercase tracking-[0.2em] mb-5" style={{ fontFamily: "'Courier New', monospace" }}>
                 {language === 'ku' ? 'شێوازی پارەدان هەڵبژێرە:' : language === 'ar' ? 'اختر طريقة الدفع:' : 'SELECT YOUR PAYMENT METHOD:'}
               </div>
 
-              {/* Cash options */}
-              <div className="space-y-3 mb-4">
+              {/* Payment options as cards */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {paymentConfig.cash !== false && (
-                <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${payment === 'cash' ? 'border-pink-400' : 'border-black/20'}`}>
-                    {payment === 'cash' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: FROOZT_PINK }} />}
-                  </div>
-                  <div onClick={() => { setPayment('cash'); setCashBalance(0); setLastInserted(null); }}>
-                    <span className="text-base font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>Cash</span>
-                    <span className="text-[10px] text-black/40 ml-2 uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                      {language === 'ku' ? 'کاش بەدەست' : language === 'ar' ? 'نقد يدوي' : 'MANUAL CASH'}
-                    </span>
-                  </div>
-                </label>
+                  <button
+                    onClick={() => { setPayment('cash'); setCashBalance(0); setLastInserted(null); }}
+                    className="flex flex-col items-center justify-center gap-3 p-5 sm:p-6 rounded-2xl cursor-pointer transition-all border-3"
+                    style={{
+                      background: payment === 'cash' ? `${FROOZT_YELLOW}25` : 'white',
+                      borderColor: payment === 'cash' ? FROOZT_YELLOW : 'rgba(0,0,0,0.08)',
+                      borderWidth: '3px',
+                    }}
+                  >
+                    <Banknote className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: payment === 'cash' ? '#1a1a1a' : '#999' }} />
+                    <div className="text-center">
+                      <div className="text-base sm:text-lg font-black text-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? 'کاش' : language === 'ar' ? 'نقداً' : 'Cash'}
+                      </div>
+                      <div className="text-[10px] text-black/40 uppercase tracking-wider mt-0.5" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? 'بەدەست' : language === 'ar' ? 'يدوي' : 'MANUAL'}
+                      </div>
+                    </div>
+                  </button>
                 )}
 
                 {paymentConfig.plc !== false && (
-                  <label className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${payment === 'plc' ? 'border-pink-400' : 'border-black/20'}`}>
-                      {payment === 'plc' && <div className="w-2.5 h-2.5 rounded-full" style={{ background: FROOZT_PINK }} />}
+                  <button
+                    onClick={() => setPayment('plc')}
+                    className="flex flex-col items-center justify-center gap-3 p-5 sm:p-6 rounded-2xl cursor-pointer transition-all"
+                    style={{
+                      background: payment === 'plc' ? `${FROOZT_ICE}25` : 'white',
+                      borderColor: payment === 'plc' ? FROOZT_ICE : 'rgba(0,0,0,0.08)',
+                      borderWidth: '3px',
+                    }}
+                  >
+                    <Coins className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: payment === 'plc' ? '#1a1a1a' : '#999' }} />
+                    <div className="text-center">
+                      <div className="text-base sm:text-lg font-black text-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? 'PLC کاش' : language === 'ar' ? 'نقد PLC' : 'PLC Cash'}
+                      </div>
+                      <div className="text-[10px] text-black/40 uppercase tracking-wider mt-0.5" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? 'بە ئامێر' : language === 'ar' ? 'آلة نقد' : 'MACHINE'}
+                      </div>
                     </div>
-                    <div onClick={() => setPayment('plc')}>
-                      <span className="text-base font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>PLC Cash</span>
-                      <span className="text-[10px] text-black/40 ml-2 uppercase tracking-wider" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {language === 'ku' ? 'کاش بە ئامێر' : language === 'ar' ? 'نقد PLC' : 'CASH MACHINE'}
-                      </span>
-                    </div>
-                  </label>
+                  </button>
                 )}
 
-                {/* PLC Balance section */}
-                {payment === 'plc' && (
-                  <div className="mx-3 rounded-xl border-2 border-black/10 p-4 bg-gray-50">
-                    <div className={`text-center p-4 rounded-xl mb-3 ${cashBalance >= cartTotal && cartTotal > 0 ? 'bg-green-50 border-2 border-green-300' : cashBalance > 0 ? 'bg-amber-50 border-2 border-amber-300' : 'bg-white border-2 border-black/10'}`}>
-                      <div className="text-[10px] text-black/40 uppercase tracking-[0.15em] mb-1 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
-                        {language === 'ku' ? 'باڵانس' : language === 'ar' ? 'الرصيد' : 'BALANCE'}
-                      </div>
-                      <div className={`text-2xl font-black ${cashBalance >= cartTotal && cartTotal > 0 ? 'text-green-600' : cashBalance > 0 ? 'text-amber-600' : 'text-black/30'}`} style={{ fontFamily: "'Courier New', monospace" }}>
-                        {cashBalance.toLocaleString()} <span className="text-xs font-normal opacity-60">IQD</span>
-                      </div>
-                      {cartTotal > 0 && cashBalance < cartTotal && (
-                        <div className="text-[10px] text-red-500 mt-1 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
-                          {(cartTotal - cashBalance).toLocaleString()} IQD {language === 'ku' ? 'پێویستە' : language === 'ar' ? 'مطلوب' : 'needed'}
-                        </div>
-                      )}
-                      {cartTotal > 0 && cashBalance >= cartTotal && cashBalance - cartTotal > 0 && (
-                        <div className="text-[10px] text-green-600 mt-1 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
-                          {language === 'ku' ? 'گەڕانەوە' : language === 'ar' ? 'الباقي' : 'Change'}: {(cashBalance - cartTotal).toLocaleString()} IQD
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-center text-xs text-black/40 flex items-center justify-center gap-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span style={{ fontFamily: "'Courier New', monospace" }}>
-                        {language === 'ku' ? 'چاوەڕوانی پارە...' : language === 'ar' ? 'في انتظار النقد...' : 'Waiting for cash...'}
-                      </span>
-                    </div>
-                    {cashBalance > 0 && (
-                      <button
-                        onClick={async () => {
-                          setCashBalance(0); setLastInserted(null);
-                          try { await supabase.functions.invoke('plc-cash-insert', { body: { machine_id: plcMachineId || 'machine-01', action: 'reset' } }); } catch {}
-                        }}
-                        className="w-full mt-3 text-[10px] text-red-500 hover:text-red-400 font-bold" style={{ fontFamily: "'Courier New', monospace" }}
-                      >
-                        ✕ {language === 'ku' ? 'باڵانس بسڕەوە' : language === 'ar' ? 'مسح الرصيد' : 'Clear Balance'}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Online payments */}
+                {/* Online payments as cards */}
                 {onlinePaymentMethods.map(m => (
-                  <label key={m.id} className="flex items-center gap-4 cursor-pointer p-3 rounded-xl hover:bg-black/3 transition-all">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${payment === m.id ? 'border-pink-400' : 'border-black/20'}`}>
-                      {payment === m.id && <div className="w-2.5 h-2.5 rounded-full" style={{ background: FROOZT_PINK }} />}
+                  <button
+                    key={m.id}
+                    onClick={() => { setPayment(m.id); setCashBalance(0); }}
+                    className="flex flex-col items-center justify-center gap-3 p-5 sm:p-6 rounded-2xl cursor-pointer transition-all"
+                    style={{
+                      background: payment === m.id ? `${FROOZT_LILAC}25` : 'white',
+                      borderColor: payment === m.id ? FROOZT_LILAC : 'rgba(0,0,0,0.08)',
+                      borderWidth: '3px',
+                    }}
+                  >
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                      {m.id === 'fib' && <img src={getFibLogo()} alt="FIB" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />}
+                      {m.id === 'zain' && <img src={getZainLogo()} alt="ZainCash" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />}
+                      {m.id === 'fastpay' && <img src={getFastpayLogo()} alt="FastPay" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />}
                     </div>
-                    <div onClick={() => { setPayment(m.id); setCashBalance(0); }} className="flex items-center gap-2">
-                      {m.icon}
-                      <span className="text-base font-bold text-black" style={{ fontFamily: "'Courier New', monospace" }}>{m.label}</span>
+                    <div className="text-base sm:text-lg font-black text-black" style={{ fontFamily: "'Courier New', monospace" }}>
+                      {m.label}
                     </div>
-                  </label>
+                  </button>
                 ))}
               </div>
 
+              {/* PLC Balance section */}
+              {payment === 'plc' && (
+                <div className="rounded-2xl border-2 border-black/10 p-5 bg-gray-50 mb-6">
+                  <div className={`text-center p-5 rounded-xl mb-3 ${cashBalance >= cartTotal && cartTotal > 0 ? 'bg-green-50 border-2 border-green-300' : cashBalance > 0 ? 'bg-amber-50 border-2 border-amber-300' : 'bg-white border-2 border-black/10'}`}>
+                    <div className="text-xs text-black/40 uppercase tracking-[0.15em] mb-1 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+                      {language === 'ku' ? 'باڵانس' : language === 'ar' ? 'الرصيد' : 'BALANCE'}
+                    </div>
+                    <div className={`text-3xl font-black ${cashBalance >= cartTotal && cartTotal > 0 ? 'text-green-600' : cashBalance > 0 ? 'text-amber-600' : 'text-black/30'}`} style={{ fontFamily: "'Courier New', monospace" }}>
+                      {cashBalance.toLocaleString()} <span className="text-sm font-normal opacity-60">IQD</span>
+                    </div>
+                    {cartTotal > 0 && cashBalance < cartTotal && (
+                      <div className="text-xs text-red-500 mt-2 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {(cartTotal - cashBalance).toLocaleString()} IQD {language === 'ku' ? 'پێویستە' : language === 'ar' ? 'مطلوب' : 'needed'}
+                      </div>
+                    )}
+                    {cartTotal > 0 && cashBalance >= cartTotal && cashBalance - cartTotal > 0 && (
+                      <div className="text-xs text-green-600 mt-2 font-bold" style={{ fontFamily: "'Courier New', monospace" }}>
+                        {language === 'ku' ? 'گەڕانەوە' : language === 'ar' ? 'الباقي' : 'Change'}: {(cashBalance - cartTotal).toLocaleString()} IQD
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center text-sm text-black/40 flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span style={{ fontFamily: "'Courier New', monospace" }}>
+                      {language === 'ku' ? 'چاوەڕوانی پارە...' : language === 'ar' ? 'في انتظار النقد...' : 'Waiting for cash...'}
+                    </span>
+                  </div>
+                  {cashBalance > 0 && (
+                    <button
+                      onClick={async () => {
+                        setCashBalance(0); setLastInserted(null);
+                        try { await supabase.functions.invoke('plc-cash-insert', { body: { machine_id: plcMachineId || 'machine-01', action: 'reset' } }); } catch {}
+                      }}
+                      className="w-full mt-3 text-xs text-red-500 hover:text-red-400 font-bold" style={{ fontFamily: "'Courier New', monospace" }}
+                    >
+                      ✕ {language === 'ku' ? 'باڵانس بسڕەوە' : language === 'ar' ? 'مسح الرصيد' : 'Clear Balance'}
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Order Type */}
-              <div className="text-xs font-bold text-black/50 uppercase tracking-[0.2em] mb-3 mt-6" style={{ fontFamily: "'Courier New', monospace" }}>
+              <div className="text-sm font-black text-black/60 uppercase tracking-[0.2em] mb-4 mt-2" style={{ fontFamily: "'Courier New', monospace" }}>
                 {language === 'ku' ? 'جۆری ئۆردەر:' : language === 'ar' ? 'نوع الطلب:' : 'ORDER TYPE:'}
               </div>
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <button
                   onClick={() => setOrderType('dine')}
-                  className="flex items-center justify-center gap-2 p-3.5 rounded-xl cursor-pointer transition-all text-sm font-bold border-2"
+                  className="flex items-center justify-center gap-3 p-5 rounded-2xl cursor-pointer transition-all text-base sm:text-lg font-black"
                   style={{
                     background: orderType === 'dine' ? `${FROOZT_PINK}20` : 'white',
-                    borderColor: orderType === 'dine' ? FROOZT_PINK : 'rgba(0,0,0,0.1)',
+                    borderColor: orderType === 'dine' ? FROOZT_PINK : 'rgba(0,0,0,0.08)',
+                    borderWidth: '3px',
                     color: orderType === 'dine' ? '#1a1a1a' : '#999',
                     fontFamily: "'Courier New', monospace",
                   }}
                 >
-                  <UtensilsCrossed className="w-4 h-4" />
+                  <UtensilsCrossed className="w-6 h-6 sm:w-7 sm:h-7" />
                   {t.dineIn}
                 </button>
                 <button
                   onClick={() => setOrderType('delivery')}
-                  className="flex items-center justify-center gap-2 p-3.5 rounded-xl cursor-pointer transition-all text-sm font-bold border-2"
+                  className="flex items-center justify-center gap-3 p-5 rounded-2xl cursor-pointer transition-all text-base sm:text-lg font-black"
                   style={{
                     background: orderType === 'delivery' ? `${FROOZT_ICE}20` : 'white',
-                    borderColor: orderType === 'delivery' ? FROOZT_ICE : 'rgba(0,0,0,0.1)',
+                    borderColor: orderType === 'delivery' ? FROOZT_ICE : 'rgba(0,0,0,0.08)',
+                    borderWidth: '3px',
                     color: orderType === 'delivery' ? '#1a1a1a' : '#999',
                     fontFamily: "'Courier New', monospace",
                   }}
                 >
-                  <Truck className="w-4 h-4" />
+                  <Truck className="w-6 h-6 sm:w-7 sm:h-7" />
                   {t.delivery}
                 </button>
               </div>

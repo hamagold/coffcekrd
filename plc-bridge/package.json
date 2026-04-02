@@ -1,10 +1,11 @@
 {
   "name": "plc-bridge",
-  "version": "1.0.0",
-  "description": "PLC Bridge - پڕۆگرامی پل بۆ پەیوەستکردنی سایت بە PLC",
+  "version": "2.0.0",
+  "description": "PLC Bridge - پڕۆگرامی پل بۆ پەیوەستکردنی سایت بە PLC/Robot (Modbus TCP)",
   "main": "bridge.js",
   "scripts": {
-    "start": "node bridge.js"
+    "start": "node bridge.js",
+    "test": "node test-connection.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",

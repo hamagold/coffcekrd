@@ -4,23 +4,15 @@
  *   PLC Bridge - پڕۆگرامی پل بۆ PLC
  * ============================================
  * 
- * ئەم پڕۆگرامە لەسەر کۆمپیوتەرەکەت ڕایدەکەیت
- * ئەو سەیری ئۆردەرە نوێکان دەکات لە داتابەیس
- * و فەرمان دەنێرێت بۆ PLC لە ڕێگەی Modbus TCP
+ * بەپێی نەخشەی ڕیجیستەرەکان لە فایلی ئێکسەل
  * 
  * ============================================
  *   چۆن بەکاری دەهێنیت:
  * ============================================
- * 
- *   1. Node.js دابمەزرێنە (https://nodejs.org)
- *   2. فۆڵدەرەکە بکەرەوە لە terminal:
- *      cd plc-bridge
- *   3. پاکەجەکان دابمەزرێنە:
- *      npm install
- *   4. فایلی .env دروست بکە (سەیری .env.example بکە)
- *   5. پڕۆگرامەکە ڕابکە:
- *      node bridge.js
- * 
+ *   1. Node.js دابمەزرێنە
+ *   2. cd plc-bridge && npm install
+ *   3. فایلی .env دروست بکە
+ *   4. node bridge.js
  * ============================================
  */
 
@@ -30,15 +22,13 @@ require('dotenv').config();
 
 // ===== ڕێکخستنەکان =====
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY; // anon key
-const PLC_IP = process.env.PLC_IP || '192.168.1.100';
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const PLC_IP = process.env.PLC_IP || '192.168.0.50';
 const PLC_PORT = parseInt(process.env.PLC_PORT || '502');
-const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '3000'); // هەر 3 چرکە
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '3000');
 
-// ===== پشکنینی ڕێکخستنەکان =====
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('❌ SUPABASE_URL و SUPABASE_KEY پێویستن!');
-  console.error('   فایلی .env دروست بکە، سەیری .env.example بکە');
   process.exit(1);
 }
 
@@ -51,23 +41,17 @@ function buildWriteMultipleRegisters(transactionId, unitId, startRegister, value
   const byteCount = quantity * 2;
   const length = 7 + byteCount;
   const buffer = Buffer.alloc(6 + length);
-
-  // MBAP Header
   buffer.writeUInt16BE(transactionId, 0);
-  buffer.writeUInt16BE(0, 2);       // Protocol ID
-  buffer.writeUInt16BE(length, 4);   // Length
-  buffer.writeUInt8(unitId, 6);      // Unit ID
-
-  // PDU
-  buffer.writeUInt8(0x10, 7);                  // Function Code: Write Multiple Registers
-  buffer.writeUInt16BE(startRegister, 8);       // Starting Address
-  buffer.writeUInt16BE(quantity, 10);           // Quantity
-  buffer.writeUInt8(byteCount, 12);             // Byte Count
-
+  buffer.writeUInt16BE(0, 2);
+  buffer.writeUInt16BE(length, 4);
+  buffer.writeUInt8(unitId, 6);
+  buffer.writeUInt8(0x10, 7);
+  buffer.writeUInt16BE(startRegister, 8);
+  buffer.writeUInt16BE(quantity, 10);
+  buffer.writeUInt8(byteCount, 12);
   for (let i = 0; i < values.length; i++) {
     buffer.writeInt16BE(values[i], 13 + i * 2);
   }
-
   return buffer;
 }
 
@@ -87,34 +71,15 @@ function sendModbusTCP(ip, port, frame, timeoutMs = 5000) {
   return new Promise((resolve) => {
     const client = new net.Socket();
     let responded = false;
-
     const timer = setTimeout(() => {
-      if (!responded) {
-        responded = true;
-        client.destroy();
-        resolve({ success: false, error: 'Timeout' });
-      }
+      if (!responded) { responded = true; client.destroy(); resolve({ success: false, error: 'Timeout' }); }
     }, timeoutMs);
-
-    client.connect(port, ip, () => {
-      client.write(frame);
-    });
-
+    client.connect(port, ip, () => { client.write(frame); });
     client.on('data', (data) => {
-      if (!responded) {
-        responded = true;
-        clearTimeout(timer);
-        client.destroy();
-        resolve({ success: true, response: data });
-      }
+      if (!responded) { responded = true; clearTimeout(timer); client.destroy(); resolve({ success: true, response: data }); }
     });
-
     client.on('error', (err) => {
-      if (!responded) {
-        responded = true;
-        clearTimeout(timer);
-        resolve({ success: false, error: err.message });
-      }
+      if (!responded) { responded = true; clearTimeout(timer); resolve({ success: false, error: err.message }); }
     });
   });
 }
@@ -122,24 +87,44 @@ function sendModbusTCP(ip, port, frame, timeoutMs = 5000) {
 function parseModbusResponse(data) {
   if (data.length < 9) return { success: false, error: 'Response too short' };
   const functionCode = data[7];
-
   if (functionCode & 0x80) {
     const exceptionCode = data[8];
     const errors = { 1: 'Illegal Function', 2: 'Illegal Data Address', 3: 'Illegal Data Value', 4: 'Server Device Failure' };
     return { success: false, error: errors[exceptionCode] || `Exception ${exceptionCode}` };
   }
-
   if (functionCode === 0x10) return { success: true };
   if (functionCode === 0x03) {
     const byteCount = data[8];
     const values = [];
-    for (let i = 0; i < byteCount / 2; i++) {
-      values.push(data.readInt16BE(9 + i * 2));
-    }
+    for (let i = 0; i < byteCount / 2; i++) values.push(data.readInt16BE(9 + i * 2));
     return { success: true, values };
   }
   return { success: true };
 }
+
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+/**
+ * Register Mapping (from Excel):
+ * 
+ * WRITE (PC → PLC):
+ *   40100 (VW1200) = Heartbeat
+ *   40101 (VW1202) = Processing mode: 1=start, 2=cancel, 3=reset
+ *   40102 (VW1204) = Device control: 1=reset, 2=clean
+ *   40110 (VW1220) = Recipe/drink code (coffee 1-50, milk tea 51-100)
+ *   40111 (VW1222) = Latte art print complete: 0=no, 1=done
+ *   40112 (VW1224) = Ice: 0=none, 1=less, 2=normal, 3=more
+ *   40113 (VW1226) = Latte art: 0=none, 1-3=patterns
+ *   40114 (VW1228) = Syrup/sugar type: 1-50 coffee
+ *   40115 (VW1230) = Cup type: 1=coffee 8oz, 5=coffee 16oz, 51=tea 12oz, 52=tea 16oz
+ *   40116 (VW1232) = Sugar amount: 0=none, 1=less, 2=normal, 3=more
+ *   40117 (VW1234) = Topping: 0=none, 51=boba, 52=strawberry, 53=orange, 54=lychee
+ * 
+ * READ (PLC → PC):
+ *   40010 (VW1020) = Device status: 1=processing, 2=standby, 3=fault, 4=not ready, 5=complete
+ *   40011 (VW1022) = Mode: 1=manual, 2=local auto, 3=remote auto
+ *   40020 (VW1040) = Today's production count
+ */
 
 // ===== ناردنی ئۆردەر بۆ PLC =====
 async function sendOrderToPLC(order) {
@@ -155,10 +140,10 @@ async function sendOrderToPLC(order) {
     const params = item.plcParams || {};
 
     console.log(`   🔧 ${item.name?.en || item.id} | PLC Code: ${plcCode} | Qty: ${qty}`);
-    console.log(`      شەکر:${params.sugar || 0} قەبارە:${params.size || 0} شیر:${params.milk || 0} ڕیسێپی:${params.recipe || 1} ئاو:${params.waterLevel || 2}`);
+    console.log(`      سەهۆڵ:${params.ice || 0} شەکر:${params.sugar || 0} کوپ:${params.cupType || 0} تۆپینگ:${params.topping || 0} لاتێ ئارت:${params.latteArt || 0}`);
 
-    // Step 1: Write command registers (40102-40103) = VW1202-VW1204
-    const cmdFrame = buildWriteMultipleRegisters(transactionId++, 1, 101, [1, 1]);
+    // Step 1: Write command register 40101 (VW1202) = 1 (start processing)
+    const cmdFrame = buildWriteMultipleRegisters(transactionId++, 1, 101, [1]);
     const cmdResult = await sendModbusTCP(PLC_IP, PLC_PORT, cmdFrame);
 
     if (!cmdResult.success) {
@@ -166,7 +151,6 @@ async function sendOrderToPLC(order) {
       results.push({ item: item.id, success: false, error: cmdResult.error });
       continue;
     }
-
     if (cmdResult.response) {
       const parsed = parseModbusResponse(cmdResult.response);
       if (!parsed.success) {
@@ -178,16 +162,16 @@ async function sendOrderToPLC(order) {
 
     await sleep(50);
 
-    // Step 2: Write item data + parameters (register 110-117) = VW1220-VW1234
+    // Step 2: Write recipe data registers 40110-40117 (VW1220-VW1234)
     const itemValues = [
-      plcCode,                    // VW1220 = drink code
-      qty,                        // VW1222 = quantity
-      params.sugar || 0,          // VW1224 = sugar (0-3)
-      params.size || 0,           // VW1226 = size (1-3)
-      params.milk || 0,           // VW1228 = milk (0-3)
-      params.recipe || 1,         // VW1230 = recipe (1-3)
-      params.waterLevel || 2,     // VW1232 = water level (1-3)
-      params.param6 || 0,         // VW1234
+      plcCode,                    // 40110 VW1220 = recipe/drink code
+      0,                          // 40111 VW1222 = latte art print complete (0)
+      params.ice || 0,            // 40112 VW1224 = ice (0-3)
+      params.latteArt || 0,       // 40113 VW1226 = latte art pattern (0-3)
+      params.sugarType || 0,      // 40114 VW1228 = syrup/sugar type (1-50)
+      params.cupType || 0,        // 40115 VW1230 = cup type
+      params.sugar || 0,          // 40116 VW1232 = sugar amount (0-3)
+      params.topping || 0,        // 40117 VW1234 = topping
     ];
 
     const itemFrame = buildWriteMultipleRegisters(transactionId++, 1, 110, itemValues);
@@ -213,6 +197,22 @@ async function sendOrderToPLC(order) {
   return results.every(r => r.success);
 }
 
+// ===== خوێندنەوەی دۆخی PLC =====
+async function readPLCStatus() {
+  // Read registers 40010-40020 (VW1020-VW1040) = 11 registers
+  const frame = buildReadHoldingRegisters(1, 1, 10, 11);
+  const result = await sendModbusTCP(PLC_IP, PLC_PORT, frame, 3000);
+  if (!result.success) return null;
+  const parsed = parseModbusResponse(result.response);
+  if (!parsed.success || !parsed.values) return null;
+  return {
+    deviceStatus: parsed.values[0],    // VW1020
+    deviceMode: parsed.values[1],      // VW1022
+    robotProgram: parsed.values[2],    // VW1024
+    todayCount: parsed.values[10],     // VW1040
+  };
+}
+
 // ===== پشکنینی پەیوەندی PLC =====
 async function pingPLC() {
   const frame = buildReadHoldingRegisters(1, 1, 0, 1);
@@ -222,55 +222,31 @@ async function pingPLC() {
   return parsed.success;
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // ===== سەیرکردنی ئۆردەرەکان =====
 async function pollOrders() {
   try {
-    // ئۆردەرە pending ـەکان بهێنە
     const { data: orders, error } = await supabase
       .from('orders')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('❌ هەڵەی داتابەیس:', error.message);
-      return;
-    }
-
+    if (error) { console.error('❌ هەڵەی داتابەیس:', error.message); return; }
     if (!orders || orders.length === 0) return;
 
     console.log(`\n🔔 ${orders.length} ئۆردەری نوێ دۆزرایەوە!`);
 
     for (const order of orders) {
-      // ستاتەس بگۆڕە بۆ 'preparing'
-      await supabase
-        .from('orders')
-        .update({ status: 'preparing' })
-        .eq('id', order.id);
-
+      await supabase.from('orders').update({ status: 'preparing' }).eq('id', order.id);
       console.log(`⚙️  ئۆردەر #${order.order_number} - دەنێردرێت بۆ PLC...`);
 
       const success = await sendOrderToPLC(order);
 
       if (success) {
-        // ستاتەس بگۆڕە بۆ 'done'
-        await supabase
-          .from('orders')
-          .update({ status: 'done' })
-          .eq('id', order.id);
-
+        await supabase.from('orders').update({ status: 'done' }).eq('id', order.id);
         console.log(`✅ ئۆردەر #${order.order_number} - تەواو بوو!`);
       } else {
-        // ستاتەس بگۆڕە بۆ 'error'
-        await supabase
-          .from('orders')
-          .update({ status: 'error' })
-          .eq('id', order.id);
-
+        await supabase.from('orders').update({ status: 'error' }).eq('id', order.id);
         console.log(`❌ ئۆردەر #${order.order_number} - هەڵە!`);
       }
     }
@@ -289,40 +265,35 @@ async function start() {
   console.log(`║  PLC Port:  ${String(PLC_PORT).padEnd(28)}║`);
   console.log(`║  Poll:      ${(POLL_INTERVAL / 1000 + 's').padEnd(28)}║`);
   console.log('╚══════════════════════════════════════════╝');
-  console.log('');
 
-  // پشکنینی PLC
   console.log('🔌 پشکنینی پەیوەندی PLC...');
   const plcOk = await pingPLC();
   if (plcOk) {
     console.log('✅ PLC پەیوەستە! (Modbus TCP)');
+    const status = await readPLCStatus();
+    if (status) {
+      const statusNames = { 1: 'کاردەکات', 2: 'ئامادەیە', 3: 'کێشە', 4: 'ئامادە نییە', 5: 'تەواو' };
+      const modeNames = { 1: 'دەستی', 2: 'ئۆتۆ ناوخۆ', 3: 'ئۆتۆ دوورادوور' };
+      console.log(`   📊 دۆخ: ${statusNames[status.deviceStatus] || status.deviceStatus}`);
+      console.log(`   🔧 مۆد: ${modeNames[status.deviceMode] || status.deviceMode}`);
+      console.log(`   📈 بەرهەمی ئەمڕۆ: ${status.todayCount}`);
+    }
   } else {
-    console.log('⚠️  PLC پەیوەست نییە! پڕۆگرام بەردەوام دەبێت...');
-    console.log(`   دڵنیابە لەوەی PLC ـەکەت ڕوونە و IP: ${PLC_IP}:${PLC_PORT} ڕاستە`);
+    console.log('⚠️  PLC پەیوەست نییە!');
+    console.log(`   IP: ${PLC_IP}:${PLC_PORT}`);
   }
 
-  // پشکنینی داتابەیس
   console.log('🔌 پشکنینی داتابەیس...');
-  const { data, error } = await supabase.from('orders').select('id').limit(1);
+  const { error } = await supabase.from('orders').select('id').limit(1);
   if (error) {
     console.error('❌ داتابەیس پەیوەست نییە:', error.message);
-    console.error('   SUPABASE_URL و SUPABASE_KEY بپشکنە');
     process.exit(1);
   }
   console.log('✅ داتابەیس پەیوەستە!');
+  console.log('\n👀 سەیرکردنی ئۆردەرەکان...\n');
 
-  console.log('');
-  console.log('👀 سەیرکردنی ئۆردەرەکان دەستی پێکرد...');
-  console.log('   (Ctrl+C بۆ وەستاندن)');
-  console.log('');
-
-  // هەر X چرکەیەک سەیری ئۆردەرەکان بکە
   setInterval(pollOrders, POLL_INTERVAL);
-  // یەکەم جار ئێستا ڕابکە
   pollOrders();
 }
 
-start().catch(err => {
-  console.error('❌ هەڵەی دەستپێکردن:', err.message);
-  process.exit(1);
-});
+start().catch(err => { console.error('❌ هەڵە:', err.message); process.exit(1); });

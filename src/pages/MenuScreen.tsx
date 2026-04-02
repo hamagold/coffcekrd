@@ -856,23 +856,37 @@ const MenuScreen = () => {
         const item = paramItem.item;
         const itemImg = menuImages[item.id] || item.image;
 
+        const iceOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ سەهۆڵ' : language === 'ar' ? 'بدون ثلج' : 'No Ice', emoji: '🚫' },
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Less', emoji: '🧊' },
+          { value: 2, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '🧊🧊' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Extra', emoji: '🧊🧊🧊' },
+        ];
         const sugarOptions = [
           { value: 0, label: language === 'ku' ? 'بێ شەکر' : language === 'ar' ? 'بدون سكر' : 'No Sugar', emoji: '🚫' },
-          { value: 1, label: language === 'ku' ? 'بە شەکر' : language === 'ar' ? 'مع سكر' : 'With Sugar', emoji: '🍬' },
+          { value: 1, label: language === 'ku' ? 'کەم' : language === 'ar' ? 'قليل' : 'Less', emoji: '🍬' },
+          { value: 2, label: language === 'ku' ? 'ئاسایی' : language === 'ar' ? 'عادي' : 'Normal', emoji: '🍬🍬' },
+          { value: 3, label: language === 'ku' ? 'زۆر' : language === 'ar' ? 'كثير' : 'Extra', emoji: '🍬🍬🍬' },
         ];
-        const sizeOptions = [
-          { value: 1, label: language === 'ku' ? 'بچووک' : language === 'ar' ? 'صغير' : 'Small', emoji: 'S' },
-          { value: 2, label: language === 'ku' ? 'گەورە' : language === 'ar' ? 'كبير' : 'Large', emoji: 'L' },
+        const cupOptions = [
+          { value: 1, label: '☕ 8oz', emoji: '☕' },
+          { value: 5, label: '☕ 16oz', emoji: '☕' },
+          { value: 51, label: '🫖 12oz', emoji: '🫖' },
+          { value: 52, label: '🫖 16oz', emoji: '🫖' },
         ];
-        const milkOptions = [
-          { value: 0, label: language === 'ku' ? 'بێ شیر' : language === 'ar' ? 'بدون حليب' : 'No Milk', emoji: '🚫' },
-          { value: 1, label: language === 'ku' ? 'بە شیر' : language === 'ar' ? 'مع حليب' : 'With Milk', emoji: '🥛' },
+        const toppingOptions = [
+          { value: 0, label: language === 'ku' ? 'بێ تۆپینگ' : language === 'ar' ? 'بدون' : 'None', emoji: '🚫' },
+          { value: 51, label: 'Boba', emoji: '🫧' },
+          { value: 52, label: language === 'ku' ? 'فراولە' : 'Strawberry', emoji: '🍓' },
+          { value: 53, label: language === 'ku' ? 'پرتەقاڵ' : 'Orange', emoji: '🍊' },
+          { value: 54, label: 'Lychee', emoji: '🫐' },
         ];
 
         const paramSections = [
+          { key: 'ice' as const, title: language === 'ku' ? 'سەهۆڵ' : language === 'ar' ? 'الثلج' : 'Ice', options: iceOptions, color: FROOZT_ICE },
           { key: 'sugar' as const, title: language === 'ku' ? 'شەکر' : language === 'ar' ? 'السكر' : 'Sugar', options: sugarOptions, color: FROOZT_YELLOW },
-          { key: 'size' as const, title: language === 'ku' ? 'قەبارە' : language === 'ar' ? 'الحجم' : 'Size', options: sizeOptions, color: FROOZT_ICE },
-          { key: 'milk' as const, title: language === 'ku' ? 'شیر' : language === 'ar' ? 'الحليب' : 'Milk', options: milkOptions, color: FROOZT_LILAC },
+          { key: 'cupType' as const, title: language === 'ku' ? 'کوپ' : language === 'ar' ? 'الكوب' : 'Cup', options: cupOptions, color: FROOZT_LILAC },
+          { key: 'topping' as const, title: language === 'ku' ? 'تۆپینگ' : language === 'ar' ? 'الإضافات' : 'Topping', options: toppingOptions, color: FROOZT_PINK },
         ];
 
         return (

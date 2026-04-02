@@ -78,8 +78,9 @@ export const useMenuItems = () => {
 
   // Realtime subscription
   useEffect(() => {
+    const channelName = `menu_items_changes_${Date.now()}`;
     const channel = supabase
-      .channel('menu_items_changes')
+      .channel(channelName)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, () => {
         fetchItems();
       })

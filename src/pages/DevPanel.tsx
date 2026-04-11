@@ -430,12 +430,14 @@ const DevPanel = () => {
                           for (const tbl of allTableNames) {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
-                              const { data, error } = await supabase.from(tbl as any).select('*');
-                              if (!error && data) {
-                                (fullExport.tables as any)[tbl] = { row_count: data.length, rows: data };
-                                addLog(`✅ Exported ${tbl}: ${data.length} rows`);
+                              // Use exec_sql to bypass RLS for full export
+                              const { data: rpcData, error: rpcError } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
+                              const rows = Array.isArray(rpcData) ? rpcData : [];
+                              if (!rpcError) {
+                                (fullExport.tables as any)[tbl] = { row_count: rows.length, rows };
+                                addLog(`✅ Exported ${tbl}: ${rows.length} rows`);
                               } else {
-                                (fullExport.tables as any)[tbl] = { error: error?.message || 'No data', rows: [] };
+                                (fullExport.tables as any)[tbl] = { error: rpcError?.message || 'No data', rows: [] };
                               }
                             } catch (e) {
                               (fullExport.tables as any)[tbl] = { error: String(e), rows: [] };
@@ -484,8 +486,10 @@ const DevPanel = () => {
                           for (const tbl of allTableNames) {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
-                              const { data, error } = await supabase.from(tbl as any).select('*');
-                              if (!error && data && data.length > 0) {
+                              // Use exec_sql to bypass RLS for full export
+                              const { data: rpcData, error } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
+                              const data = Array.isArray(rpcData) ? rpcData : [];
+                              if (!error && data.length > 0) {
                                 sql += `-- ========================================\n`;
                                 sql += `-- Table: ${tbl} (${data.length} rows)\n`;
                                 sql += `-- ========================================\n\n`;

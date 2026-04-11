@@ -44,6 +44,8 @@ const DevPanel = () => {
   const [importJson, setImportJson] = useState('');
   const [migrationStatus, setMigrationStatus] = useState<{ table: string; status: string; count: number }[]>([]);
   const [isMigrating, setIsMigrating] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportProgress, setExportProgress] = useState('');
 
   const addLog = (message: string) => {
     setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 99)]);
@@ -360,7 +362,10 @@ const DevPanel = () => {
         </div>
 
         <Tabs defaultValue="database" className="w-full">
-          <TabsList className="w-full grid grid-cols-7 h-11">
+          <TabsList className="w-full grid grid-cols-8 h-11">
+            <TabsTrigger value="export" className="gap-1 text-[10px] px-2">
+              <Download className="w-3.5 h-3.5" /> Export All
+            </TabsTrigger>
             <TabsTrigger value="database" className="gap-1 text-[10px] px-2">
               <Database className="w-3.5 h-3.5" /> Database
             </TabsTrigger>

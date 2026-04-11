@@ -427,12 +427,26 @@ const DevPanel = () => {
                           const allTableNames = ['app_settings', 'menu_categories', 'menu_items', 'menu_item_variants', 'orders', 'profiles', 'user_roles', 'plc_sessions'];
                           const fullExport: Record<string, any> = { exported_at: new Date().toISOString(), tables: {} };
 
+                          // Pre-fetch email lookup
+                          const { data: authUsersData } = await supabase.rpc('exec_sql', { query_text: `SELECT id, email FROM auth.users` });
+                          const emailMap: Record<string, string> = {};
+                          if (Array.isArray(authUsersData)) {
+                            authUsersData.forEach((u: any) => { emailMap[u.id] = u.email; });
+                          }
+
                           for (const tbl of allTableNames) {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
                               // Use exec_sql to bypass RLS for full export
                               const { data: rpcData, error: rpcError } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
-                              const rows = Array.isArray(rpcData) ? rpcData : [];
+                              let rows = Array.isArray(rpcData) ? rpcData : [];
+                              // Replace user_id/id UUIDs with emails for readability
+                              if (tbl === 'user_roles') {
+                                rows = rows.map((r: any) => ({ ...r, user_email: emailMap[r.user_id] || r.user_id }));
+                              }
+                              if (tbl === 'profiles') {
+                                rows = rows.map((r: any) => ({ ...r, email: emailMap[r.id] || r.id }));
+                              }
                               if (!rpcError) {
                                 (fullExport.tables as any)[tbl] = { row_count: rows.length, rows };
                                 addLog(`✅ Exported ${tbl}: ${rows.length} rows`);

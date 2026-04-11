@@ -390,6 +390,203 @@ const DevPanel = () => {
           </TabsList>
 
           {/* Database Tab */}
+          {/* Export All Tab */}
+          <TabsContent value="export" className="space-y-4 mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Download className="w-5 h-5 text-primary" /> Export Entire Database
+                </CardTitle>
+                <CardDescription>
+                  Download all tables, rows, and data in JSON or MySQL format
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {exportLoading && (
+                  <div className="flex items-center gap-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                    <span className="text-sm text-foreground">{exportProgress}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* JSON Export */}
+                  <Card className="border-2 border-primary/20 hover:border-primary/50 transition-colors">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileJson className="w-5 h-5 text-blue-500" /> Export as JSON
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Full database export with all tables and rows in JSON format
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
+                        onClick={async () => {
+                          setExportLoading(true);
+                          const allTableNames = ['app_settings', 'menu_categories', 'menu_items', 'menu_item_variants', 'orders', 'profiles', 'user_roles', 'plc_sessions'];
+                          const fullExport: Record<string, any> = { exported_at: new Date().toISOString(), tables: {} };
+
+                          for (const tbl of allTableNames) {
+                            setExportProgress(`Fetching ${tbl}...`);
+                            try {
+                              const { data, error } = await supabase.from(tbl as any).select('*');
+                              if (!error && data) {
+                                (fullExport.tables as any)[tbl] = { row_count: data.length, rows: data };
+                                addLog(`✅ Exported ${tbl}: ${data.length} rows`);
+                              } else {
+                                (fullExport.tables as any)[tbl] = { error: error?.message || 'No data', rows: [] };
+                              }
+                            } catch (e) {
+                              (fullExport.tables as any)[tbl] = { error: String(e), rows: [] };
+                            }
+                          }
+
+                          const json = JSON.stringify(fullExport, null, 2);
+                          const blob = new Blob([json], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `full_database_export_${new Date().toISOString().split('T')[0]}.json`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          setExportLoading(false);
+                          setExportProgress('');
+                          addLog('📥 Full JSON export completed');
+                          toast.success('Full database exported as JSON!');
+                        }}
+                        disabled={exportLoading}
+                        className="w-full gap-2"
+                        size="lg"
+                      >
+                        <Download className="w-5 h-5" /> Download JSON
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* MySQL Export */}
+                  <Card className="border-2 border-orange-500/20 hover:border-orange-500/50 transition-colors">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Database className="w-5 h-5 text-orange-500" /> Export as MySQL / SQL
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Full database export as SQL INSERT statements compatible with MySQL
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
+                        onClick={async () => {
+                          setExportLoading(true);
+                          const allTableNames = ['app_settings', 'menu_categories', 'menu_items', 'menu_item_variants', 'orders', 'profiles', 'user_roles', 'plc_sessions'];
+                          let sql = `-- Full Database Export\n-- Generated: ${new Date().toISOString()}\n-- Tables: ${allTableNames.join(', ')}\n\n`;
+
+                          for (const tbl of allTableNames) {
+                            setExportProgress(`Fetching ${tbl}...`);
+                            try {
+                              const { data, error } = await supabase.from(tbl as any).select('*');
+                              if (!error && data && data.length > 0) {
+                                sql += `-- ========================================\n`;
+                                sql += `-- Table: ${tbl} (${data.length} rows)\n`;
+                                sql += `-- ========================================\n\n`;
+
+                                // CREATE TABLE
+                                const columns = Object.keys(data[0]);
+                                sql += `CREATE TABLE IF NOT EXISTS \`${tbl}\` (\n`;
+                                sql += columns.map(col => {
+                                  const sampleVal = data[0][col];
+                                  let colType = 'TEXT';
+                                  if (typeof sampleVal === 'number') colType = Number.isInteger(sampleVal) ? 'INT' : 'DECIMAL(10,2)';
+                                  else if (typeof sampleVal === 'boolean') colType = 'BOOLEAN';
+                                  else if (typeof sampleVal === 'object' && sampleVal !== null) colType = 'JSON';
+                                  else if (col === 'id') colType = 'VARCHAR(36)';
+                                  else if (col.includes('_at') || col.includes('created') || col.includes('updated')) colType = 'TIMESTAMP';
+                                  if (col === 'id') return `  \`${col}\` ${colType} PRIMARY KEY`;
+                                  return `  \`${col}\` ${colType}`;
+                                }).join(',\n');
+                                sql += `\n);\n\n`;
+
+                                // INSERT statements
+                                for (const row of data) {
+                                  const vals = columns.map(col => {
+                                    const v = row[col];
+                                    if (v === null || v === undefined) return 'NULL';
+                                    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+                                    if (typeof v === 'object') return `'${JSON.stringify(v).replace(/'/g, "\\'")}'`;
+                                    return `'${String(v).replace(/'/g, "\\'")}'`;
+                                  });
+                                  sql += `INSERT INTO \`${tbl}\` (${columns.map(c => `\`${c}\``).join(', ')}) VALUES (${vals.join(', ')});\n`;
+                                }
+                                sql += `\n`;
+                                addLog(`✅ Exported ${tbl}: ${data.length} rows as SQL`);
+                              } else {
+                                sql += `-- Table: ${tbl} (empty or error: ${error?.message || 'no data'})\n\n`;
+                              }
+                            } catch (e) {
+                              sql += `-- Table: ${tbl} (error: ${String(e)})\n\n`;
+                            }
+                          }
+
+                          const blob = new Blob([sql], { type: 'text/sql' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `full_database_export_${new Date().toISOString().split('T')[0]}.sql`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          setExportLoading(false);
+                          setExportProgress('');
+                          addLog('📥 Full MySQL/SQL export completed');
+                          toast.success('Full database exported as SQL!');
+                        }}
+                        disabled={exportLoading}
+                        className="w-full gap-2 bg-orange-600 hover:bg-orange-700"
+                        size="lg"
+                      >
+                        <Download className="w-5 h-5" /> Download SQL
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Export per table */}
+                <Card>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm">Export Individual Tables</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      {['app_settings', 'menu_categories', 'menu_items', 'menu_item_variants', 'orders', 'profiles', 'user_roles', 'plc_sessions'].map(tbl => (
+                        <Button
+                          key={tbl}
+                          variant="outline"
+                          size="sm"
+                          className="text-xs justify-start gap-2"
+                          disabled={exportLoading}
+                          onClick={async () => {
+                            setExportLoading(true);
+                            setExportProgress(`Exporting ${tbl}...`);
+                            const { data, error } = await supabase.from(tbl as any).select('*');
+                            if (!error && data) {
+                              exportData(data, tbl);
+                            } else {
+                              toast.error(`Error exporting ${tbl}: ${error?.message}`);
+                            }
+                            setExportLoading(false);
+                            setExportProgress('');
+                          }}
+                        >
+                          <Table2 className="w-3 h-3" /> {tbl}
+                        </Button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Database Tab */}
           <TabsContent value="database" className="space-y-4 mt-4">
             <div className="flex items-center gap-3 flex-wrap">
               <Button onClick={fetchTables} disabled={loading} variant="outline" size="sm">

@@ -517,6 +517,7 @@ const DevPanel = () => {
                               if (tbl === 'profiles') {
                                 data = data.map((r: any) => ({ ...r, email: emailMap2[r.id] || r.id }));
                               }
+                              if (!error && data.length > 0) {
                                 sql += `-- ========================================\n`;
                                 sql += `-- Table: ${tbl} (${data.length} rows)\n`;
                                 sql += `-- ========================================\n\n`;

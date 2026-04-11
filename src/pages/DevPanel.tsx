@@ -497,13 +497,26 @@ const DevPanel = () => {
                           const allTableNames = ['app_settings', 'menu_categories', 'menu_items', 'menu_item_variants', 'orders', 'profiles', 'user_roles', 'plc_sessions'];
                           let sql = `-- Full Database Export\n-- Generated: ${new Date().toISOString()}\n-- Tables: ${allTableNames.join(', ')}\n\n`;
 
+                          // Pre-fetch email lookup for readable export
+                          const { data: authUsersData2 } = await supabase.rpc('exec_sql', { query_text: `SELECT id, email FROM auth.users` });
+                          const emailMap2: Record<string, string> = {};
+                          if (Array.isArray(authUsersData2)) {
+                            authUsersData2.forEach((u: any) => { emailMap2[u.id] = u.email; });
+                          }
+
                           for (const tbl of allTableNames) {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
                               // Use exec_sql to bypass RLS for full export
                               const { data: rpcData, error } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
-                              const data = Array.isArray(rpcData) ? rpcData : [];
-                              if (!error && data.length > 0) {
+                              let data = Array.isArray(rpcData) ? rpcData : [];
+                              // Replace user_id/id UUIDs with emails for readability
+                              if (tbl === 'user_roles') {
+                                data = data.map((r: any) => ({ ...r, user_email: emailMap2[r.user_id] || r.user_id }));
+                              }
+                              if (tbl === 'profiles') {
+                                data = data.map((r: any) => ({ ...r, email: emailMap2[r.id] || r.id }));
+                              }
                                 sql += `-- ========================================\n`;
                                 sql += `-- Table: ${tbl} (${data.length} rows)\n`;
                                 sql += `-- ========================================\n\n`;

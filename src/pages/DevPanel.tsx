@@ -443,7 +443,7 @@ const DevPanel = () => {
                           const fullExport: Record<string, any> = { exported_at: new Date().toISOString(), tables: {} };
 
                           // Pre-fetch email lookup
-                          const { data: authUsersData } = await supabase.rpc('exec_sql', { query_text: `SELECT id, email FROM auth.users` });
+                          const { data: authUsersData } = await runPrivilegedSql('SELECT id, email FROM auth.users');
                           const emailMap: Record<string, string> = {};
                           if (Array.isArray(authUsersData)) {
                             authUsersData.forEach((u: any) => { emailMap[u.id] = u.email; });
@@ -453,7 +453,7 @@ const DevPanel = () => {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
                               // Use exec_sql to bypass RLS for full export
-                              const { data: rpcData, error: rpcError } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
+                              const { data: rpcData, error: rpcError } = await runPrivilegedSql(`SELECT * FROM ${tbl}`);
                               let rows = Array.isArray(rpcData) ? rpcData : [];
                               // Replace user_id/id UUIDs with emails for readability
                               if (tbl === 'user_roles') {
@@ -513,7 +513,7 @@ const DevPanel = () => {
                           let sql = `-- Full Database Export\n-- Generated: ${new Date().toISOString()}\n-- Tables: ${allTableNames.join(', ')}\n\n`;
 
                           // Pre-fetch email lookup for readable export
-                          const { data: authUsersData2 } = await supabase.rpc('exec_sql', { query_text: `SELECT id, email FROM auth.users` });
+                          const { data: authUsersData2 } = await runPrivilegedSql('SELECT id, email FROM auth.users');
                           const emailMap2: Record<string, string> = {};
                           if (Array.isArray(authUsersData2)) {
                             authUsersData2.forEach((u: any) => { emailMap2[u.id] = u.email; });
@@ -523,7 +523,7 @@ const DevPanel = () => {
                             setExportProgress(`Fetching ${tbl}...`);
                             try {
                               // Use exec_sql to bypass RLS for full export
-                              const { data: rpcData, error } = await supabase.rpc('exec_sql', { query_text: `SELECT * FROM ${tbl}` });
+                              const { data: rpcData, error } = await runPrivilegedSql(`SELECT * FROM ${tbl}`);
                               let data = Array.isArray(rpcData) ? rpcData : [];
                               // Replace user_id/id UUIDs with emails for readability
                               if (tbl === 'user_roles') {

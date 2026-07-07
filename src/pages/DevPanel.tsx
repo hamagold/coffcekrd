@@ -17,6 +17,21 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 
 const DEV_PASSWORD = 'hamagold2026';
 
+// Route privileged SQL through the run-sql edge function (service_role),
+// since exec_sql is no longer callable directly by anon/authenticated clients.
+async function runPrivilegedSql(query: string): Promise<{ data: any[] | null; error: { message: string } | null }> {
+  try {
+    const { data, error } = await supabase.functions.invoke('run-sql', {
+      body: { query, dev_password: DEV_PASSWORD },
+    });
+    if (error) return { data: null, error: { message: error.message } };
+    if (data?.error) return { data: null, error: { message: data.error } };
+    return { data: Array.isArray(data?.data) ? data.data : [], error: null };
+  } catch (e: any) {
+    return { data: null, error: { message: String(e?.message || e) } };
+  }
+}
+
 interface TableInfo {
   name: string;
   rowCount: number;
